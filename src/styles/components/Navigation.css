@@ -1,60 +1,162 @@
+/* ==========================================
+   MOBILE-FIRST PREMIUM NAVIGATION
+   ========================================== */
+
 .main-navigation {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  border-bottom: 3px solid #3b82f6;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--primary-medium);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbar but keep functionality */
+.main-navigation::-webkit-scrollbar {
+  display: none;
 }
 
 .nav-content {
   display: flex;
   gap: 0;
-  overflow-x: auto;
+  min-width: min-content;
 }
+
+/* ==========================================
+   NAV ITEMS - Touch Optimized
+   ========================================== */
 
 .nav-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 16px 24px;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: var(--spacing-sm) var(--spacing-md);
   text-decoration: none;
-  color: #cbd5e1;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  color: var(--medium-gray);
+  font-weight: 600;
+  font-size: 0.75rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-bottom: 3px solid transparent;
   white-space: nowrap;
-  min-width: max-content;
+  min-width: 80px;
+  position: relative;
+  overflow: hidden;
+  min-height: var(--touch-target);
 }
 
-.nav-item:hover {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
+/* Hover glow effect */
+.nav-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, var(--gold-glow) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.nav-item--active {
-  background-color: rgba(59, 130, 246, 0.15);
-  color: #3b82f6;
-  border-bottom-color: #3b82f6;
+.nav-item:active::before {
+  opacity: 1;
 }
 
+/* Icon styling */
 .nav-icon {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: grayscale(100%);
 }
 
 .nav-label {
-  font-size: 0.9rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
-@media (max-width: 768px) {
+/* ==========================================
+   HOVER & ACTIVE STATES
+   ========================================== */
+
+.nav-item:hover {
+  color: var(--gold-light);
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.nav-item:hover .nav-icon {
+  transform: translateY(-2px);
+  filter: grayscale(0%);
+}
+
+/* Active state */
+.nav-item--active {
+  color: var(--gold-primary);
+  background: rgba(212, 175, 55, 0.15);
+  border-bottom-color: var(--gold-primary);
+  box-shadow: inset 0 -2px 0 0 var(--gold-primary);
+}
+
+.nav-item--active .nav-icon {
+  filter: grayscale(0%);
+  transform: scale(1.1);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+/* ==========================================
+   TABLET VIEW
+   ========================================== */
+
+@media (min-width: 640px) {
   .nav-item {
-    padding: 12px 16px;
-    flex-direction: column;
-    gap: 4px;
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: var(--spacing-md) var(--spacing-lg);
+    min-width: auto;
   }
-
+  
   .nav-icon {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
   }
-
+  
   .nav-label {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* ==========================================
+   DESKTOP VIEW
+   ========================================== */
+
+@media (min-width: 1024px) {
+  .main-navigation {
+    overflow: visible;
+  }
+  
+  .nav-content {
+    justify-content: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .nav-item {
+    border-radius: var(--radius-md);
+    border-bottom: none;
+    padding: var(--spacing-md) var(--spacing-xl);
+  }
+  
+  .nav-item--active {
+    box-shadow: var(--shadow-gold);
   }
 }

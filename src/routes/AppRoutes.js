@@ -4,7 +4,7 @@ import MainLayout from '../components/layout/MainLayout';
 import RestaurantBilling from '../pages/RestaurantBilling';
 import DishManagement from '../pages/DishManagement';
 import Expenditure from '../pages/Expenditure';
-
+import OrderHistory from '../pages/OrderHistory';
 const AppRoutes = () => {
   return (
     <Routes>
@@ -13,7 +13,7 @@ const AppRoutes = () => {
         <Route path="billing" element={<RestaurantBilling />} />
         <Route path="dishes" element={<DishManagement />} />
         {/* Future routes */}
-        <Route path="orders" element={<div>Order History Coming Soon</div>} />
+        <Route path="orders" element={<OrderHistory />} />
         <Route path="analytics" element={<div>Analytics Coming Soon</div>} />
         <Route path="expenditure" element={<Expenditure/>} />
       </Route>

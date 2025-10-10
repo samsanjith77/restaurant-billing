@@ -5,7 +5,8 @@ export const API_CONFIG = {
     CREATE_ORDER: '/orders/create/',
     // NEW endpoints
     CREATE_DISH: '/dishes/create/',
-    UPDATE_DISH_IMAGE: '/dishes/<dish_id>/update-image/'
+    UPDATE_DISH_IMAGE: '/dishes/<dish_id>/update-image/',
+    ORDER_HISTORY: '/orders/history/'
   }
 };
 

@@ -128,7 +128,7 @@ const DishForm = ({ onDishCreated }) => {
             <input
               type="number"
               id="price"
-              step="0.01"
+              step="1.00"
               min="0"
               className={`form-input ${errors.price ? 'form-input--error' : ''}`}
               placeholder="Enter price (e.g., 299.00)"

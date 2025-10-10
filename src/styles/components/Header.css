@@ -1,37 +1,73 @@
+/* ==========================================
+   PREMIUM HEADER - DARK NAVY + GOLD THEME
+   ========================================== */
+
 .header {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  color: white;
-  padding: 20px 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 3s ease;
+}
+
+/* Scrolled header - enhanced shadow */
+.header.scrolled {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  border-bottom-color: rgba(212, 175, 55, 0.5);
 }
 
 .header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 20px;
 }
+
+/* ==========================================
+   BRAND SECTION
+   ========================================== */
 
 .brand {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
 .restaurant-name {
   font-size: 1.75rem;
-  font-weight: 700;
+  font-weight: 800;
   margin: 0;
-  background: linear-gradient(45deg, #ffffff, #e0e7ff);
+  background: linear-gradient(135deg, #d4af37 0%, #f4e4c1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+  position: relative;
+}
+
+/* Optional: Add icon before restaurant name */
+.restaurant-name::before {
+  content: '🍽️';
+  font-size: 2rem;
+  filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.5));
+  -webkit-text-fill-color: initial;
 }
 
 .tagline {
   font-size: 0.875rem;
-  color: #e0e7ff;
-  font-weight: 400;
-  margin-top: 2px;
+  color: #f4e4c1;
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.9;
 }
+
+/* ==========================================
+   HEADER NAVIGATION
+   ========================================== */
 
 .header-nav {
   display: flex;
@@ -45,13 +81,78 @@
 }
 
 .welcome {
-  font-weight: 500;
-  color: #e0e7ff;
+  font-weight: 600;
+  color: #f4e4c1;
+  font-size: 0.95rem;
 }
 
+/* ==========================================
+   BUTTONS IN HEADER
+   ========================================== */
+
+.header-nav .btn {
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  min-height: 44px;
+}
+
+.header-nav .btn--outline {
+  background: transparent;
+  color: #d4af37;
+  border: 2px solid #d4af37;
+}
+
+.header-nav .btn--outline:hover {
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+  color: #0f172a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 24px rgba(212, 175, 55, 0.4);
+  border-color: #d4af37;
+}
+
+.header-nav .btn--outline:active {
+  transform: translateY(0);
+}
+
+.header-nav .btn--primary {
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+  color: #0f172a;
+  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
+}
+
+.header-nav .btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 32px rgba(212, 175, 55, 0.5);
+}
+
+/* ==========================================
+   MOBILE RESPONSIVE
+   ========================================== */
+
 @media (max-width: 768px) {
+  .header {
+    padding: 15px 0;
+  }
+
   .restaurant-name {
     font-size: 1.5rem;
+  }
+
+  .restaurant-name::before {
+    font-size: 1.75rem;
+  }
+
+  .tagline {
+    font-size: 0.75rem;
   }
 
   .header-content {
@@ -63,4 +164,81 @@
   .brand {
     align-items: center;
   }
+
+  .welcome {
+    display: none; /* Hide welcome text on mobile */
+  }
+
+  .header-nav .btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .restaurant-name {
+    font-size: 1.25rem;
+  }
+
+  .restaurant-name::before {
+    font-size: 1.5rem;
+  }
+
+  .user-menu {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .header-nav .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ==========================================
+   TABLET VIEW
+   ========================================== */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .restaurant-name {
+    font-size: 1.6rem;
+  }
+
+  .welcome {
+    font-size: 0.9rem;
+  }
+}
+
+/* ==========================================
+   PREMIUM EFFECTS
+   ========================================== */
+
+/* Subtle glow on hover */
+.header:hover {
+  border-bottom-color: rgba(212, 175, 55, 0.4);
+}
+
+/* Animated gradient for restaurant name */
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.restaurant-name {
+  background-size: 200% auto;
+  animation: shimmer 7s ease-in-out infinite;
+}
+
+/* Smooth scroll shadow effect */
+.header.scrolled {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  border-bottom-color: rgba(212, 175, 55, 0.5);
 }

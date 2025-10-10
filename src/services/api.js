@@ -83,6 +83,32 @@ class ApiService {
       throw error;
     }
   }
+  // Add this method to your ApiService class
+
+  // Update this method in your ApiService class
+
+  static async getOrderHistory(payload) {
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ORDER_HISTORY}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch order history');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching order history:', error);
+      throw error;
+    }
+  }
+
+
 }
 
 export default ApiService;
