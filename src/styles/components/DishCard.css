@@ -14,14 +14,15 @@
 
 .dish-image-container {
   position: relative;
-  height: 180px;
+  height: 100px;
   overflow: hidden;
+  width: auto;
 }
 
 .dish-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit:contain;
 }
 
 .dish-content {

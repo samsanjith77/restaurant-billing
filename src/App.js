@@ -1,16 +1,18 @@
 import React from 'react';
-import Header from './components/layout/Header';
-import RestaurantBilling from './pages/RestaurantBilling';
+import { BrowserRouter as Router } from 'react-router-dom';
+import AppRoutes from './routes/AppRoutes';
+import { AuthProvider } from './contexts/AuthContext';
 import './styles/App.css';
 
 function App() {
   return (
-    <div className="App">
-      <Header />
-      <main className="main-content">
-        <RestaurantBilling />
-      </main>
-    </div>
+    <AuthProvider>
+      <Router>
+        <div className="App">
+          <AppRoutes />
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 
