@@ -4,7 +4,7 @@ class ApiService {
   // Helper method to get default headers
   static getHeaders(isFormData = false) {
     const headers = {
-      'ngrok-skip-browser-warning': 'true' // Add this for ngrok
+      'ngrok-skip-browser-warning': 'true'
     };
 
     if (!isFormData) {
@@ -35,7 +35,7 @@ class ApiService {
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CREATE_DISH}`,
         {
           method: 'POST',
-          headers: this.getHeaders(true), // true = FormData, don't set Content-Type
+          headers: this.getHeaders(true),
           body: formData
         }
       );
@@ -48,12 +48,13 @@ class ApiService {
     }
   }
 
+  // CHANGED: PUT to PATCH
   static async updateDishPrice(dishId, priceData) {
     try {
       const response = await fetch(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.UPDATE_DISH_PRICE.replace('<dish_id>', dishId)}`,
         {
-          method: 'PUT',
+          method: 'PATCH', // Changed from PUT to PATCH
           headers: this.getHeaders(),
           body: JSON.stringify(priceData)
         }
@@ -67,13 +68,14 @@ class ApiService {
     }
   }
 
+  // CHANGED: PUT to PATCH
   static async updateDishImage(dishId, formData) {
     try {
       const response = await fetch(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.UPDATE_DISH_IMAGE.replace('<dish_id>', dishId)}`,
         {
-          method: 'PUT',
-          headers: this.getHeaders(true), // FormData
+          method: 'PATCH', // Changed from PUT to PATCH
+          headers: this.getHeaders(true),
           body: formData
         }
       );

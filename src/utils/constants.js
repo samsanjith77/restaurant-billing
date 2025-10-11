@@ -1,6 +1,6 @@
 export const API_CONFIG = {
   // BASE_URL: 'http://192.168.1.4:8000/bill',
-  BASE_URL: 'https://3d86dfec65c0.ngrok-free.app/bill',
+  BASE_URL: 'https://a2bfb74c1d9a.ngrok-free.app/bill',
   ENDPOINTS: {
     DISHES: '/dishes/',
     CREATE_ORDER: '/orders/create/',
