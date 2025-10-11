@@ -3,84 +3,10 @@
    ========================================== */
 
 .expenditure {
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm); /* REDUCED: Less padding on mobile */
   max-width: 1200px;
   margin: 0 auto;
 }
-
-/* Category Summary */
-.category-summary {
-  background: var(--white);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: var(--spacing-lg);
-}
-
-.category-summary h3 {
-  font-size: 1.1rem;
-  color: var(--primary-dark);
-  margin-bottom: var(--spacing-md);
-  font-weight: 700;
-}
-
-.category-cards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-sm);
-}
-
-.category-card {
-  background: var(--off-white);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  border-left: 4px solid var(--purple-accent);
-}
-
-.category-name {
-  font-weight: 600;
-  color: var(--primary-dark);
-  margin-bottom: var(--spacing-xs);
-  font-size: 0.9rem;
-}
-
-.category-amount {
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: var(--purple-accent);
-}
-
-/* Update person card */
-.person-role-badge {
-  font-size: 0.7rem;
-  padding: 0.25rem 0.5rem;
-  background: var(--primary-dark);
-  color: var(--gold-primary);
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  display: inline-block;
-  margin-bottom: var(--spacing-xs);
-}
-
-/* Update expense item */
-.expense-person-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.expense-role {
-  font-size: 0.7rem;
-  color: var(--medium-gray);
-  font-weight: 500;
-}
-
-@media (min-width: 640px) {
-  .category-cards {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
 
 /* ==========================================
    NOTIFICATION
@@ -139,19 +65,19 @@
 }
 
 /* ==========================================
-   SUMMARY CARDS
+   SUMMARY CARDS - MOBILE OPTIMIZED
    ========================================== */
 
 .summary-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-lg);
 }
 
 .summary-card {
   background: var(--white);
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   display: flex;
@@ -160,14 +86,14 @@
 }
 
 .card-icon {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   background: var(--gradient-gold);
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 800;
   color: var(--primary-dark);
   flex-shrink: 0;
@@ -178,10 +104,11 @@
   flex-direction: column;
   gap: 0.25rem;
   min-width: 0;
+  flex: 1;
 }
 
 .card-value {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 800;
   color: var(--primary-dark);
   white-space: nowrap;
@@ -236,7 +163,7 @@
 }
 
 /* ==========================================
-   FORM SECTION
+   FORM SECTION - FIXED WIDTH CONSTRAINTS
    ========================================== */
 
 .form-section {
@@ -271,6 +198,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
+  min-width: 0;
 }
 
 .form-group label {
@@ -283,12 +211,15 @@
 
 .form-group input,
 .form-group select {
+  width: 100%;
+  max-width: 100%;
   padding: var(--spacing-sm);
   border: 2px solid var(--light-gray);
   border-radius: var(--radius-md);
   font-size: 0.9rem;
   background: var(--white);
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .form-group input:focus,
@@ -296,6 +227,16 @@
   outline: none;
   border-color: var(--gold-primary);
   box-shadow: 0 0 0 3px var(--gold-glow);
+}
+
+.form-group input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.form-group input[type="number"]::-webkit-outer-spin-button,
+.form-group input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .submit-btn {
@@ -392,12 +333,60 @@
 }
 
 .person-filter {
+  width: 100%;
+  max-width: 100%;
   padding: var(--spacing-sm);
   border: 2px solid var(--light-gray);
   border-radius: var(--radius-md);
   font-size: 0.9rem;
   background: var(--white);
   font-weight: 600;
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   CATEGORY SUMMARY
+   ========================================== */
+
+.category-summary {
+  background: var(--white);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.category-summary h3 {
+  font-size: 1.1rem;
+  color: var(--primary-dark);
+  margin-bottom: var(--spacing-md);
+  font-weight: 700;
+}
+
+.category-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.category-card {
+  background: var(--off-white);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--gold-primary);
+}
+
+.category-name {
+  font-weight: 600;
+  color: var(--primary-dark);
+  margin-bottom: var(--spacing-xs);
+  font-size: 0.9rem;
+}
+
+.category-amount {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--gold-primary);
 }
 
 /* ==========================================
@@ -436,6 +425,17 @@
   color: var(--primary-dark);
   margin-bottom: var(--spacing-xs);
   font-size: 0.95rem;
+}
+
+.person-role-badge {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--primary-dark);
+  color: var(--gold-primary);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: var(--spacing-xs);
 }
 
 .person-stats {
@@ -496,10 +496,22 @@
   margin-bottom: var(--spacing-xs);
 }
 
+.expense-person-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .expense-person {
   font-weight: 700;
   color: var(--primary-dark);
   font-size: 0.95rem;
+}
+
+.expense-role {
+  font-size: 0.7rem;
+  color: var(--medium-gray);
+  font-weight: 500;
 }
 
 .expense-category {
@@ -564,6 +576,7 @@
 
 .person-details {
   flex: 1;
+  min-width: 0;
 }
 
 .person-details .person-name {
@@ -609,6 +622,30 @@
    TABLET & DESKTOP
    ========================================== */
 
+@media (min-width: 480px) {
+  .expenditure {
+    padding: var(--spacing-md);
+  }
+
+  .summary-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .summary-card {
+    padding: var(--spacing-md);
+  }
+
+  .card-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 1.25rem;
+  }
+
+  .card-value {
+    font-size: 1.1rem;
+  }
+}
+
 @media (min-width: 640px) {
   .summary-cards {
     gap: var(--spacing-md);
@@ -618,17 +655,20 @@
   .filters-section,
   .expenses-list,
   .persons-list,
-  .person-summary {
+  .person-summary,
+  .category-summary {
     padding: var(--spacing-lg);
   }
 
-  .person-cards {
+  .person-cards,
+  .category-cards {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 1024px) {
-  .person-cards {
+  .person-cards,
+  .category-cards {
     grid-template-columns: repeat(3, 1fr);
   }
 }
