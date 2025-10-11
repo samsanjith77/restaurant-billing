@@ -1,64 +1,385 @@
 import React, { useState } from 'react';
 import DishForm from '../components/dishes/DishForm';
-import DishList from '../components/dishes/DishList';
 import useDishes from '../hooks/useDishes';
+import ApiService from '../services/api';
 import '../styles/components/DishManagement.css';
 
 const DishManagement = () => {
   const [activeTab, setActiveTab] = useState('list');
   const { dishes, loading, error, refetch } = useDishes();
+  
+  // Edit price modal state
+  const [editPriceModal, setEditPriceModal] = useState(null);
+  const [editPrice, setEditPrice] = useState('');
+  
+  // Edit image modal state
+  const [editImageModal, setEditImageModal] = useState(null);
+  const [newImage, setNewImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState(null);
 
   const handleDishCreated = () => {
-    refetch(); // Refresh the dish list
-    setActiveTab('list'); // Switch back to list view
+    refetch();
+    setActiveTab('list');
   };
 
-  const handleImageUpdated = () => {
-    refetch(); // Refresh the dish list
+  // ============= PRICE EDIT =============
+  const handleEditPriceClick = (dish) => {
+    setEditPriceModal(dish);
+    setEditPrice(dish.price);
+  };
+
+  const handleClosePriceEdit = () => {
+    setEditPriceModal(null);
+    setEditPrice('');
+  };
+
+  const handleUpdatePrice = async (e) => {
+    e.preventDefault();
+    
+    if (!editPrice || parseFloat(editPrice) <= 0) {
+      setMessage({ type: 'error', text: 'Please enter a valid price' });
+      setTimeout(() => setMessage(null), 3000);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await ApiService.updateDishPrice(editPriceModal.id, {
+        price: parseFloat(editPrice)
+      });
+
+      setMessage({ type: 'success', text: 'Price updated successfully' });
+      await refetch();
+      handleClosePriceEdit();
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message || 'Failed to update price' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // ============= IMAGE EDIT =============
+  const handleEditImageClick = (dish) => {
+    setEditImageModal(dish);
+    setNewImage(null);
+    setImagePreview(null);
+  };
+
+  const handleCloseImageEdit = () => {
+    setEditImageModal(null);
+    setNewImage(null);
+    setImagePreview(null);
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewImage(file);
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUpdateImage = async (e) => {
+    e.preventDefault();
+    
+    if (!newImage) {
+      setMessage({ type: 'error', text: 'Please select an image' });
+      setTimeout(() => setMessage(null), 3000);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('image', newImage);
+
+      await ApiService.updateDishImage(editImageModal.id, formData);
+
+      setMessage({ type: 'success', text: 'Image updated successfully' });
+      await refetch();
+      handleCloseImageEdit();
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message || 'Failed to update image' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="dish-management">
+      {/* Message Notification */}
+      {message && (
+        <div className={`notification notification--${message.type}`}>
+          {message.text}
+        </div>
+      )}
+
+      {/* Header */}
       <div className="dish-management__header">
-        <h1>🍽️ Dish Management</h1>
+        <h1>Dish Management</h1>
         <p>Create and manage your restaurant dishes</p>
       </div>
 
+      {/* Tabs */}
       <div className="tabs">
         <button 
           className={`tab ${activeTab === 'list' ? 'tab--active' : ''}`}
           onClick={() => setActiveTab('list')}
         >
-          📋 All Dishes ({dishes.length})
+          All Dishes ({dishes.length})
         </button>
         <button 
           className={`tab ${activeTab === 'create' ? 'tab--active' : ''}`}
           onClick={() => setActiveTab('create')}
         >
-          ➕ Add New Dish
+          Add New Dish
         </button>
       </div>
 
+      {/* Tab Content */}
       <div className="tab-content">
+        {/* LIST TAB */}
         {activeTab === 'list' && (
           <div className="tab-panel">
-            <DishList
-              dishes={dishes}
-              loading={loading}
-              error={error}
-              onRetry={refetch}
-              showActions={true}
-              onImageUpdated={handleImageUpdated}
-            />
+            {loading ? (
+              <div className="loading-state">Loading dishes...</div>
+            ) : error ? (
+              <div className="error-state">
+                <p>{error}</p>
+                <button onClick={refetch} className="retry-btn">Retry</button>
+              </div>
+            ) : dishes.length === 0 ? (
+              <div className="empty-state">
+                <p>No dishes available</p>
+                <span>Create your first dish</span>
+              </div>
+            ) : (
+              <div className="dishes-grid-manage">
+                {dishes.map((dish) => (
+                  <div key={dish.id} className="dish-card-manage">
+                    {/* IMAGE - LEFT */}
+                    {dish.image && (
+                      <div className="dish-img-manage">
+                        <img src={dish.image} alt={dish.name} />
+                      </div>
+                    )}
+
+                    {/* INFO - MIDDLE */}
+                    <div className="dish-info-manage">
+                      <h4 className="dish-name-manage">{dish.name}</h4>
+                      <p className="dish-price-manage">
+                        ₹{parseFloat(dish.price).toFixed(2)}
+                      </p>
+                    </div>
+
+                    {/* BUTTONS - RIGHT SIDE BY SIDE */}
+                    <div className="dish-actions-manage">
+                      <button
+                        className="action-btn-small action-btn--price"
+                        onClick={() => handleEditPriceClick(dish)}
+                        title="Edit Price"
+                      >
+                        Price
+                      </button>
+                      <button
+                        className="action-btn-small action-btn--image"
+                        onClick={() => handleEditImageClick(dish)}
+                        title="Edit Image"
+                      >
+                        Image
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
+        {/* CREATE TAB */}
         {activeTab === 'create' && (
           <div className="tab-panel">
             <DishForm onDishCreated={handleDishCreated} />
           </div>
         )}
       </div>
+
+      {/* ============= EDIT PRICE MODAL ============= */}
+      {editPriceModal && (
+        <div className="edit-modal" onClick={handleClosePriceEdit}>
+          <div className="edit-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="edit-modal-header">
+              <h3>Edit Price</h3>
+              <button 
+                className="modal-close-btn" 
+                onClick={handleClosePriceEdit} 
+                type="button"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdatePrice} className="edit-form">
+              <div className="edit-dish-info">
+                {editPriceModal.image && (
+                  <img 
+                    src={editPriceModal.image} 
+                    alt={editPriceModal.name} 
+                    className="edit-dish-img" 
+                  />
+                )}
+                <div className="edit-dish-details">
+                  <h4>{editPriceModal.name}</h4>
+                  <p className="current-price">
+                    Current: ₹{parseFloat(editPriceModal.price).toFixed(2)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="form-group-compact">
+                <label htmlFor="edit-price">New Price (₹)</label>
+                <input
+                  id="edit-price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={editPrice}
+                  onChange={(e) => setEditPrice(e.target.value)}
+                  placeholder="Enter new price"
+                  className="price-input-compact"
+                  autoFocus
+                  required
+                />
+              </div>
+
+              <div className="edit-actions">
+                <button 
+                  type="button" 
+                  className="btn-cancel" 
+                  onClick={handleClosePriceEdit} 
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn-save" 
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Updating...' : 'Update Price'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============= EDIT IMAGE MODAL ============= */}
+      {editImageModal && (
+        <div className="edit-modal" onClick={handleCloseImageEdit}>
+          <div className="edit-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="edit-modal-header">
+              <h3>Edit Image</h3>
+              <button 
+                className="modal-close-btn" 
+                onClick={handleCloseImageEdit} 
+                type="button"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateImage} className="edit-form">
+              <div className="edit-dish-info">
+                <div className="edit-dish-details" style={{ width: '100%' }}>
+                  <h4>{editImageModal.name}</h4>
+                  <p className="current-price">
+                    ₹{parseFloat(editImageModal.price).toFixed(2)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="form-group-compact">
+                <label>Current Image</label>
+                {editImageModal.image && (
+                  <img 
+                    src={editImageModal.image} 
+                    alt={editImageModal.name} 
+                    className="current-image-full" 
+                  />
+                )}
+              </div>
+
+              <div className="form-group-compact">
+                <label htmlFor="new-image">New Image</label>
+                {!imagePreview ? (
+                  <label htmlFor="new-image" className="upload-area-compact">
+                    <input
+                      id="new-image"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="file-input-hidden"
+                    />
+                    <div className="upload-content">
+                      <div className="upload-icon">📷</div>
+                      <p className="upload-text">Tap to upload new image</p>
+                    </div>
+                  </label>
+                ) : (
+                  <div className="preview-container">
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      className="preview-image-full" 
+                    />
+                    <button 
+                      type="button" 
+                      className="change-image-btn" 
+                      onClick={() => {
+                        setNewImage(null);
+                        setImagePreview(null);
+                      }}
+                    >
+                      Change Image
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="edit-actions">
+                <button 
+                  type="button" 
+                  className="btn-cancel" 
+                  onClick={handleCloseImageEdit} 
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn-save" 
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Updating...' : 'Update Image'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

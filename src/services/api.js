@@ -107,6 +107,75 @@ class ApiService {
       throw error;
     }
   }
+// Add these methods to your ApiService class
+
+  // Persons APIs
+  static async getPersons() {
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PERSONS}`);
+      if (!response.ok) throw new Error('Failed to fetch persons');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching persons:', error);
+      throw error;
+    }
+  }
+
+  static async addPerson(personData) {
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ADD_PERSON}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(personData)
+      });
+      
+      if (!response.ok) throw new Error('Failed to add person');
+      return await response.json();
+    } catch (error) {
+      console.error('Error adding person:', error);
+      throw error;
+    }
+  }
+
+  // Expenses APIs
+  static async filterExpenses(filterData) {
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.FILTER_EXPENSES}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(filterData)
+      });
+      
+      if (!response.ok) throw new Error('Failed to filter expenses');
+      return await response.json();
+    } catch (error) {
+      console.error('Error filtering expenses:', error);
+      throw error;
+    }
+  }
+
+  static async addExpense(expenseData) {
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ADD_EXPENSE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(expenseData)
+      });
+      
+      if (!response.ok) throw new Error('Failed to add expense');
+      return await response.json();
+    } catch (error) {
+      console.error('Error adding expense:', error);
+      throw error;
+    }
+  }
+
 
 
 }

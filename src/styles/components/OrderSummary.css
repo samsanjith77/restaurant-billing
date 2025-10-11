@@ -1,115 +1,185 @@
+/* ==========================================
+   ULTRA-COMPACT ORDER SUMMARY
+   ========================================== */
+
 .order-summary {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 20px;
-}
-
-.order-summary__header {
-  padding: 20px 20px 0;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.order-summary__header h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 15px;
-}
-
-.order-summary__body {
-  padding: 20px;
-  max-height: 400px;
+  flex: 1;
   overflow-y: auto;
+  padding: 0.5rem;
+  max-height: 350px;
+  -webkit-overflow-scrolling: touch;
 }
 
-.empty-order {
-  text-align: center;
-  color: #64748b;
-  font-style: italic;
-  padding: 20px 0;
+.order-summary::-webkit-scrollbar {
+  width: 3px;
 }
+
+.order-summary::-webkit-scrollbar-thumb {
+  background: var(--gold-primary);
+  border-radius: var(--radius-sm);
+}
+
+/* ==========================================
+   EMPTY CART - Compact
+   ========================================== */
+
+.empty-cart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  opacity: 0.3;
+  margin-bottom: 0.75rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.empty-cart p {
+  color: var(--dark-gray);
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.empty-hint {
+  color: var(--medium-gray);
+  font-size: 0.75rem;
+}
+
+/* ==========================================
+   COMPACT ORDER ITEMS
+   ========================================== */
 
 .order-items {
-  scale: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
 }
 
 .order-item {
+  background: var(--off-white);
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--light-gray);
+}
+
+.item-info {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  padding: 12px 0;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.order-item:last-child {
-  border-bottom: none;
-}
-
-.order-item__details {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
+  align-items: baseline;
+  margin-bottom: 0.375rem;
+  gap: 0.5rem;
 }
 
 .item-name {
+  font-weight: 600;
+  color: var(--primary-dark);
+  font-size: 0.85rem;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.item-price {
+  color: var(--medium-gray);
+  font-size: 0.75rem;
   font-weight: 500;
-  color: #1e293b;
-  margin-bottom: 4px;
+  white-space: nowrap;
+}
+
+.item-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: var(--white);
+  border-radius: var(--radius-full);
+  padding: 2px;
+  width: fit-content;
+  border: 1px solid var(--light-gray);
+}
+
+.qty-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: var(--gold-primary);
+  color: var(--primary-dark);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-btn:active {
+  transform: scale(0.9);
+}
+
+.qty-btn--minus {
+  background: var(--light-gray);
+}
+
+.qty-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .item-quantity {
-  font-size: 0.875rem;
-  color: #64748b;
+  min-width: 20px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--primary-dark);
+  font-size: 0.85rem;
 }
 
 .item-total {
-  font-weight: 600;
-  color: #f97316;
-}
-
-.order-total {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 2px solid #e2e8f0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gold-primary);
   text-align: right;
-  font-size: 1.125rem;
+  margin-top: 0.25rem;
 }
 
-.order-status {
-  margin-top: 12px;
-  padding: 10px;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
+/* ==========================================
+   TABLET & DESKTOP
+   ========================================== */
 
-.order-status.success {
-  background-color: #dcfce7;
-  color: #166534;
-  border: 1px solid #bbf7d0;
-}
-
-.order-status.error {
-  background-color: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-}
-
-.order-summary__footer {
-  padding: 20px;
-  border-top: 1px solid #e2e8f0;
-}
-
-@media (max-width: 768px) {
+@media (min-width: 768px) {
   .order-summary {
-    position: relative;
-    top: auto;
+    max-height: 450px;
+    padding: 0.75rem;
   }
-  
-  .order-summary__body {
-    max-height: none;
+
+  .order-items {
+    gap: 0.5rem;
+  }
+
+  .order-item {
+    padding: 0.625rem;
+  }
+
+  .item-name {
+    font-size: 0.9rem;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.05);
   }
 }

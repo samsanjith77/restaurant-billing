@@ -1,12 +1,18 @@
 export const API_CONFIG = {
-  BASE_URL: 'http://127.0.0.1:8000/bill',
+  // BASE_URL: 'http://192.168.1.4:8000/bill',
+  BASE_URL: 'https://3d86dfec65c0.ngrok-free.app/bill',
   ENDPOINTS: {
     DISHES: '/dishes/',
     CREATE_ORDER: '/orders/create/',
     // NEW endpoints
     CREATE_DISH: '/dishes/create/',
     UPDATE_DISH_IMAGE: '/dishes/<dish_id>/update-image/',
-    ORDER_HISTORY: '/orders/history/'
+    UPDATE_DISH_PRICE: '/dishes/<dish_id>/update-price/',
+    ORDER_HISTORY: '/orders/history/',
+    PERSONS: '/persons/',
+    ADD_PERSON: '/persons/add/',
+    FILTER_EXPENSES: '/expenses/filter/',
+    ADD_EXPENSE: '/expenses/add/'
   }
 };
 
@@ -22,7 +28,6 @@ export const MESSAGES = {
   SUCCESS_ORDER: 'Order placed successfully!',
   EMPTY_ORDER: 'Please select at least one dish',
   NO_DISHES: 'No dishes available',
-  // NEW messages
   SUCCESS_DISH_CREATED: 'Dish created successfully!',
   SUCCESS_IMAGE_UPDATED: 'Dish image updated successfully!',
   ERROR_CREATE_DISH: 'Failed to create dish. Please try again.',
@@ -30,7 +35,6 @@ export const MESSAGES = {
   CREATING_DISH: 'Creating dish...',
   UPDATING_IMAGE: 'Updating image...'
 };
-
 export const FILE_TYPES = {
   ACCEPTED_IMAGES: 'image/jpeg,image/jpg,image/png,image/webp',
   MAX_FILE_SIZE: 5 * 1024 * 1024 // 5MB
