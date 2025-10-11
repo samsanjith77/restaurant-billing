@@ -108,16 +108,24 @@ class ApiService {
     }
   }
 
-  static async getOrderHistory() {
+ // ============= ORDERS =============
+
+// FIXED: Force POST by always sending a body (even if empty)
+  static async getOrderHistory(payload = {}) {
     try {
       const response = await fetch(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ORDER_HISTORY}`,
         {
-          headers: this.getHeaders()
+          method: 'POST',
+          headers: this.getHeaders(), // Changed: Use getHeaders() for consistency
+          body: JSON.stringify(payload) // Always send body, even if empty {}
         }
       );
-
-      if (!response.ok) throw new Error('Failed to fetch order history');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch order history');
+      }
+      
       return await response.json();
     } catch (error) {
       console.error('Error fetching order history:', error);
