@@ -1,72 +1,121 @@
 /* ==========================================
-   PREMIUM HEADER - DARK NAVY + GOLD THEME
+   HEADER - FIXED TOP
+   ========================================== */
+/* ==========================================
+   HEADER - PREMIUM GLASS EFFECT
    ========================================== */
 
 .header {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  transition: all 3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
 }
 
-/* Scrolled header - enhanced shadow */
 .header.scrolled {
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-  border-bottom-color: rgba(212, 175, 55, 0.5);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(15px);
+}
+
+/* Rest of your existing header CSS... */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--gradient-primary);
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+}
+
+.header.scrolled {
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(10px);
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
 }
 
 .header-content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 20px;
+  justify-content: space-between;
+  min-height: 70px;
+  gap: var(--spacing-md);
 }
 
 /* ==========================================
-   BRAND SECTION
+   BRAND
    ========================================== */
 
 .brand {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .restaurant-name {
-  font-size: 1.75rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  margin: 0;
-  background: linear-gradient(135deg, #d4af37 0%, #f4e4c1 100%);
+  background: var(--gradient-gold);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  letter-spacing: -0.02em;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
-  position: relative;
-}
-
-/* Optional: Add icon before restaurant name */
-.restaurant-name::before {
-  content: '🍽️';
-  font-size: 2rem;
-  filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.5));
-  -webkit-text-fill-color: initial;
+  margin: 0;
+  white-space: nowrap;
 }
 
 .tagline {
-  font-size: 0.875rem;
-  color: #f4e4c1;
+  font-size: 0.7rem;
+  color: var(--gold-light);
   font-weight: 500;
-  margin: 0;
   letter-spacing: 0.05em;
-  text-transform: uppercase;
-  opacity: 0.9;
 }
 
 /* ==========================================
-   HEADER NAVIGATION
+   MAIN NAVIGATION
+   ========================================== */
+
+.header-main-nav {
+  display: none;
+  gap: 0.5rem;
+}
+
+.nav-link {
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: var(--gold-light);
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  background: rgba(212, 175, 55, 0.1);
+  color: var(--gold-primary);
+}
+
+.nav-link.active {
+  background: var(--gold-primary);
+  color: var(--primary-dark);
+}
+
+/* ==========================================
+   HEADER ACTIONS
    ========================================== */
 
 .header-nav {
@@ -74,171 +123,100 @@
   align-items: center;
 }
 
-.user-menu {
+.header-actions {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 0.75rem;
 }
 
-.welcome {
-  font-weight: 600;
-  color: #f4e4c1;
-  font-size: 0.95rem;
-}
-
-/* ==========================================
-   BUTTONS IN HEADER
-   ========================================== */
-
-.header-nav .btn {
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 0.9rem;
+.btn {
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.85rem;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   border: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
   white-space: nowrap;
-  min-height: 44px;
 }
 
-.header-nav .btn--outline {
+.btn--outline {
   background: transparent;
-  color: #d4af37;
-  border: 2px solid #d4af37;
+  border: 2px solid var(--gold-primary);
+  color: var(--gold-primary);
 }
 
-.header-nav .btn--outline:hover {
-  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
-  color: #0f172a;
+.btn--outline:hover {
+  background: var(--gold-primary);
+  color: var(--primary-dark);
   transform: translateY(-2px);
-  box-shadow: 0 4px 24px rgba(212, 175, 55, 0.4);
-  border-color: #d4af37;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
 }
 
-.header-nav .btn--outline:active {
+.btn--outline:active {
   transform: translateY(0);
 }
 
-.header-nav .btn--primary {
-  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
-  color: #0f172a;
-  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
+.btn--register {
+  background: var(--gradient-gold);
+  color: var(--primary-dark);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
 }
 
-.header-nav .btn--primary:hover {
+.btn--register:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 32px rgba(212, 175, 55, 0.5);
+  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.4);
+}
+
+.btn--register:active {
+  transform: translateY(0);
 }
 
 /* ==========================================
-   MOBILE RESPONSIVE
+   RESPONSIVE - TABLET & DESKTOP
    ========================================== */
 
-@media (max-width: 768px) {
-  .header {
-    padding: 15px 0;
+@media (min-width: 768px) {
+  .header-main-nav {
+    display: flex;
   }
 
   .restaurant-name {
     font-size: 1.5rem;
-  }
-
-  .restaurant-name::before {
-    font-size: 1.75rem;
   }
 
   .tagline {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
   }
+}
 
+/* ==========================================
+   RESPONSIVE - MOBILE
+   ========================================== */
+
+@media (max-width: 767px) {
   .header-content {
-    flex-direction: column;
-    gap: 15px;
-    text-align: center;
+    min-height: 60px;
   }
 
-  .brand {
-    align-items: center;
-  }
-
-  .welcome {
-    display: none; /* Hide welcome text on mobile */
-  }
-
-  .header-nav .btn {
-    padding: 8px 16px;
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 480px) {
   .restaurant-name {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
   }
 
-  .restaurant-name::before {
-    font-size: 1.5rem;
+  .tagline {
+    font-size: 0.65rem;
   }
 
-  .user-menu {
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
+  .btn {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8rem;
   }
 
-  .header-nav .btn {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* ==========================================
-   TABLET VIEW
-   ========================================== */
-
-@media (min-width: 769px) and (max-width: 1024px) {
-  .restaurant-name {
-    font-size: 1.6rem;
+  .btn--register {
+    display: none; /* Hide register button on mobile */
   }
 
-  .welcome {
-    font-size: 0.9rem;
+  .header-actions {
+    gap: 0.5rem;
   }
-}
-
-/* ==========================================
-   PREMIUM EFFECTS
-   ========================================== */
-
-/* Subtle glow on hover */
-.header:hover {
-  border-bottom-color: rgba(212, 175, 55, 0.4);
-}
-
-/* Animated gradient for restaurant name */
-@keyframes shimmer {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.restaurant-name {
-  background-size: 200% auto;
-  animation: shimmer 7s ease-in-out infinite;
-}
-
-/* Smooth scroll shadow effect */
-.header.scrolled {
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-  border-bottom-color: rgba(212, 175, 55, 0.5);
 }

@@ -1,0 +1,173 @@
+/* ==========================================
+   ANALYTICS - COMING SOON PAGE
+   ========================================== */
+
+.analytics {
+  padding: var(--spacing-md);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ==========================================
+   PAGE HEADER
+   ========================================== */
+
+.page-header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.page-header h1 {
+  font-size: 1.75rem;
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+  font-weight: 800;
+}
+
+.page-header p {
+  color: var(--dark-gray);
+  font-size: 0.95rem;
+}
+
+/* ==========================================
+   COMING SOON CARD
+   ========================================== */
+
+.coming-soon-card {
+  background: var(--white);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.coming-soon-icon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.coming-soon-card h2 {
+  font-size: 1.5rem;
+  color: var(--primary-dark);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 800;
+}
+
+.coming-soon-card > p {
+  color: var(--dark-gray);
+  font-size: 1rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ==========================================
+   FEATURES PREVIEW
+   ========================================== */
+
+.features-preview {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.feature-item {
+  background: var(--off-white);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  border: 2px solid var(--light-gray);
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  border-color: var(--gold-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.feature-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.feature-text {
+  font-weight: 600;
+  color: var(--primary-dark);
+  font-size: 0.9rem;
+}
+
+/* ==========================================
+   PLACEHOLDER CARDS
+   ========================================== */
+
+.placeholder-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.placeholder-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  border: 1px solid var(--light-gray);
+}
+
+.placeholder-header {
+  background: var(--gradient-primary);
+  padding: var(--spacing-md);
+}
+
+.placeholder-header h3 {
+  color: var(--gold-primary);
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 700;
+}
+
+.placeholder-content {
+  padding: var(--spacing-lg);
+  text-align: center;
+}
+
+.placeholder-content p {
+  color: var(--dark-gray);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 768px) {
+  .features-preview {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+
+  .placeholder-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .coming-soon-card {
+    padding: var(--spacing-lg);
+  }
+
+  .coming-soon-icon {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .features-preview {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

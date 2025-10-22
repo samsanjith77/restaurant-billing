@@ -2,11 +2,18 @@
    ULTRA-COMPACT BILLING - MOBILE FIRST
    ========================================== */
 
+/* ==========================================
+   RESTAURANT BILLING - WITH BACKGROUND
+   ========================================== */
+
 .restaurant-billing {
-  padding: 0.5rem;
-  max-width: 1600px;
-  margin: 0 auto;
+  background: transparent !important;
+  min-height: 100vh;
 }
+
+
+/* Rest of your existing CSS below... */
+
 
 /* ==========================================
    NOTIFICATION - Compact

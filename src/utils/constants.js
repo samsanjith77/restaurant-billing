@@ -1,41 +1,40 @@
 export const API_CONFIG = {
-  // BASE_URL: 'http://192.168.1.4:8000/bill',
-  BASE_URL: 'https://a2bfb74c1d9a.ngrok-free.app/bill',
+  BASE_URL: 'http://192.168.1.4:8000', // Change to your backend URL
   ENDPOINTS: {
-    DISHES: '/dishes/',
-    CREATE_ORDER: '/orders/create/',
-    // NEW endpoints
-    CREATE_DISH: '/dishes/create/',
-    UPDATE_DISH_IMAGE: '/dishes/<dish_id>/update-image/',
-    UPDATE_DISH_PRICE: '/dishes/<dish_id>/update-price/',
-    ORDER_HISTORY: '/orders/history/',
-    PERSONS: '/persons/',
-    ADD_PERSON: '/persons/add/',
-    FILTER_EXPENSES: '/expenses/filter/',
-    ADD_EXPENSE: '/expenses/add/'
+    // Auth endpoints
+    LOGIN: '/accounts/login/',
+    REGISTER: '/accounts/register/',
+    TOKEN_REFRESH: '/accounts/token/refresh/',
+    
+    // Existing endpoints
+    DISHES: '/bill/dishes/',
+    CREATE_ORDER: '/bill/orders/create/',
+    CREATE_DISH: '/bill/dishes/create/',
+    UPDATE_DISH_IMAGE: '/bill/dishes/<dish_id>/update-image/',
+    UPDATE_DISH_PRICE: '/bill/dishes/<dish_id>/update-price/',
+    ORDER_HISTORY: '/bill/orders/history/',
+    PERSONS: '/bill/orders/persons/',
+    ADD_PERSON: '/bill/orders/persons/add/',
+    FILTER_EXPENSES: '/bill/orders/expenses/filter/',
+    ADD_EXPENSE: '/bill/orders/expenses/add/'
   }
 };
 
 export const ORDER_TYPES = {
-  DINE_IN: 'dine_in',
+  DINE_IN: 'dine-in',
   DELIVERY: 'delivery'
 };
 
 export const MESSAGES = {
-  LOADING_DISHES: 'Loading dishes...',
-  ERROR_FETCH_DISHES: 'Failed to load dishes. Please try again.',
-  ERROR_CREATE_ORDER: 'Failed to create order. Please try again.',
+  EMPTY_ORDER: 'Please add items to your order',
   SUCCESS_ORDER: 'Order placed successfully!',
-  EMPTY_ORDER: 'Please select at least one dish',
-  NO_DISHES: 'No dishes available',
-  SUCCESS_DISH_CREATED: 'Dish created successfully!',
-  SUCCESS_IMAGE_UPDATED: 'Dish image updated successfully!',
-  ERROR_CREATE_DISH: 'Failed to create dish. Please try again.',
-  ERROR_UPDATE_IMAGE: 'Failed to update image. Please try again.',
-  CREATING_DISH: 'Creating dish...',
-  UPDATING_IMAGE: 'Updating image...'
+  ERROR_CREATE_ORDER: 'Failed to create order',
+  LOGIN_REQUIRED: 'Please login to continue',
+  SESSION_EXPIRED: 'Session expired. Please login again'
 };
-export const FILE_TYPES = {
-  ACCEPTED_IMAGES: 'image/jpeg,image/jpg,image/png,image/webp',
-  MAX_FILE_SIZE: 5 * 1024 * 1024 // 5MB
+
+// Token storage keys
+export const TOKEN_KEYS = {
+  ACCESS: 'access_token',
+  REFRESH: 'refresh_token'
 };
