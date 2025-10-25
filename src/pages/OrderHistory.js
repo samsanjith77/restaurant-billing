@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ApiService from '../services/api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
@@ -48,24 +48,12 @@ const OrderHistory = () => {
     return date.toISOString();
   }
 
-  // Auto-fetch when dates change
-  useEffect(() => {
-    if (startDate && endDate) {
-      fetchOrders();
-    }
-  }, [startDate, endDate]);
-
-  // Filter orders when search or filter changes
-  useEffect(() => {
-    filterOrders();
-  }, [searchTerm, filterType, orders]);
-
-  const fetchOrders = async () => {
+  // Fetch orders with useCallback to prevent warning
+  const fetchOrders = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // Convert local time to UTC for API
       const startUTC = localToUTC(startDate);
       const endUTC = localToUTC(endDate);
 
@@ -91,19 +79,38 @@ const OrderHistory = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [startDate, endDate]);
 
-  const filterOrders = () => {
+  // Filter orders with useCallback to prevent warning
+  const filterOrders = useCallback(() => {
     let filtered = [...orders];
 
-    // Filter by order type
+    console.log('🔍 Filtering:', {
+      filterType,
+      totalOrders: orders.length,
+      orderTypes: orders.map(o => o.order_type)
+    });
+
     if (filterType !== 'all') {
-      filtered = filtered.filter(order => 
-        order.order_type.toLowerCase().replace(' ', '_') === filterType
-      );
+      filtered = filtered.filter(order => {
+        const orderTypeNormalized = order.order_type.toLowerCase().replace(/[\s_-]+/g, '');
+        const filterNormalized = filterType.toLowerCase().replace(/[\s_-]+/g, '');
+        
+        const matches = orderTypeNormalized === filterNormalized;
+        
+        console.log('Compare:', {
+          original: order.order_type,
+          normalized: orderTypeNormalized,
+          filter: filterNormalized,
+          matches
+        });
+        
+        return matches;
+      });
     }
 
-    // Search by order ID or dish name
+    console.log('✅ Filtered result:', filtered.length);
+
     if (searchTerm) {
       filtered = filtered.filter(order => {
         const searchLower = searchTerm.toLowerCase();
@@ -116,9 +123,21 @@ const OrderHistory = () => {
     }
 
     setFilteredOrders(filtered);
-  };
+  }, [orders, filterType, searchTerm]);
 
-  // Quick date filters - Now updates state which triggers useEffect
+  // Auto-fetch when dates change
+  useEffect(() => {
+    if (startDate && endDate) {
+      fetchOrders();
+    }
+  }, [startDate, endDate, fetchOrders]);
+
+  // Filter orders when search or filter changes
+  useEffect(() => {
+    filterOrders();
+  }, [filterOrders]);
+
+  // Quick date filters
   const applyQuickFilter = (filter) => {
     setQuickFilter(filter);
     const now = new Date();
@@ -158,7 +177,6 @@ const OrderHistory = () => {
       default:
         break;
     }
-    // No need to call fetchOrders() - useEffect will do it automatically
   };
 
   const formatDate = (dateString) => {
@@ -177,7 +195,8 @@ const OrderHistory = () => {
   };
 
   const getOrderTypeIcon = (orderType) => {
-    return orderType === 'Dine In' ? '🍽️' : '🏍️';
+    const normalized = orderType.toLowerCase().replace(/[\s_-]+/g, '');
+    return normalized === 'dinein' ? '🍽️' : '🏍️';
   };
 
   const getTotalRevenue = () => {
@@ -284,8 +303,8 @@ const OrderHistory = () => {
 
         <div className="type-filters">
           {[
-            { value: 'all', label: 'All' },
-            { value: 'dine_in', label: '🍽️', title: 'Dine In' },
+            { value: 'all', label: 'All', title: 'All Orders' },
+            { value: 'dinein', label: '🍽️', title: 'Dine In' },
             { value: 'delivery', label: '🏍️', title: 'Delivery' }
           ].map(filter => (
             <button

@@ -13,10 +13,15 @@ export const API_CONFIG = {
     UPDATE_DISH_IMAGE: '/bill/dishes/<dish_id>/update-image/',
     UPDATE_DISH_PRICE: '/bill/dishes/<dish_id>/update-price/',
     ORDER_HISTORY: '/bill/orders/history/',
-    PERSONS: '/bill/orders/persons/',
-    ADD_PERSON: '/bill/orders/persons/add/',
-    FILTER_EXPENSES: '/bill/orders/expenses/filter/',
-    ADD_EXPENSE: '/bill/orders/expenses/add/'
+    PERSONS: '/bill/persons/',
+    ADD_PERSON: '/bill/persons/add/',
+    FILTER_EXPENSES: '/bill/expenses/filter/',
+    ADD_EXPENSE: '/bill/expenses/add/',
+
+
+    // Analytics endpoints - NEW
+    ANALYTICS_SUMMARY: '/bill/analytics/summary/',
+    WORKER_EXPENSE: '/bill/analytics/worker-expense/'
   }
 };
 

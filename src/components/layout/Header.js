@@ -46,19 +46,19 @@ const Header = () => {
           {isAuthenticated && (
             <nav className="header-main-nav">
               <NavLink to="/billing" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-                💰 Billing
+                Billing
               </NavLink>
               <NavLink to="/dishes" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-                🍽️ Dishes
+                Dishes
               </NavLink>
               <NavLink to="/orders" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-                📋 Orders
+                Orders
               </NavLink>
               <NavLink to="/expenditure" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-                💸 Expenditure
+                Expenditure
               </NavLink>
               <NavLink to="/analytics" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-                📊 Analytics
+                Analytics
               </NavLink>
             </nav>
           )}

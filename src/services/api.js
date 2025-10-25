@@ -246,6 +246,55 @@ class ApiService {
       throw error;
     }
   }
+  // ============= ANALYTICS =============
+static async getAnalyticsSummary(params = {}) {
+  try {
+    const queryParams = new URLSearchParams();
+    
+    if (params.filter) {
+      queryParams.append('filter', params.filter);
+    }
+    if (params.start_date) {
+      queryParams.append('start_date', params.start_date);
+    }
+    if (params.end_date) {
+      queryParams.append('end_date', params.end_date);
+    }
+
+    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ANALYTICS_SUMMARY}${
+      queryParams.toString() ? `?${queryParams.toString()}` : ''
+    }`;
+
+    const response = await this.authenticatedFetch(url, {
+      headers: this.getHeaders()
+    });
+    
+    if (!response.ok) throw new Error('Failed to fetch analytics summary');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching analytics summary:', error);
+    throw error;
+  }
+}
+
+static async getWorkerExpense(date = null) {
+  try {
+    const url = date 
+      ? `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.WORKER_EXPENSE}?date=${date}`
+      : `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.WORKER_EXPENSE}`;
+
+    const response = await this.authenticatedFetch(url, {
+      headers: this.getHeaders()
+    });
+    
+    if (!response.ok) throw new Error('Failed to fetch worker expense');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching worker expense:', error);
+    throw error;
+  }
+}
+
 }
 
 export default ApiService;
