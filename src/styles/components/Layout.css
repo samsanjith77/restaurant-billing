@@ -1,16 +1,16 @@
 /* ==========================================
-   APP LAYOUT - PREMIUM BLUE BACKGROUND
+   APP LAYOUT - DARK BLUE THEME MATCHING HEADER
    ========================================== */
 
 .app-layout {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%) !important;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;
   position: relative;
 }
 
-/* Add subtle pattern overlay for premium look */
+/* Subtle pattern overlay */
 .app-layout::before {
   content: '';
   position: fixed;
@@ -18,9 +18,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(96, 165, 250, 0.1) 0%, transparent 50%);
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(212, 175, 55, 0.03) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
 }
@@ -30,7 +30,7 @@
   padding: var(--spacing-md);
   padding-top: 90px;
   padding-bottom: var(--spacing-md);
-  background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(219, 234, 254, 0.95) 100%) !important;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(51, 65, 85, 0.6) 100%) !important;
   backdrop-filter: blur(10px);
   min-height: calc(100vh - 70px);
   overflow-y: auto;
@@ -50,7 +50,7 @@
   z-index: 1000;
   display: none;
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
   padding: 0.5rem 0;
   border-top: 2px solid rgba(212, 175, 55, 0.3);
 }

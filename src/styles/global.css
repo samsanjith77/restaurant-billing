@@ -1,5 +1,5 @@
 /* ==========================================
-   CSS VARIABLES - PREMIUM BLUE THEME
+   CSS VARIABLES - PREMIUM DARK BLUE THEME
    ========================================== */
 
 :root {
@@ -25,10 +25,11 @@
   --gradient-gold: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
   --gradient-primary: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   
-  /* Premium Blue Gradients */
-  --gradient-blue-main: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
-  --gradient-blue-light: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%);
-  --gradient-blue-soft: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 50%, #93c5fd 100%);
+  /* Premium Blue Theme - Darker to match header */
+  --bg-dark-blue: #1e293b;
+  --bg-medium-blue: #334155;
+  --bg-light-blue: #475569;
+  --bg-accent: #64748b;
   
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -42,7 +43,7 @@
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-  --shadow-blue: 0 10px 40px rgba(59, 130, 246, 0.2);
+  --shadow-blue: 0 10px 40px rgba(30, 41, 59, 0.4);
   
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
@@ -52,7 +53,7 @@
 }
 
 /* ==========================================
-   RESET & PREMIUM BACKGROUND
+   RESET & PREMIUM DARK BACKGROUND
    ========================================== */
 
 * {
@@ -62,7 +63,7 @@
 }
 
 html {
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
   min-height: 100vh;
 }
 
@@ -72,7 +73,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%) !important;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;
   color: var(--primary-dark);
   min-height: 100vh;
 }
