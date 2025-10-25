@@ -6,6 +6,8 @@ import '../styles/components/Analytics.css';
 const Analytics = () => {
   const [summary, setSummary] = useState(null);
   const [workerExpense, setWorkerExpense] = useState(null);
+  const [revenueTrend, setRevenueTrend] = useState(null);
+  const [topDishes, setTopDishes] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
@@ -14,6 +16,7 @@ const Analytics = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [workerDate, setWorkerDate] = useState(getTodayString());
+  const [trendDays, setTrendDays] = useState(7);
 
   // Get today's date in YYYY-MM-DD format
   function getTodayString() {
@@ -35,7 +38,6 @@ const Analytics = () => {
         params.start_date = startDate;
         params.end_date = endDate;
       }
-      // If 'today' or no params, API defaults to today
 
       console.log('📊 Fetching analytics with params:', params);
       const data = await ApiService.getAnalyticsSummary(params);
@@ -61,6 +63,30 @@ const Analytics = () => {
     }
   }, [workerDate]);
 
+  // Fetch daily revenue trend
+  const fetchRevenueTrend = useCallback(async () => {
+    try {
+      console.log('📈 Fetching revenue trend for', trendDays, 'days');
+      const data = await ApiService.getDailyRevenueTrend(trendDays);
+      console.log('✅ Revenue trend:', data);
+      setRevenueTrend(data);
+    } catch (err) {
+      console.error('❌ Error:', err);
+    }
+  }, [trendDays]);
+
+  // Fetch top selling dishes
+  const fetchTopDishes = useCallback(async () => {
+    try {
+      console.log('🍽️ Fetching top selling dishes');
+      const data = await ApiService.getTopSellingDishes();
+      console.log('✅ Top dishes:', data);
+      setTopDishes(data);
+    } catch (err) {
+      console.error('❌ Error:', err);
+    }
+  }, []);
+
   // Fetch on mount and when filters change
   useEffect(() => {
     fetchSummary();
@@ -69,6 +95,14 @@ const Analytics = () => {
   useEffect(() => {
     fetchWorkerExpense();
   }, [fetchWorkerExpense]);
+
+  useEffect(() => {
+    fetchRevenueTrend();
+  }, [fetchRevenueTrend]);
+
+  useEffect(() => {
+    fetchTopDishes();
+  }, [fetchTopDishes]);
 
   // Quick filter handlers
   const applyFilter = (type) => {
@@ -90,6 +124,11 @@ const Analytics = () => {
     if (balance > 0) return 'positive';
     if (balance < 0) return 'negative';
     return 'neutral';
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
   if (loading && !summary) {
@@ -212,33 +251,108 @@ const Analytics = () => {
             </div>
           </div>
 
-          {/* Percentage Bar */}
+          {/* FIXED: Income vs Expense Bar */}
           {summary.total_income > 0 && (
             <div className="breakdown-bar">
               <div className="breakdown-header">
-                <span>Income vs Expense</span>
+                <span>Income vs Expense Breakdown</span>
                 <span className="profit-margin">
                   Profit Margin: {((summary.balance / summary.total_income) * 100).toFixed(1)}%
                 </span>
               </div>
-              <div className="bar-container">
-                <div 
-                  className="bar-segment income" 
-                  style={{ width: '100%' }}
-                  title={`Income: ${formatCurrency(summary.total_income)}`}
-                >
-                  <span className="bar-label">Income</span>
+              <div className="bar-visual">
+                <div className="bar-row">
+                  <div className="bar-label-left">Income</div>
+                  <div className="bar-track">
+                    <div 
+                      className="bar-fill income-bar" 
+                      style={{ width: '100%' }}
+                    >
+                      <span className="bar-amount">{formatCurrency(summary.total_income)}</span>
+                    </div>
+                  </div>
                 </div>
-                <div 
-                  className="bar-segment expense" 
-                  style={{ width: `${(summary.total_expense / summary.total_income) * 100}%` }}
-                  title={`Expense: ${formatCurrency(summary.total_expense)}`}
-                >
-                  <span className="bar-label">Expense</span>
+                <div className="bar-row">
+                  <div className="bar-label-left">Expense</div>
+                  <div className="bar-track">
+                    <div 
+                      className="bar-fill expense-bar" 
+                      style={{ width: `${(summary.total_expense / summary.total_income) * 100}%` }}
+                    >
+                      <span className="bar-amount">{formatCurrency(summary.total_expense)}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Daily Revenue Trend Chart */}
+      {revenueTrend && revenueTrend.labels && revenueTrend.labels.length > 0 && (
+        <div className="analytics-section">
+          <div className="section-header">
+            <h2>📈 Daily Revenue Trend</h2>
+            <div className="trend-controls">
+              <select 
+                value={trendDays} 
+                onChange={(e) => setTrendDays(Number(e.target.value))}
+                className="days-select"
+              >
+                <option value={7}>Last 7 Days</option>
+                <option value={14}>Last 14 Days</option>
+                <option value={30}>Last 30 Days</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="chart-container">
+            {revenueTrend.labels.map((label, index) => {
+              const income = revenueTrend.daily_income[index];
+              const maxIncome = Math.max(...revenueTrend.daily_income);
+              const heightPercent = maxIncome > 0 ? (income / maxIncome) * 100 : 0;
+
+              return (
+                <div key={index} className="chart-bar">
+                  <div className="bar-wrapper">
+                    <div 
+                      className="bar-column" 
+                      style={{ height: `${heightPercent}%` }}
+                      title={formatCurrency(income)}
+                    >
+                      <span className="bar-value">{formatCurrency(income)}</span>
+                    </div>
+                  </div>
+                  <div className="bar-label">{formatDate(label)}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Top Selling Dishes */}
+      {topDishes && topDishes.top_dishes && topDishes.top_dishes.length > 0 && (
+        <div className="analytics-section">
+          <div className="section-header">
+            <h2>🍽️ Top Selling Dishes</h2>
+          </div>
+
+          <div className="dishes-list">
+            {topDishes.top_dishes.map((dish, index) => (
+              <div key={index} className="dish-item">
+                <div className="dish-rank">#{index + 1}</div>
+                <div className="dish-info">
+                  <div className="dish-name">{dish.dish_name}</div>
+                  <div className="dish-stats">
+                    <span className="dish-quantity">Sold: {dish.total_sold}</span>
+                  </div>
+                </div>
+                <div className="dish-revenue">{formatCurrency(dish.total_revenue)}</div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

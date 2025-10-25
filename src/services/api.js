@@ -294,6 +294,39 @@ static async getWorkerExpense(date = null) {
     throw error;
   }
 }
+// ... existing analytics methods ...
+
+static async getDailyRevenueTrend(days = 7) {
+  try {
+    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DAILY_REVENUE_TREND}?days=${days}`;
+
+    const response = await this.authenticatedFetch(url, {
+      headers: this.getHeaders()
+    });
+    
+    if (!response.ok) throw new Error('Failed to fetch daily revenue trend');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching daily revenue trend:', error);
+    throw error;
+  }
+}
+
+static async getTopSellingDishes() {
+  try {
+    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.TOP_SELLING_DISHES}`;
+
+    const response = await this.authenticatedFetch(url, {
+      headers: this.getHeaders()
+    });
+    
+    if (!response.ok) throw new Error('Failed to fetch top selling dishes');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching top selling dishes:', error);
+    throw error;
+  }
+}
 
 }
 

@@ -21,7 +21,9 @@ export const API_CONFIG = {
 
     // Analytics endpoints - NEW
     ANALYTICS_SUMMARY: '/bill/analytics/summary/',
-    WORKER_EXPENSE: '/bill/analytics/worker-expense/'
+    WORKER_EXPENSE: '/bill/analytics/worker-expense/',
+    DAILY_REVENUE_TREND: '/bill/analytics/daily-revenue-trend/',  // NEW
+    TOP_SELLING_DISHES: '/bill/analytics/top-selling-dishes/' 
   }
 };
 
