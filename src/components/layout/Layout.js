@@ -1,9 +1,12 @@
 import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import Header from './Header';
 import '../../styles/components/Layout.css';
 
 const Layout = () => {
+  const { isAdmin } = useAuth();
+
   return (
     <div className="app-layout">
       <Header />
@@ -11,7 +14,7 @@ const Layout = () => {
         <Outlet />
       </main>
       
-      {/* Mobile Bottom Navigation - Inline */}
+      {/* Mobile Bottom Navigation */}
       <nav className="bottom-nav">
         <NavLink to="/billing" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
           <span className="nav-icon">💰</span>
@@ -29,10 +32,13 @@ const Layout = () => {
           <span className="nav-icon">💸</span>
           <span className="nav-label">Expense</span>
         </NavLink>
-        <NavLink to="/analytics" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-          <span className="nav-icon">📊</span>
-          <span className="nav-label">Analytics</span>
-        </NavLink>
+        {/* Show Analytics only for Admin */}
+        {isAdmin && (
+          <NavLink to="/analytics" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
+            <span className="nav-icon">📊</span>
+            <span className="nav-label">Analytics</span>
+          </NavLink>
+        )}
       </nav>
     </div>
   );

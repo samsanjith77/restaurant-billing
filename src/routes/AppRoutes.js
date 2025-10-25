@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
+import AdminRoute from '../components/auth/AdminRoute';
 import Login from '../components/auth/Login';
 import Register from '../components/auth/Register';
 import Layout from '../components/layout/Layout';
@@ -8,13 +9,15 @@ import RestaurantBilling from '../pages/RestaurantBilling';
 import DishManagement from '../pages/DishManagement';
 import OrderHistory from '../pages/OrderHistory';
 import Expenditure from '../pages/Expenditure';
-import Analytics from '../pages/Analytics'; // NEW
+import Analytics from '../pages/Analytics';
 
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* Public route */}
       <Route path="/login" element={<Login />} />
       
+      {/* Protected routes */}
       <Route path="/" element={
         <ProtectedRoute>
           <Layout />
@@ -25,10 +28,21 @@ const AppRoutes = () => {
         <Route path="dishes" element={<DishManagement />} />
         <Route path="orders" element={<OrderHistory />} />
         <Route path="expenditure" element={<Expenditure />} />
-        <Route path="analytics" element={<Analytics />} /> {/* NEW */}
-        <Route path="register" element={<Register />} />
+        
+        {/* Admin-only routes */}
+        <Route path="analytics" element={
+          <AdminRoute>
+            <Analytics />
+          </AdminRoute>
+        } />
+        <Route path="register" element={
+          <AdminRoute>
+            <Register />
+          </AdminRoute>
+        } />
       </Route>
 
+      {/* Catch all */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );

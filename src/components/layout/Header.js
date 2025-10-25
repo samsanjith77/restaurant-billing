@@ -5,7 +5,7 @@ import '../../styles/components/Header.css';
 
 const Header = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, user, isAdmin, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -46,29 +46,44 @@ const Header = () => {
           {isAuthenticated && (
             <nav className="header-main-nav">
               <NavLink to="/billing" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-                Billing
+                💰 Billing
               </NavLink>
               <NavLink to="/dishes" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-                Dishes
+                🍽️ Dishes
               </NavLink>
               <NavLink to="/orders" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-                Orders
+                📋 Orders
               </NavLink>
               <NavLink to="/expenditure" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-                Expenditure
+                💸 Expenditure
               </NavLink>
-              <NavLink to="/analytics" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-                Analytics
-              </NavLink>
+              {/* Show Analytics only for Admin */}
+              {isAdmin && (
+                <NavLink to="/analytics" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+                  📊 Analytics
+                </NavLink>
+              )}
             </nav>
           )}
 
           <nav className="header-nav">
             {isAuthenticated ? (
               <div className="header-actions">
-                <button className="btn btn--register" onClick={() => navigate('/register')}>
-                  + New User
-                </button>
+                {/* Show user info */}
+                {user && (
+                  <div className="user-info">
+                    <span className="username">{user.username}</span>
+                    {isAdmin && <span className="admin-badge">Admin</span>}
+                  </div>
+                )}
+                
+                {/* Show Register button only for Admin */}
+                {isAdmin && (
+                  <button className="btn btn--register" onClick={() => navigate('/register')}>
+                    + New User
+                  </button>
+                )}
+                
                 <button className="btn btn--outline" onClick={handleLogout}>
                   Logout
                 </button>
