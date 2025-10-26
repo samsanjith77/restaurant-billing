@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-  BASE_URL: 'http://192.168.1.4:8000', // Change to your backend URL
+  BASE_URL: 'http://localhost:8000', // Change to your backend URL
   ENDPOINTS: {
     // Auth endpoints
     LOGIN: '/accounts/login/',

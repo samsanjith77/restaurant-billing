@@ -1,105 +1,65 @@
 /* ==========================================
-   ULTRA-COMPACT BILLING - MOBILE FIRST
-   ========================================== */
-
-/* ==========================================
-   RESTAURANT BILLING - WITH BACKGROUND
+   RESTAURANT BILLING - DISHES LEFT, CART RIGHT
    ========================================== */
 
 .restaurant-billing {
+  padding: var(--spacing-sm) var(--spacing-md);
+  max-width: 100%;
+  margin: 0;
   background: transparent !important;
   min-height: 100vh;
-}
-
-
-/* Rest of your existing CSS below... */
-
-
-/* ==========================================
-   NOTIFICATION - Compact
-   ========================================== */
-
-.notification {
-  position: fixed;
-  top: 0.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  background: var(--white);
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  animation: slideDown 0.3s ease-out;
-  max-width: 90%;
-  font-weight: 600;
-  font-size: 0.85rem;
-  border-left: 4px solid var(--gold-primary);
-}
-
-.notification--success {
-  border-left-color: var(--success);
-  color: var(--success);
-}
-
-.notification--error {
-  border-left-color: var(--error);
-  color: var(--error);
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
-
-/* ==========================================
-   BILLING CONTAINER - Compact Gap
-   ========================================== */
-
-.billing-container {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.5rem;
+  grid-template-columns: 1fr 340px;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+
+/* Force correct grid order */
+.restaurant-billing > .dishes-section {
+  grid-column: 1;
+  order: 1;
+}
+
+.restaurant-billing > .order-section {
+  grid-column: 2;
+  order: 2;
 }
 
 /* ==========================================
-   DISHES SECTION - Compact
+   LEFT - DISHES SECTION
    ========================================== */
 
 .dishes-section {
-  background: var(--white);
-  padding: 0.75rem;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--light-gray);
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .section-header h2 {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: var(--primary-dark);
   margin: 0;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 800;
 }
 
 .icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--light-gray);
+  border: 2px solid var(--light-gray);
   background: var(--white);
   color: var(--dark-gray);
   cursor: pointer;
@@ -107,13 +67,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  font-size: 1.2rem;
 }
 
-.icon-btn:active {
-  transform: scale(0.95);
+.icon-btn:hover:not(:disabled) {
   border-color: var(--gold-primary);
   color: var(--gold-primary);
+  transform: rotate(180deg);
 }
 
 .icon-btn:disabled {
@@ -122,65 +82,218 @@
 }
 
 /* ==========================================
-   ORDER SECTION - ULTRA COMPACT MOBILE
+   DISHES GRID - COMPACT CARDS
+   ========================================== */
+
+.dishes-grid-billing {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.dish-card-billing {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-md);
+  padding: 0.6rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.dish-card-billing:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+  border-color: var(--gold-primary);
+}
+
+.dish-img-billing {
+  width: 100%;
+  height: 100px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+  background: var(--light-gray);
+}
+
+.dish-img-billing img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dish-info-billing {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.dish-name-billing {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin: 0;
+  line-height: 1.25;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  min-height: 2.1em;
+}
+
+.dish-price-billing {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--gold-primary);
+  margin: 0;
+}
+
+/* ==========================================
+   DISH QUANTITY CONTROLS - GOLD THEME
+   ========================================== */
+
+.dish-quantity-control {
+  margin-top: auto;
+}
+
+.qty-controls-billing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 0.4rem 0.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--light-gray);
+}
+
+.qty-btn-billing {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+  color: var(--primary-dark);
+  box-shadow: 0 2px 6px rgba(212, 175, 55, 0.3);
+}
+
+.qty-btn-billing:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.5);
+  background: linear-gradient(135deg, #b8941f 0%, #9a7a1a 100%);
+}
+
+.qty-btn-billing:active {
+  transform: scale(0.9);
+}
+
+.qty-display {
+  min-width: 28px;
+  text-align: center;
+  font-weight: 800;
+  color: var(--primary-dark);
+  font-size: 0.9rem;
+}
+
+.add-btn-billing {
+  width: 100%;
+  padding: 0.65rem;
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--primary-dark);
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.add-btn-billing:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+  background: linear-gradient(135deg, #b8941f 0%, #9a7a1a 100%);
+}
+
+.add-btn-billing:active {
+  transform: translateY(0);
+}
+
+/* ==========================================
+   RIGHT - ORDER SECTION (STICKY CART)
    ========================================== */
 
 .order-section {
-  background: var(--white);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-sm);
   position: sticky;
-  top: 70px;
-  max-height: calc(100vh - 80px);
+  top: 90px;
+  align-self: start;
+  width: 340px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   overflow: hidden;
 }
 
 .order-header {
+  padding: 0.75rem var(--spacing-md);
+  background: var(--primary-dark);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem;
-  background: var(--primary-dark);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .order-header h3 {
   color: var(--gold-primary);
   margin: 0;
   font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: 800;
 }
 
 .text-btn {
   background: none;
   border: none;
-  padding: 0.25rem 0.5rem;
-  font-weight: 600;
+  padding: 0.35rem 0.7rem;
+  font-weight: 700;
   font-size: 0.75rem;
   cursor: pointer;
   border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .text-btn--danger {
-  color: rgba(239, 68, 68, 0.8);
+  color: rgba(239, 68, 68, 0.9);
 }
 
-.text-btn--danger:active {
+.text-btn--danger:hover {
   color: var(--error);
   background: rgba(239, 68, 68, 0.1);
-  transform: scale(0.95);
 }
 
 /* ==========================================
-   ULTRA-COMPACT ORDER TYPE
+   ORDER TYPE SELECTOR
    ========================================== */
 
 .order-type-compact {
-  padding: 0.5rem 0.75rem;
+  padding: var(--spacing-sm) var(--spacing-md);
   background: var(--off-white);
   border-bottom: 1px solid var(--light-gray);
 }
@@ -188,144 +301,142 @@
 .compact-label {
   display: block;
   font-size: 0.7rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--dark-gray);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 0.375rem;
+  margin-bottom: 0.4rem;
 }
 
 .type-toggle {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.25rem;
+  gap: 0.4rem;
   background: var(--white);
-  padding: 2px;
+  padding: 3px;
   border-radius: var(--radius-md);
   border: 1px solid var(--light-gray);
 }
 
 .type-option {
-  padding: 0.375rem 0.5rem;
+  padding: 0.5rem;
   background: transparent;
   border: none;
-  border-radius: calc(var(--radius-md) - 2px);
-  font-weight: 600;
+  border-radius: calc(var(--radius-md) - 3px);
+  font-weight: 700;
   font-size: 0.8rem;
   color: var(--dark-gray);
   cursor: pointer;
-  transition: all 0.2s ease;
-  min-height: 32px;
+  transition: all 0.3s ease;
 }
 
-.type-option:active {
-  transform: scale(0.98);
+.type-option:hover {
+  background: var(--off-white);
 }
 
 .type-option.active {
   background: var(--gradient-gold);
   color: var(--primary-dark);
-  box-shadow: 0 1px 4px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
 }
 
 /* ==========================================
-   ULTRA-COMPACT ORDER SUMMARY
+   ORDER SUMMARY (CART ITEMS)
    ========================================== */
 
 .order-summary {
   flex: 1;
   overflow-y: auto;
-  padding: 0.5rem;
-  -webkit-overflow-scrolling: touch;
+  min-height: 200px;
+  max-height: calc(100vh - 500px);
 }
 
 .order-summary::-webkit-scrollbar {
-  width: 3px;
+  width: 4px;
 }
 
 .order-summary::-webkit-scrollbar-thumb {
   background: var(--gold-primary);
-  border-radius: var(--radius-sm);
+  border-radius: 10px;
 }
-
-/* ==========================================
-   EMPTY STATE - Compact
-   ========================================== */
 
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem 1rem;
+  padding: var(--spacing-xl);
   text-align: center;
+  min-height: 200px;
+}
+
+.empty-cart-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.3;
 }
 
 .empty-state p {
   color: var(--dark-gray);
-  font-weight: 600;
+  font-weight: 700;
   margin: 0 0 0.25rem 0;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 .empty-state span {
   color: var(--medium-gray);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
 }
 
 /* ==========================================
-   ULTRA-COMPACT ORDER ITEMS
+   ORDER ITEMS (CART) - GOLD THEME
    ========================================== */
 
 .order-items {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: 0.5rem;
+  padding: var(--spacing-sm) var(--spacing-md);
 }
 
 .order-item {
   background: var(--off-white);
-  padding: 0.5rem;
+  padding: 0.75rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--light-gray);
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
-.order-item:active {
+.order-item:hover {
   border-color: var(--gold-primary);
-  transform: scale(0.99);
+  transform: translateX(-2px);
 }
 
 .item-details {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 0.375rem;
+  margin-bottom: 0.5rem;
   gap: 0.5rem;
 }
 
 .item-name {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--primary-dark);
   font-size: 0.85rem;
   flex: 1;
   line-height: 1.2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .item-price {
   color: var(--medium-gray);
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
-  flex-shrink: 0;
 }
-
-/* ==========================================
-   ULTRA-COMPACT ITEM ACTIONS
-   ========================================== */
 
 .item-actions {
   display: flex;
@@ -337,10 +448,10 @@
 .qty-control {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.3rem;
   background: var(--white);
   border-radius: var(--radius-full);
-  padding: 2px;
+  padding: 3px;
   border: 1px solid var(--light-gray);
 }
 
@@ -349,472 +460,124 @@
   height: 24px;
   border-radius: 50%;
   border: none;
-  background: var(--light-gray);
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
   color: var(--primary-dark);
+  font-weight: 800;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(212, 175, 55, 0.3);
+}
+
+.qty-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.5);
 }
 
 .qty-btn:active {
   transform: scale(0.9);
-  background: var(--gold-primary);
 }
 
 .qty-value {
-  min-width: 20px;
+  min-width: 24px;
   text-align: center;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--primary-dark);
   font-size: 0.85rem;
 }
 
 .item-subtotal {
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--gold-primary);
   white-space: nowrap;
 }
 
 /* ==========================================
-   ULTRA-COMPACT ORDER FOOTER
+   ORDER FOOTER (TOTAL & PLACE ORDER)
    ========================================== */
 
 .order-footer {
-  padding: 0.75rem;
+  padding: var(--spacing-md);
   background: var(--white);
   border-top: 1px solid var(--light-gray);
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
 .total-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
-  margin-bottom: 0.5rem;
+  padding: 0.75rem 0;
+  margin-bottom: 0.75rem;
 }
 
 .total-label {
-  font-weight: 700;
+  font-weight: 800;
   color: var(--primary-dark);
-  font-size: 0.95rem;
-  letter-spacing: -0.01em;
+  font-size: 1.1rem;
 }
 
 .total-value {
-  font-size: 1.35rem;
+  font-size: 1.5rem;
   font-weight: 800;
   color: var(--gold-primary);
-  letter-spacing: -0.02em;
 }
-
-/* ==========================================
-   COMPACT PLACE ORDER BUTTON
-   ========================================== */
 
 .place-order-btn {
   width: 100%;
-  padding: 0.75rem;
-  background: var(--gradient-gold);
+  padding: 1rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   border: none;
   border-radius: var(--radius-md);
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--primary-dark);
+  color: var(--white);
+  font-weight: 800;
+  font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
-  letter-spacing: -0.01em;
-  min-height: 44px;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.place-order-btn:active {
-  transform: scale(0.98);
-  box-shadow: 0 1px 4px rgba(212, 175, 55, 0.2);
+.place-order-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.5);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
 }
 
 .place-order-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
-  box-shadow: none;
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
 }
 
 /* ==========================================
-   TABLET & DESKTOP
+   LOADING & ERROR STATES
    ========================================== */
-
-@media (min-width: 768px) {
-  .restaurant-billing {
-    padding: 1rem;
-  }
-
-  .billing-container {
-    grid-template-columns: 1fr 340px;
-    gap: 1rem;
-  }
-
-  .dishes-section {
-    padding: 1rem;
-  }
-
-  .section-header {
-    margin-bottom: 1rem;
-  }
-
-  .section-header h2 {
-    font-size: 1.3rem;
-  }
-
-  .order-section {
-    top: 90px;
-  }
-
-  .order-header {
-    padding: 1rem;
-  }
-
-  .order-header h3 {
-    font-size: 1.1rem;
-  }
-
-  .order-type-compact {
-    padding: 0.75rem 1rem;
-  }
-
-  .order-summary {
-    padding: 0.75rem;
-  }
-
-  .order-footer {
-    padding: 1rem;
-  }
-
-  .total-value {
-    font-size: 1.5rem;
-  }
-
-  .place-order-btn {
-    padding: 0.875rem;
-    font-size: 0.95rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .billing-container {
-    grid-template-columns: 1fr 380px;
-  }
-}
-/* ==========================================
-   COMPACT BILLING DISHES - MOBILE FIRST
-   ========================================== */
-
-.dishes-grid-billing {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.5rem;
-}
-
-.dish-card-billing {
-  background: var(--off-white);
-  border-radius: var(--radius-lg);
-  padding: 0.75rem;
-  display: grid;
-  grid-template-columns: 60px 1fr auto;
-  gap: 0.75rem;
-  align-items: center;
-  border: 1px solid var(--light-gray);
-  transition: all 0.3s ease;
-}
-
-.dish-card-billing:active {
-  transform: scale(0.99);
-  border-color: var(--gold-primary);
-}
-
-.dish-img-billing {
-  width: 60px;
-  height: 60px;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  background: var(--light-gray);
-  flex-shrink: 0;
-}
-
-.dish-img-billing img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.dish-info-billing {
-  min-width: 0;
-}
-
-.dish-name-billing {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--primary-dark);
-  margin: 0 0 0.25rem 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.dish-price-billing {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--gold-primary);
-  margin: 0;
-}
-
-/* ==========================================
-   QUANTITY CONTROLS - COMPACT
-   ========================================== */
-
-.dish-quantity-control {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.qty-controls-billing {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  background: var(--white);
-  border-radius: var(--radius-full);
-  padding: 2px;
-  border: 1px solid var(--light-gray);
-}
-
-.qty-btn-billing {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: none;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.qty-minus {
-  background: var(--light-gray);
-  color: var(--primary-dark);
-}
-
-.qty-plus {
-  background: var(--gold-primary);
-  color: var(--primary-dark);
-}
-
-.qty-btn-billing:active {
-  transform: scale(0.9);
-}
-
-.qty-display {
-  min-width: 28px;
-  text-align: center;
-  font-weight: 700;
-  color: var(--primary-dark);
-  font-size: 0.9rem;
-}
-
-.add-btn-billing {
-  padding: 0.5rem 1rem;
-  background: var(--gradient-gold);
-  border: none;
-  border-radius: var(--radius-full);
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: var(--primary-dark);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 70px;
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.2);
-}
-
-.add-btn-billing:active {
-  transform: scale(0.95);
-  box-shadow: 0 1px 4px rgba(212, 175, 55, 0.15);
-}
-
-/* ==========================================
-   TABLET & DESKTOP
-   ========================================== */
-
-@media (min-width: 640px) {
-  .dishes-grid-billing {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .dishes-grid-billing {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* ==========================================
-   COMPACT BILLING DISHES - MOBILE FIRST
-   ========================================== */
-
-.dishes-grid-billing {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.5rem;
-}
-
-.dish-card-billing {
-  background: var(--off-white);
-  border-radius: var(--radius-lg);
-  padding: 0.75rem;
-  display: grid;
-  grid-template-columns: 60px 1fr auto;
-  gap: 0.75rem;
-  align-items: center;
-  border: 1px solid var(--light-gray);
-  transition: all 0.3s ease;
-}
-
-.dish-card-billing:active {
-  transform: scale(0.99);
-  border-color: var(--gold-primary);
-}
-
-.dish-img-billing {
-  width: 60px;
-  height: 60px;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  background: var(--light-gray);
-  flex-shrink: 0;
-}
-
-.dish-img-billing img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.dish-info-billing {
-  min-width: 0;
-}
-
-.dish-name-billing {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--primary-dark);
-  margin: 0 0 0.25rem 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.dish-price-billing {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--gold-primary);
-  margin: 0;
-}
-
-/* ==========================================
-   QUANTITY CONTROLS - COMPACT
-   ========================================== */
-
-.dish-quantity-control {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.qty-controls-billing {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  background: var(--white);
-  border-radius: var(--radius-full);
-  padding: 2px;
-  border: 1px solid var(--light-gray);
-}
-
-.qty-btn-billing {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: none;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.qty-minus {
-  background: var(--light-gray);
-  color: var(--primary-dark);
-}
-
-.qty-plus {
-  background: var(--gold-primary);
-  color: var(--primary-dark);
-}
-
-.qty-btn-billing:active {
-  transform: scale(0.9);
-}
-
-.qty-display {
-  min-width: 28px;
-  text-align: center;
-  font-weight: 700;
-  color: var(--primary-dark);
-  font-size: 0.9rem;
-}
-
-.add-btn-billing {
-  padding: 0.5rem 1rem;
-  background: var(--gradient-gold);
-  border: none;
-  border-radius: var(--radius-full);
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: var(--primary-dark);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 70px;
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.2);
-}
-
-.add-btn-billing:active {
-  transform: scale(0.95);
-  box-shadow: 0 1px 4px rgba(212, 175, 55, 0.15);
-}
 
 .loading-state,
-.error-state,
-.empty-state {
+.error-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   text-align: center;
-  padding: 2rem 1rem;
-  color: var(--dark-gray);
-  font-weight: 600;
+  min-height: 300px;
 }
 
 .error-state p {
   color: var(--error);
+  font-weight: 600;
   margin-bottom: 1rem;
 }
 
@@ -826,25 +589,94 @@
   font-weight: 700;
   color: var(--primary-dark);
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.retry-btn:active {
-  transform: scale(0.98);
+.retry-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
 }
 
 /* ==========================================
-   TABLET & DESKTOP
+   NOTIFICATION
    ========================================== */
 
-@media (min-width: 640px) {
-  .dishes-grid-billing {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+.notification {
+  position: fixed;
+  top: 90px;
+  right: 1rem;
+  z-index: 1001;
+  background: var(--white);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease-out;
+  max-width: 400px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.notification--success {
+  border-left: 4px solid var(--success);
+  color: var(--success);
+}
+
+.notification--error {
+  border-left: 4px solid var(--error);
+  color: var(--error);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
-@media (min-width: 1024px) {
+/* ==========================================
+   RESPONSIVE - MOBILE
+   ========================================== */
+
+@media (max-width: 1023px) {
+  .restaurant-billing {
+    grid-template-columns: 1fr;
+    padding: var(--spacing-sm);
+    padding-bottom: 420px;
+  }
+
+  .dishes-section {
+    order: 1;
+  }
+
+  .order-section {
+    order: 2;
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    width: 100%;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
+    backdrop-filter: blur(20px);
+    border-top: 2px solid var(--gold-primary);
+    max-height: 55vh;
+  }
+
+  .order-summary {
+    max-height: 25vh;
+  }
+
   .dishes-grid-billing {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .dishes-grid-billing {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   }
 }

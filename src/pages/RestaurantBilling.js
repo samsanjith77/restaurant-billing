@@ -99,67 +99,136 @@ const RestaurantBilling = () => {
         </div>
       )}
 
-      <div className="billing-container">
-        {/* Dishes Section - Compact Layout */}
-        <div className="dishes-section">
-          <div className="section-header">
-            <h2>Menu</h2>
-            <button className="icon-btn" onClick={refetch} disabled={loading} title="Refresh">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-              </svg>
+      {/* DISHES SECTION - LEFT SIDE */}
+      <div className="dishes-section">
+        <div className="section-header">
+          <h2>Menu</h2>
+          <button className="icon-btn" onClick={refetch} disabled={loading} title="Refresh">
+            🔄
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="loading-state">Loading menu...</div>
+        ) : error ? (
+          <div className="error-state">
+            <p>{error}</p>
+            <button onClick={refetch} className="retry-btn">Retry</button>
+          </div>
+        ) : dishes.length === 0 ? (
+          <div className="empty-state">
+            <p>No dishes available</p>
+          </div>
+        ) : (
+          <div className="dishes-grid-billing">
+            {dishes.map((dish) => (
+              <div key={dish.id} className="dish-card-billing">
+                {dish.image && (
+                  <div className="dish-img-billing">
+                    <img src={dish.image} alt={dish.name} />
+                  </div>
+                )}
+                <div className="dish-info-billing">
+                  <h4 className="dish-name-billing">{dish.name}</h4>
+                  <p className="dish-price-billing">₹{parseFloat(dish.price).toFixed(2)}</p>
+                </div>
+                <div className="dish-quantity-control">
+                  {orderItems[dish.id] ? (
+                    <div className="qty-controls-billing">
+                      <button
+                        className="qty-btn-billing qty-minus"
+                        onClick={() => handleQuantityChange(dish.id, (orderItems[dish.id] || 0) - 1)}
+                      >
+                        −
+                      </button>
+                      <span className="qty-display">{orderItems[dish.id]}</span>
+                      <button
+                        className="qty-btn-billing qty-plus"
+                        onClick={() => handleQuantityChange(dish.id, (orderItems[dish.id] || 0) + 1)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      className="add-btn-billing"
+                      onClick={() => handleQuantityChange(dish.id, 1)}
+                    >
+                      + Add
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ORDER SECTION - RIGHT SIDE */}
+      <div className="order-section">
+        <div className="order-header">
+          <h3>Cart ({getTotalItems()})</h3>
+          {getTotalItems() > 0 && (
+            <button className="text-btn text-btn--danger" onClick={handleClearCart}>
+              Clear
+            </button>
+          )}
+        </div>
+
+        {/* Compact Order Type */}
+        <div className="order-type-compact">
+          <label className="compact-label">Order Type</label>
+          <div className="type-toggle">
+            <button
+              className={`type-option ${orderType === ORDER_TYPES.DINE_IN ? 'active' : ''}`}
+              onClick={() => setOrderType(ORDER_TYPES.DINE_IN)}
+            >
+              🍽️ Dine In
+            </button>
+            <button
+              className={`type-option ${orderType === ORDER_TYPES.DELIVERY ? 'active' : ''}`}
+              onClick={() => setOrderType(ORDER_TYPES.DELIVERY)}
+            >
+              🏍️ Delivery
             </button>
           </div>
+        </div>
 
-          {loading ? (
-            <div className="loading-state">Loading menu...</div>
-          ) : error ? (
-            <div className="error-state">
-              <p>{error}</p>
-              <button onClick={refetch} className="retry-btn">Retry</button>
-            </div>
-          ) : dishes.length === 0 ? (
+        {/* Order Items */}
+        <div className="order-summary">
+          {orderedDishes.length === 0 ? (
             <div className="empty-state">
-              <p>No dishes available</p>
+              <div className="empty-cart-icon">🛒</div>
+              <p>Cart is empty</p>
+              <span>Add items from menu</span>
             </div>
           ) : (
-            <div className="dishes-grid-billing">
-              {dishes.map((dish) => (
-                <div key={dish.id} className="dish-card-billing">
-                  {dish.image && (
-                    <div className="dish-img-billing">
-                      <img src={dish.image} alt={dish.name} />
-                    </div>
-                  )}
-                  <div className="dish-info-billing">
-                    <h4 className="dish-name-billing">{dish.name}</h4>
-                    <p className="dish-price-billing">₹{parseFloat(dish.price).toFixed(2)}</p>
+            <div className="order-items">
+              {orderedDishes.map(dish => (
+                <div key={dish.id} className="order-item">
+                  <div className="item-details">
+                    <span className="item-name">{dish.name}</span>
+                    <span className="item-price">₹{parseFloat(dish.price).toFixed(2)}</span>
                   </div>
-                  <div className="dish-quantity-control">
-                    {orderItems[dish.id] ? (
-                      <div className="qty-controls-billing">
-                        <button
-                          className="qty-btn-billing qty-minus"
-                          onClick={() => handleQuantityChange(dish.id, (orderItems[dish.id] || 0) - 1)}
-                        >
-                          −
-                        </button>
-                        <span className="qty-display">{orderItems[dish.id]}</span>
-                        <button
-                          className="qty-btn-billing qty-plus"
-                          onClick={() => handleQuantityChange(dish.id, (orderItems[dish.id] || 0) + 1)}
-                        >
-                          +
-                        </button>
-                      </div>
-                    ) : (
+                  <div className="item-actions">
+                    <div className="qty-control">
                       <button
-                        className="add-btn-billing"
-                        onClick={() => handleQuantityChange(dish.id, 1)}
+                        className="qty-btn"
+                        onClick={() => handleQuantityChange(dish.id, dish.quantity - 1)}
                       >
-                        Add
+                        −
                       </button>
-                    )}
+                      <span className="qty-value">{dish.quantity}</span>
+                      <button
+                        className="qty-btn"
+                        onClick={() => handleQuantityChange(dish.id, dish.quantity + 1)}
+                      >
+                        +
+                      </button>
+                    </div>
+                    <span className="item-subtotal">
+                      ₹{(parseFloat(dish.price) * dish.quantity).toFixed(2)}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -167,97 +236,20 @@ const RestaurantBilling = () => {
           )}
         </div>
 
-        {/* Order Section */}
-        <div className="order-section">
-          <div className="order-header">
-            <h3>Current Order</h3>
-            {getTotalItems() > 0 && (
-              <button className="text-btn text-btn--danger" onClick={handleClearCart}>
-                Clear
-              </button>
-            )}
+        {/* Order Footer */}
+        <div className="order-footer">
+          <div className="total-row">
+            <span className="total-label">Total</span>
+            <span className="total-value">₹{calculateTotal().toFixed(2)}</span>
           </div>
 
-          {/* Compact Order Type */}
-          <div className="order-type-compact">
-            <label className="compact-label">Order Type</label>
-            <div className="type-toggle">
-              <button
-                className={`type-option ${orderType === ORDER_TYPES.DINE_IN ? 'active' : ''}`}
-                onClick={() => setOrderType(ORDER_TYPES.DINE_IN)}
-              >
-                Dine In
-              </button>
-              <button
-                className={`type-option ${orderType === ORDER_TYPES.DELIVERY ? 'active' : ''}`}
-                onClick={() => setOrderType(ORDER_TYPES.DELIVERY)}
-              >
-                Delivery
-              </button>
-            </div>
-          </div>
-
-          {/* Order Items */}
-          <div className="order-summary">
-            {orderedDishes.length === 0 ? (
-              <div className="empty-state">
-                <p>Cart is empty</p>
-                <span>Add items from menu</span>
-              </div>
-            ) : (
-              <div className="order-items">
-                {orderedDishes.map(dish => (
-                  <div key={dish.id} className="order-item">
-                    <div className="item-details">
-                      <span className="item-name">{dish.name}</span>
-                      <span className="item-price">₹{parseFloat(dish.price).toFixed(2)}</span>
-                    </div>
-                    <div className="item-actions">
-                      <div className="qty-control">
-                        <button
-                          className="qty-btn"
-                          onClick={() => handleQuantityChange(dish.id, dish.quantity - 1)}
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                          </svg>
-                        </button>
-                        <span className="qty-value">{dish.quantity}</span>
-                        <button
-                          className="qty-btn"
-                          onClick={() => handleQuantityChange(dish.id, dish.quantity + 1)}
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                            <line x1="12" y1="5" x2="12" y2="19"/>
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                          </svg>
-                        </button>
-                      </div>
-                      <span className="item-subtotal">
-                        ₹{(parseFloat(dish.price) * dish.quantity).toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Order Footer */}
-          <div className="order-footer">
-            <div className="total-row">
-              <span className="total-label">Total</span>
-              <span className="total-value">₹{calculateTotal().toFixed(2)}</span>
-            </div>
-
-            <button
-              className="place-order-btn"
-              onClick={handlePlaceOrder}
-              disabled={isProcessing || getTotalItems() === 0}
-            >
-              {isProcessing ? 'Processing...' : `Place Order (${getTotalItems()})`}
-            </button>
-          </div>
+          <button
+            className="place-order-btn"
+            onClick={handlePlaceOrder}
+            disabled={isProcessing || getTotalItems() === 0}
+          >
+            {isProcessing ? 'Processing...' : `Place Order (${getTotalItems()})`}
+          </button>
         </div>
       </div>
     </div>
