@@ -5,83 +5,85 @@ import '../../styles/components/DishForm.css';
 const DishForm = ({ onDishCreated }) => {
   const [formData, setFormData] = useState({
     name: '',
+    secondary_name: '',
     price: '',
+    meal_type: 'afternoon',
     image: null
   });
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
 
+  const mealTypeOptions = [
+    { value: 'morning', label: '🌅 Morning' },
+    { value: 'afternoon', label: '🍽️ Afternoon' },
+    { value: 'night', label: '🌙 Night' }
+  ];
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: value 
     }));
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData(prev => ({
-        ...prev,
-        image: file
-      }));
-
-      // Create preview
+      setFormData(prev => ({ ...prev, image: file }));
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result);
-      };
+      reader.onloadend = () => setPreview(reader.result);
       reader.readAsDataURL(file);
     }
   };
 
   const handleRemoveImage = () => {
-    setFormData(prev => ({
-      ...prev,
-      image: null
-    }));
+    setFormData(prev => ({ ...prev, image: null }));
     setPreview(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!formData.name || !formData.price) {
+    
+    if (!formData.name.trim() || !formData.price.trim()) {
       setMessage({ type: 'error', text: 'Name and price are required' });
       setTimeout(() => setMessage(null), 3000);
       return;
     }
 
-    setLoading(true);
-    setMessage(null);
+    if (isNaN(parseFloat(formData.price)) || parseFloat(formData.price) <= 0) {
+      setMessage({ type: 'error', text: 'Price must be a valid positive number' });
+      setTimeout(() => setMessage(null), 3000);
+      return;
+    }
 
+    setLoading(true);
     try {
-      const dishFormData = new FormData();
-      dishFormData.append('name', formData.name);
-      dishFormData.append('price', formData.price);
+      const formDataPayload = new FormData();
+      formDataPayload.append('name', formData.name.trim());
+      formDataPayload.append('secondary_name', formData.secondary_name.trim());
+      formDataPayload.append('price', parseFloat(formData.price));
+      formDataPayload.append('meal_type', formData.meal_type);
+      
       if (formData.image) {
-        dishFormData.append('image', formData.image);
+        formDataPayload.append('image', formData.image);
       }
 
-      // Use result to get message from API
-      const result = await ApiService.createDish(dishFormData);
-
-      setMessage({ 
-        type: 'success', 
-        text: result.message || 'Dish created successfully!' 
-      });
+      const result = await ApiService.createDish(formDataPayload);
+      setMessage({ type: 'success', text: result.message || 'Dish created successfully!' });
       
       // Reset form
-      setFormData({ name: '', price: '', image: null });
+      setFormData({ 
+        name: '', 
+        secondary_name: '', 
+        price: '', 
+        meal_type: 'afternoon',
+        image: null 
+      });
       setPreview(null);
-
-      // Notify parent
-      setTimeout(() => {
-        if (onDishCreated) onDishCreated();
-      }, 1000);
-
+      
+      if (onDishCreated) onDishCreated();
     } catch (err) {
       setMessage({ type: 'error', text: err.message || 'Failed to create dish' });
     } finally {
@@ -96,9 +98,9 @@ const DishForm = ({ onDishCreated }) => {
           {message.text}
         </div>
       )}
-
+      
       <form onSubmit={handleSubmit} className="dish-form-mobile">
-        {/* Dish Name */}
+        {/* Dish Name Field */}
         <div className="form-group-mobile">
           <label htmlFor="dish-name">Dish Name *</label>
           <input
@@ -108,12 +110,26 @@ const DishForm = ({ onDishCreated }) => {
             value={formData.name}
             onChange={handleInputChange}
             placeholder="e.g., Chicken Biryani"
-            className="input-mobile"
             required
+            maxLength="100"
           />
         </div>
 
-        {/* Price */}
+        {/* Secondary Name Field */}
+        <div className="form-group-mobile">
+          <label htmlFor="secondary-name">Secondary Name (Optional)</label>
+          <input
+            id="secondary-name"
+            type="text"
+            name="secondary_name"
+            value={formData.secondary_name}
+            onChange={handleInputChange}
+            placeholder="e.g., चिकन बिरयानी"
+            maxLength="100"
+          />
+        </div>
+
+        {/* Price Field */}
         <div className="form-group-mobile">
           <label htmlFor="dish-price">Price (₹) *</label>
           <input
@@ -125,15 +141,32 @@ const DishForm = ({ onDishCreated }) => {
             value={formData.price}
             onChange={handleInputChange}
             placeholder="0.00"
-            className="input-mobile"
             required
           />
         </div>
 
-        {/* Image Upload - Touch-Friendly */}
+        {/* Meal Type Field */}
         <div className="form-group-mobile">
-          <label>Dish Image</label>
-          
+          <label htmlFor="meal-type">Meal Type *</label>
+          <select
+            id="meal-type"
+            name="meal_type"
+            value={formData.meal_type}
+            onChange={handleInputChange}
+            required
+            className="meal-type-select"
+          >
+            {mealTypeOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Image Upload Field */}
+        <div className="form-group-mobile">
+          <label htmlFor="dish-image">Dish Image</label>
           {!preview ? (
             <label htmlFor="dish-image" className="upload-area-mobile">
               <input
@@ -152,10 +185,10 @@ const DishForm = ({ onDishCreated }) => {
           ) : (
             <div className="image-preview-mobile">
               <img src={preview} alt="Preview" className="preview-img" />
-              <button
-                type="button"
-                className="remove-image-btn"
+              <button 
+                type="button" 
                 onClick={handleRemoveImage}
+                className="remove-btn"
               >
                 Remove Image
               </button>
@@ -164,10 +197,10 @@ const DishForm = ({ onDishCreated }) => {
         </div>
 
         {/* Submit Button */}
-        <button
-          type="submit"
-          className="submit-btn-mobile"
+        <button 
+          type="submit" 
           disabled={loading}
+          className="submit-btn-mobile"
         >
           {loading ? 'Creating...' : 'Create Dish'}
         </button>

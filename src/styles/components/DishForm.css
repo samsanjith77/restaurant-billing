@@ -1,56 +1,90 @@
 /* ==========================================
-   MOBILE-FIRST DISH FORM
+   ROOT VARIABLES
+   ========================================== */
+
+:root {
+  --primary-dark: #1a1a1a;
+  --white: #ffffff;
+  --off-white: #f9f9f9;
+  --light-gray: #e5e5e5;
+  --medium-gray: #999999;
+  --success: #10b981;
+  --error: #ef4444;
+  --gold-primary: #d4af37;
+  --gold-glow: rgba(212, 175, 55, 0.15);
+  --gradient-gold: linear-gradient(135deg, #d4af37 0%, #c99a2e 100%);
+  --radius-md: 6px;
+  --radius-lg: 12px;
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ==========================================
+   CONTAINER
    ========================================== */
 
 .dish-form-container {
   max-width: 600px;
   margin: 0 auto;
+  padding: 1rem;
+  width: 100%;
 }
 
 /* ==========================================
-   FORM MESSAGE
+   FORM MESSAGE (Success/Error)
    ========================================== */
 
 .form-message {
-  padding: 0.875rem;
+  padding: 1rem;
   border-radius: var(--radius-md);
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   font-weight: 600;
   font-size: 0.9rem;
   text-align: center;
   animation: slideDown 0.3s ease-out;
+  border: 2px solid;
+  line-height: 1.5;
+  display: block;
+  width: 100%;
 }
 
 .form-message--success {
-  background: #ecfdf5;
+  background-color: #ecfdf5;
   color: var(--success);
-  border: 2px solid var(--success);
+  border-color: var(--success);
 }
 
 .form-message--error {
-  background: #fef2f2;
+  background-color: #fef2f2;
   color: var(--error);
-  border: 2px solid var(--error);
+  border-color: var(--error);
 }
 
 /* ==========================================
-   MOBILE FORM
+   FORM WRAPPER
    ========================================== */
 
 .dish-form-mobile {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
+  width: 100%;
 }
 
 /* ==========================================
-   FORM GROUPS - MOBILE OPTIMIZED
+   FORM GROUP - Label + Input Container
    ========================================== */
 
 .form-group-mobile {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .form-group-mobile label {
@@ -59,38 +93,154 @@
   color: var(--primary-dark);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  display: block;
+  line-height: 1.2;
+  margin: 0;
+  padding: 0;
 }
 
 /* ==========================================
-   INPUT FIELDS - TOUCH FRIENDLY
+   TEXT INPUT FIELDS - PROPERLY ALIGNED
    ========================================== */
 
-.input-mobile {
+.form-group-mobile input[type="text"] {
   width: 100%;
-  padding: 0.875rem;
+  height: 48px;
+  padding: 0.75rem 1rem;
   border: 2px solid var(--light-gray);
   border-radius: var(--radius-lg);
   font-size: 1rem;
   font-weight: 500;
   color: var(--primary-dark);
-  background: var(--white);
+  background-color: var(--white);
+  font-family: inherit;
+  
+  /* CRITICAL: Text Alignment */
+  display: block;
+  line-height: 1.5;
+  vertical-align: middle;
+  text-align: left;
+  
+  /* Remove browser defaults */
+  -webkit-appearance: none;
+  appearance: none;
+  
+  /* Transitions */
   transition: all 0.3s ease;
-  min-height: 48px;
+  
+  /* Remove outline on focus (we use border + shadow) */
+  outline: none;
 }
 
-.input-mobile:focus {
-  outline: none;
+/* Placeholder styling for text inputs */
+.form-group-mobile input[type="text"]::placeholder {
+  color: var(--medium-gray);
+  font-weight: 400;
+  opacity: 1;
+  text-align: left;
+}
+
+/* Firefox placeholder */
+.form-group-mobile input[type="text"]::-webkit-input-placeholder {
+  color: var(--medium-gray);
+  font-weight: 400;
+  opacity: 1;
+  text-align: left;
+}
+
+/* Focus state for text inputs */
+.form-group-mobile input[type="text"]:focus {
   border-color: var(--gold-primary);
   box-shadow: 0 0 0 4px var(--gold-glow);
-  background: var(--off-white);
+  background-color: var(--off-white);
 }
 
-.input-mobile::placeholder {
+/* Hover state for text inputs */
+.form-group-mobile input[type="text"]:hover:not(:focus) {
+  border-color: #d0d0d0;
+  background-color: #fcfcfc;
+}
+
+/* Disabled state for text inputs */
+.form-group-mobile input[type="text"]:disabled {
+  background-color: var(--off-white);
   color: var(--medium-gray);
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 /* ==========================================
-   UPLOAD AREA - LARGE TOUCH TARGET
+   NUMBER INPUT FIELD (Price) - PROPERLY ALIGNED
+   ========================================== */
+
+.form-group-mobile input[type="number"] {
+  width: 100%;
+  height: 48px;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--light-gray);
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--primary-dark);
+  background-color: var(--white);
+  font-family: inherit;
+  
+  /* CRITICAL: Text Alignment */
+  display: block;
+  line-height: 1.5;
+  vertical-align: middle;
+  text-align: left;
+  
+  /* Remove browser defaults */
+  -webkit-appearance: none;
+  appearance: none;
+  -moz-appearance: textfield;
+  
+  /* Transitions */
+  transition: all 0.3s ease;
+  
+  /* Remove outline on focus */
+  outline: none;
+}
+
+/* Remove spinner buttons from number input (Chrome/Safari) */
+.form-group-mobile input[type="number"]::-webkit-outer-spin-button,
+.form-group-mobile input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Placeholder styling for number input */
+.form-group-mobile input[type="number"]::placeholder {
+  color: var(--medium-gray);
+  font-weight: 400;
+  opacity: 1;
+  text-align: left;
+}
+
+/* Focus state for number input */
+.form-group-mobile input[type="number"]:focus {
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 0 4px var(--gold-glow);
+  background-color: var(--off-white);
+}
+
+/* Hover state for number input */
+.form-group-mobile input[type="number"]:hover:not(:focus) {
+  border-color: #d0d0d0;
+  background-color: #fcfcfc;
+}
+
+/* Disabled state for number input */
+.form-group-mobile input[type="number"]:disabled {
+  background-color: var(--off-white);
+  color: var(--medium-gray);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ==========================================
+   UPLOAD AREA
    ========================================== */
 
 .upload-area-mobile {
@@ -101,17 +251,23 @@
   padding: 2rem 1rem;
   border: 3px dashed var(--light-gray);
   border-radius: var(--radius-lg);
-  background: var(--off-white);
+  background-color: var(--off-white);
   cursor: pointer;
   transition: all 0.3s ease;
   min-height: 180px;
   position: relative;
+  width: 100%;
+}
+
+.upload-area-mobile:hover {
+  border-color: #d0d0d0;
+  background-color: var(--white);
 }
 
 .upload-area-mobile:active {
   border-color: var(--gold-primary);
-  background: var(--white);
-  transform: scale(0.99);
+  background-color: var(--white);
+  transform: scale(0.98);
 }
 
 .file-input-hidden {
@@ -133,11 +289,16 @@
   gap: 0.75rem;
   text-align: center;
   pointer-events: none;
+  width: 100%;
 }
 
 .upload-icon {
   font-size: 3rem;
   opacity: 0.6;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+  display: block;
 }
 
 .upload-text {
@@ -145,21 +306,29 @@
   font-weight: 700;
   color: var(--primary-dark);
   margin: 0;
+  padding: 0;
+  line-height: 1.4;
+  display: block;
 }
 
 .upload-hint {
   font-size: 0.8rem;
   color: var(--medium-gray);
+  margin: 0;
+  padding: 0;
+  line-height: 1.3;
+  display: block;
 }
 
 /* ==========================================
-   IMAGE PREVIEW - MOBILE
+   IMAGE PREVIEW
    ========================================== */
 
 .image-preview-mobile {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
+  width: 100%;
 }
 
 .preview-img {
@@ -168,34 +337,59 @@
   object-fit: cover;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
+  display: block;
+  margin: 0;
+  padding: 0;
 }
 
-.remove-image-btn {
-  padding: 0.75rem;
-  background: var(--light-gray);
-  border: none;
-  border-radius: var(--radius-md);
+.remove-btn {
+  width: 100%;
+  height: 48px;
+  padding: 0.75rem 1rem;
+  background-color: var(--light-gray);
+  border: 2px solid var(--light-gray);
+  border-radius: var(--radius-lg);
   font-weight: 700;
   font-size: 0.9rem;
   color: var(--error);
   cursor: pointer;
+  font-family: inherit;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.3s ease;
-  min-height: 48px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-.remove-image-btn:active {
+.remove-btn:hover {
+  background-color: #d9d9d9;
+  border-color: #d0d0d0;
+}
+
+.remove-btn:active {
   transform: scale(0.98);
-  background: var(--error);
+  background-color: var(--error);
   color: var(--white);
+  border-color: var(--error);
+}
+
+.remove-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* ==========================================
-   SUBMIT BUTTON - MOBILE
+   SUBMIT BUTTON
    ========================================== */
 
 .submit-btn-mobile {
   width: 100%;
-  padding: 1rem;
+  height: 52px;
+  padding: 1rem 1.5rem;
   background: var(--gradient-gold);
   border: none;
   border-radius: var(--radius-lg);
@@ -203,13 +397,25 @@
   font-size: 1rem;
   color: var(--primary-dark);
   cursor: pointer;
-  transition: all 0.3s ease;
   box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
-  min-height: 52px;
+  font-family: inherit;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
   margin-top: 0.5rem;
 }
 
-.submit-btn-mobile:active {
+.submit-btn-mobile:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+  transform: translateY(-2px);
+}
+
+.submit-btn-mobile:active:not(:disabled) {
   transform: scale(0.98);
   box-shadow: 0 2px 8px rgba(212, 175, 55, 0.2);
 }
@@ -221,25 +427,113 @@
 }
 
 /* ==========================================
-   TABLET & DESKTOP
+   RESPONSIVE DESIGN - TABLET (640px+)
    ========================================== */
 
 @media (min-width: 640px) {
-  .dish-form-mobile {
-    gap: 1.5rem;
+  .dish-form-container {
+    padding: 2rem;
+    max-width: 650px;
   }
 
-  .input-mobile {
-    padding: 1rem;
+  .dish-form-mobile {
+    gap: 2rem;
+  }
+
+  .form-group-mobile label {
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .form-group-mobile input[type="text"],
+  .form-group-mobile input[type="number"] {
+    height: 52px;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
   }
 
   .upload-area-mobile {
     padding: 2.5rem 1.5rem;
-    min-height: 200px;
+    min-height: 220px;
+  }
+
+  .upload-icon {
+    font-size: 3.5rem;
+  }
+
+  .upload-text {
+    font-size: 1.1rem;
   }
 
   .preview-img {
-    height: 250px;
+    height: 280px;
+  }
+
+  .remove-btn {
+    height: 52px;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+  }
+
+  .submit-btn-mobile {
+    height: 56px;
+    padding: 1.125rem 2rem;
+    font-size: 1.05rem;
+    margin-top: 1rem;
+  }
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN - DESKTOP (1024px+)
+   ========================================== */
+
+@media (min-width: 1024px) {
+  .dish-form-container {
+    max-width: 700px;
+    padding: 2.5rem;
+    margin-top: 2rem;
+  }
+
+  .form-group-mobile {
+    gap: 0.75rem;
+  }
+
+  .form-group-mobile label {
+    font-size: 0.95rem;
+  }
+
+  .form-group-mobile input[type="text"],
+  .form-group-mobile input[type="number"] {
+    padding: 1rem 1.5rem;
+    font-size: 1.05rem;
+    height: 54px;
+  }
+
+  .upload-area-mobile {
+    padding: 3rem 2rem;
+    min-height: 250px;
+  }
+
+  .upload-icon {
+    font-size: 4rem;
+  }
+
+  .upload-text {
+    font-size: 1.2rem;
+  }
+
+  .upload-hint {
+    font-size: 0.9rem;
+  }
+
+  .preview-img {
+    height: 320px;
+  }
+
+  .submit-btn-mobile {
+    height: 58px;
+    padding: 1.25rem 2.5rem;
+    font-size: 1.1rem;
   }
 }
 
@@ -250,10 +544,158 @@
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-15px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus visible for accessibility */
+.form-group-mobile input:focus-visible {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   DARK MODE SUPPORT
+   ========================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-dark: #f5f5f5;
+    --white: #1a1a1a;
+    --off-white: #2a2a2a;
+    --light-gray: #404040;
+    --medium-gray: #999999;
+  }
+
+  .form-message--success {
+    background-color: #064e3b;
+    color: #86efac;
+  }
+
+  .form-message--error {
+    background-color: #7f1d1d;
+    color: #fca5a5;
+  }
+}
+
+/* ==========================================
+   PRINT STYLES
+   ========================================== */
+
+@media print {
+  .dish-form-container {
+    padding: 0;
+  }
+
+  .form-message {
+    display: none;
+  }
+
+  .submit-btn-mobile {
+    display: none;
+  }
+}
+
+/* ==========================================
+   MEAL TYPE SELECT FIELD
+   ========================================== */
+
+.meal-type-select {
+  width: 100%;
+  height: 48px;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--light-gray);
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--primary-dark);
+  background-color: var(--white);
+  font-family: inherit;
+  
+  /* Remove browser defaults */
+  -webkit-appearance: none;
+  appearance: none;
+  
+  /* Transitions */
+  transition: all 0.3s ease;
+  
+  /* Remove outline on focus */
+  outline: none;
+  
+  /* Cursor */
+  cursor: pointer;
+}
+
+/* Placeholder styling */
+.meal-type-select::placeholder {
+  color: var(--medium-gray);
+  font-weight: 400;
+}
+
+/* Focus state */
+.meal-type-select:focus {
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 0 4px var(--gold-glow);
+  background-color: var(--off-white);
+}
+
+/* Hover state */
+.meal-type-select:hover:not(:focus) {
+  border-color: #d0d0d0;
+  background-color: #fcfcfc;
+}
+
+/* Disabled state */
+.meal-type-select:disabled {
+  background-color: var(--off-white);
+  color: var(--medium-gray);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Option styling */
+.meal-type-select option {
+  padding: 0.75rem 1rem;
+  background-color: var(--white);
+  color: var(--primary-dark);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.meal-type-select option:checked {
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+  color: var(--primary-dark);
+}
+
+/* Custom select wrapper styling for better appearance */
+.meal-type-select {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.25rem;
+  padding-right: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .meal-type-select {
+    height: 52px;
+    padding: 0.875rem 1.25rem;
+    padding-right: 2.75rem;
   }
 }

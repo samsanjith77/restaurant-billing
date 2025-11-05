@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import DishForm from '../components/dishes/DishForm';
+import DishForm from '../components/dishes/DishForm'; // You'll add secondary_name input here
 import useDishes from '../hooks/useDishes';
 import ApiService from '../services/api';
 import '../styles/components/DishManagement.css';
@@ -7,16 +7,16 @@ import '../styles/components/DishManagement.css';
 const DishManagement = () => {
   const [activeTab, setActiveTab] = useState('list');
   const { dishes, loading, error, refetch } = useDishes();
-  
-  // Edit price modal state
+
+  // Price modal
   const [editPriceModal, setEditPriceModal] = useState(null);
   const [editPrice, setEditPrice] = useState('');
-  
-  // Edit image modal state
+
+  // Image modal
   const [editImageModal, setEditImageModal] = useState(null);
   const [newImage, setNewImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState(null);
 
@@ -25,7 +25,6 @@ const DishManagement = () => {
     setActiveTab('list');
   };
 
-  // ============= PRICE EDIT =============
   const handleEditPriceClick = (dish) => {
     setEditPriceModal(dish);
     setEditPrice(dish.price);
@@ -38,20 +37,18 @@ const DishManagement = () => {
 
   const handleUpdatePrice = async (e) => {
     e.preventDefault();
-    
+
     if (!editPrice || parseFloat(editPrice) <= 0) {
       setMessage({ type: 'error', text: 'Please enter a valid price' });
       setTimeout(() => setMessage(null), 3000);
       return;
     }
-
     setIsSubmitting(true);
 
     try {
       await ApiService.updateDishPrice(editPriceModal.id, {
-        price: parseFloat(editPrice)
+        price: parseFloat(editPrice),
       });
-
       setMessage({ type: 'success', text: 'Price updated successfully' });
       await refetch();
       handleClosePriceEdit();
@@ -63,7 +60,6 @@ const DishManagement = () => {
     }
   };
 
-  // ============= IMAGE EDIT =============
   const handleEditImageClick = (dish) => {
     setEditImageModal(dish);
     setNewImage(null);
@@ -80,7 +76,6 @@ const DishManagement = () => {
     const file = e.target.files[0];
     if (file) {
       setNewImage(file);
-      
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -91,13 +86,12 @@ const DishManagement = () => {
 
   const handleUpdateImage = async (e) => {
     e.preventDefault();
-    
+
     if (!newImage) {
       setMessage({ type: 'error', text: 'Please select an image' });
       setTimeout(() => setMessage(null), 3000);
       return;
     }
-
     setIsSubmitting(true);
 
     try {
@@ -119,28 +113,25 @@ const DishManagement = () => {
 
   return (
     <div className="dish-management">
-      {/* Message Notification */}
       {message && (
         <div className={`notification notification--${message.type}`}>
           {message.text}
         </div>
       )}
 
-      {/* Header */}
       <div className="dish-management__header">
         <h1>Dish Management</h1>
         <p>Create and manage your restaurant dishes</p>
       </div>
 
-      {/* Tabs */}
       <div className="tabs">
-        <button 
+        <button
           className={`tab ${activeTab === 'list' ? 'tab--active' : ''}`}
           onClick={() => setActiveTab('list')}
         >
           All Dishes ({dishes.length})
         </button>
-        <button 
+        <button
           className={`tab ${activeTab === 'create' ? 'tab--active' : ''}`}
           onClick={() => setActiveTab('create')}
         >
@@ -148,9 +139,7 @@ const DishManagement = () => {
         </button>
       </div>
 
-      {/* Tab Content */}
       <div className="tab-content">
-        {/* LIST TAB */}
         {activeTab === 'list' && (
           <div className="tab-panel">
             {loading ? (
@@ -169,22 +158,18 @@ const DishManagement = () => {
               <div className="dishes-grid-manage">
                 {dishes.map((dish) => (
                   <div key={dish.id} className="dish-card-manage">
-                    {/* IMAGE - LEFT */}
                     {dish.image && (
                       <div className="dish-img-manage">
                         <img src={dish.image} alt={dish.name} />
                       </div>
                     )}
-
-                    {/* INFO - MIDDLE */}
                     <div className="dish-info-manage">
                       <h4 className="dish-name-manage">{dish.name}</h4>
-                      <p className="dish-price-manage">
-                        ₹{parseFloat(dish.price).toFixed(2)}
-                      </p>
+                      {dish.secondary_name && (
+                        <p className="dish-secondary-name-manage">{dish.secondary_name}</p>
+                      )}
+                      <p className="dish-price-manage">₹{parseFloat(dish.price).toFixed(2)}</p>
                     </div>
-
-                    {/* BUTTONS - RIGHT SIDE BY SIDE */}
                     <div className="dish-actions-manage">
                       <button
                         className="action-btn-small action-btn--price"
@@ -208,7 +193,6 @@ const DishManagement = () => {
           </div>
         )}
 
-        {/* CREATE TAB */}
         {activeTab === 'create' && (
           <div className="tab-panel">
             <DishForm onDishCreated={handleDishCreated} />
@@ -216,32 +200,24 @@ const DishManagement = () => {
         )}
       </div>
 
-      {/* ============= EDIT PRICE MODAL ============= */}
       {editPriceModal && (
         <div className="edit-modal" onClick={handleClosePriceEdit}>
           <div className="edit-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="edit-modal-header">
               <h3>Edit Price</h3>
-              <button 
-                className="modal-close-btn" 
-                onClick={handleClosePriceEdit} 
-                type="button"
-              >
-                ✕
-              </button>
+              <button className="modal-close-btn" onClick={handleClosePriceEdit} type="button">✕</button>
             </div>
 
             <form onSubmit={handleUpdatePrice} className="edit-form">
               <div className="edit-dish-info">
                 {editPriceModal.image && (
-                  <img 
-                    src={editPriceModal.image} 
-                    alt={editPriceModal.name} 
-                    className="edit-dish-img" 
-                  />
+                  <img src={editPriceModal.image} alt={editPriceModal.name} className="edit-dish-img" />
                 )}
                 <div className="edit-dish-details">
                   <h4>{editPriceModal.name}</h4>
+                  {editPriceModal.secondary_name && (
+                    <p className="dish-secondary-name-manage">{editPriceModal.secondary_name}</p>
+                  )}
                   <p className="current-price">
                     Current: ₹{parseFloat(editPriceModal.price).toFixed(2)}
                   </p>
@@ -265,60 +241,37 @@ const DishManagement = () => {
               </div>
 
               <div className="edit-actions">
-                <button 
-                  type="button" 
-                  className="btn-cancel" 
-                  onClick={handleClosePriceEdit} 
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="btn-save" 
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Updating...' : 'Update Price'}
-                </button>
+                <button type="button" className="btn-cancel" onClick={handleClosePriceEdit} disabled={isSubmitting}>Cancel</button>
+                <button type="submit" className="btn-save" disabled={isSubmitting}>{isSubmitting ? 'Updating...' : 'Update Price'}</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* ============= EDIT IMAGE MODAL ============= */}
       {editImageModal && (
         <div className="edit-modal" onClick={handleCloseImageEdit}>
           <div className="edit-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="edit-modal-header">
               <h3>Edit Image</h3>
-              <button 
-                className="modal-close-btn" 
-                onClick={handleCloseImageEdit} 
-                type="button"
-              >
-                ✕
-              </button>
+              <button className="modal-close-btn" onClick={handleCloseImageEdit} type="button">✕</button>
             </div>
 
             <form onSubmit={handleUpdateImage} className="edit-form">
               <div className="edit-dish-info">
                 <div className="edit-dish-details" style={{ width: '100%' }}>
                   <h4>{editImageModal.name}</h4>
-                  <p className="current-price">
-                    ₹{parseFloat(editImageModal.price).toFixed(2)}
-                  </p>
+                  {editImageModal.secondary_name && (
+                    <p className="dish-secondary-name-manage">{editImageModal.secondary_name}</p>
+                  )}
+                  <p className="current-price">₹{parseFloat(editImageModal.price).toFixed(2)}</p>
                 </div>
               </div>
 
               <div className="form-group-compact">
                 <label>Current Image</label>
                 {editImageModal.image && (
-                  <img 
-                    src={editImageModal.image} 
-                    alt={editImageModal.name} 
-                    className="current-image-full" 
-                  />
+                  <img src={editImageModal.image} alt={editImageModal.name} className="current-image-full" />
                 )}
               </div>
 
@@ -340,41 +293,22 @@ const DishManagement = () => {
                   </label>
                 ) : (
                   <div className="preview-container">
-                    <img 
-                      src={imagePreview} 
-                      alt="Preview" 
-                      className="preview-image-full" 
-                    />
-                    <button 
-                      type="button" 
-                      className="change-image-btn" 
+                    <img src={imagePreview} alt="Preview" className="preview-image-full" />
+                    <button
+                      type="button"
+                      className="change-image-btn"
                       onClick={() => {
                         setNewImage(null);
                         setImagePreview(null);
                       }}
-                    >
-                      Change Image
-                    </button>
+                    >Change Image</button>
                   </div>
                 )}
               </div>
 
               <div className="edit-actions">
-                <button 
-                  type="button" 
-                  className="btn-cancel" 
-                  onClick={handleCloseImageEdit} 
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="btn-save" 
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Updating...' : 'Update Image'}
-                </button>
+                <button type="button" className="btn-cancel" onClick={handleCloseImageEdit} disabled={isSubmitting}>Cancel</button>
+                <button type="submit" className="btn-save" disabled={isSubmitting}>{isSubmitting ? 'Updating...' : 'Update Image'}</button>
               </div>
             </form>
           </div>

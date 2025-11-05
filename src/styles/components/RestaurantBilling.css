@@ -1,28 +1,240 @@
 /* ==========================================
-   RESTAURANT BILLING - DISHES LEFT, CART RIGHT
+   ROOT VARIABLES
+   ========================================== */
+
+:root {
+  --primary-dark: #1a1a1a;
+  --white: #ffffff;
+  --off-white: #f9f9f9;
+  --light-gray: #e5e5e5;
+  --dark-gray: #666666;
+  --medium-gray: #999999;
+  --success: #10b981;
+  --error: #ef4444;
+  --gold-primary: #d4af37;
+  --gold-glow: rgba(212, 175, 55, 0.15);
+  --gradient-gold: linear-gradient(135deg, #d4af37 0%, #c99a2e 100%);
+  --radius-md: 6px;
+  --radius-lg: 12px;
+  --radius-sm: 4px;
+  --radius-full: 999px;
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   RESTAURANT BILLING - MAIN CONTAINER
    ========================================== */
 
 .restaurant-billing {
-  padding: var(--spacing-sm) var(--spacing-md);
-  max-width: 100%;
-  margin: 0;
-  background: transparent !important;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+  background: transparent;
+}
+
+/* ==========================================
+   UNIFIED HEADER BAR - ALL IN ONE
+   ========================================== */
+
+.unified-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem var(--spacing-md);
+  background: linear-gradient(135deg, #d4af37 0%, #c99a2e 100%);
+  border-bottom: 2px solid #b8941f;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
+  width: 100%;
+  flex-shrink: 0;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+/* LEFT SECTION - LANGUAGE BUTTON */
+.header-left {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.page-view-btn {
+  padding: 0.65rem 1.2rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  border: none;
+  background: var(--white);
+  color: var(--gold-primary);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.page-view-btn:hover,
+.page-view-btn:focus {
+  background: var(--primary-dark);
+  color: var(--gold-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.page-view-btn:active {
+  transform: scale(0.98);
+}
+
+/* CENTER SECTION - MEAL TYPE BUTTONS */
+.header-center {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.meal-type-btn {
+  padding: 0.55rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  color: var(--dark-gray);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  min-width: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.meal-type-btn:hover {
+  border-color: var(--primary-dark);
+  background-color: var(--white);
+  color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.meal-type-btn.active {
+  background: var(--primary-dark);
+  color: var(--gold-primary);
+  border-color: var(--primary-dark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transform: none;
+}
+
+.meal-type-btn:active {
+  transform: scale(0.97);
+}
+
+/* RIGHT SECTION - REFRESH BUTTON */
+.header-right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.refresh-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: var(--white);
+  color: var(--dark-gray);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  font-family: inherit;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  color: var(--primary-dark);
+  transform: rotate(180deg);
+  background: var(--white);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.refresh-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   MAIN CONTENT - GRID LAYOUT
+   ========================================== */
+
+.billing-content {
   display: grid;
   grid-template-columns: 1fr 340px;
   gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  flex: 1;
   align-items: start;
 }
 
-/* Force correct grid order */
-.restaurant-billing > .dishes-section {
-  grid-column: 1;
-  order: 1;
+/* ==========================================
+   NOTIFICATION
+   ========================================== */
+
+.notification {
+  position: fixed;
+  top: 120px;
+  right: 1rem;
+  z-index: 1001;
+  background: var(--white);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease-out;
+  max-width: 400px;
+  width: calc(100vw - 2rem);
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
-.restaurant-billing > .order-section {
-  grid-column: 2;
-  order: 2;
+.notification--success {
+  border-left: 4px solid var(--success);
+  color: var(--success);
+}
+
+.notification--error {
+  border-left: 4px solid var(--error);
+  color: var(--error);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* ==========================================
@@ -37,48 +249,7 @@
 }
 
 .section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(20px);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.section-header h2 {
-  font-size: 1.2rem;
-  color: var(--primary-dark);
-  margin: 0;
-  font-weight: 800;
-}
-
-.icon-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-md);
-  border: 2px solid var(--light-gray);
-  background: var(--white);
-  color: var(--dark-gray);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-}
-
-.icon-btn:hover:not(:disabled) {
-  border-color: var(--gold-primary);
-  color: var(--gold-primary);
-  transform: rotate(180deg);
-}
-
-.icon-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+  display: none;
 }
 
 /* ==========================================
@@ -89,6 +260,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: var(--spacing-sm);
+  width: 100%;
 }
 
 .dish-card-billing {
@@ -101,6 +273,8 @@
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
 .dish-card-billing:hover {
@@ -116,6 +290,7 @@
   margin-bottom: 0.5rem;
   overflow: hidden;
   background: var(--light-gray);
+  flex-shrink: 0;
 }
 
 .dish-img-billing img {
@@ -128,35 +303,53 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  margin-bottom: 0.5rem;
+  gap: 0.35rem;
+  margin-bottom: 0.6rem;
+  min-height: 0;
 }
 
 .dish-name-billing {
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 800;
   color: var(--primary-dark);
   margin: 0;
-  line-height: 1.25;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-  min-height: 2.1em;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.6em;
+}
+
+.dish-secondary-name-billing {
+  font-size: 0.85rem;
+  color: #b8941f;
+  font-weight: 600;
+  margin: 0.1rem 0;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .dish-price-billing {
-  font-size: 1.05rem;
-  font-weight: 800;
+  font-size: 1.2rem;
+  font-weight: 900;
   color: var(--gold-primary);
   margin: 0;
+  line-height: 1;
 }
 
 /* ==========================================
-   DISH QUANTITY CONTROLS - GOLD THEME
+   DISH QUANTITY CONTROLS
    ========================================== */
 
 .dish-quantity-control {
   margin-top: auto;
+  width: 100%;
+  flex-shrink: 0;
 }
 
 .qty-controls-billing {
@@ -165,18 +358,19 @@
   justify-content: center;
   gap: 0.4rem;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  padding: 0.4rem 0.5rem;
+  padding: 0.5rem 0.4rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--light-gray);
+  width: 100%;
 }
 
 .qty-btn-billing {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: none;
   font-weight: 800;
-  font-size: 0.95rem;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -185,12 +379,13 @@
   background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
   color: var(--primary-dark);
   box-shadow: 0 2px 6px rgba(212, 175, 55, 0.3);
+  flex-shrink: 0;
+  font-family: inherit;
 }
 
 .qty-btn-billing:hover {
   transform: scale(1.15);
   box-shadow: 0 4px 12px rgba(212, 175, 55, 0.5);
-  background: linear-gradient(135deg, #b8941f 0%, #9a7a1a 100%);
 }
 
 .qty-btn-billing:active {
@@ -198,16 +393,17 @@
 }
 
 .qty-display {
-  min-width: 28px;
+  min-width: 30px;
   text-align: center;
   font-weight: 800;
   color: var(--primary-dark);
   font-size: 0.9rem;
+  line-height: 1;
 }
 
 .add-btn-billing {
   width: 100%;
-  padding: 0.65rem;
+  padding: 0.7rem 0.5rem;
   background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
   border: none;
   border-radius: var(--radius-md);
@@ -219,6 +415,11 @@
   box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
 }
 
 .add-btn-billing:hover {
@@ -238,45 +439,50 @@
 .order-section {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: 0;
   position: sticky;
-  top: 90px;
-  align-self: start;
+  top: var(--spacing-md);
   width: 340px;
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(20px);
   border-radius: var(--radius-lg);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: 3px solid var(--gold-primary);
   overflow: hidden;
+  max-height: calc(100vh - 250px);
 }
 
 .order-header {
-  padding: 0.75rem var(--spacing-md);
-  background: var(--primary-dark);
+  padding: 0.875rem var(--spacing-md);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
+  border-bottom: 2px solid var(--gold-primary);
 }
 
 .order-header h3 {
   color: var(--gold-primary);
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 800;
+  letter-spacing: -0.5px;
 }
 
 .text-btn {
   background: none;
   border: none;
-  padding: 0.35rem 0.7rem;
+  padding: 0.4rem 0.6rem;
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   cursor: pointer;
   border-radius: var(--radius-sm);
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-family: inherit;
 }
 
 .text-btn--danger {
@@ -285,7 +491,7 @@
 
 .text-btn--danger:hover {
   color: var(--error);
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.15);
 }
 
 /* ==========================================
@@ -296,6 +502,7 @@
   padding: var(--spacing-sm) var(--spacing-md);
   background: var(--off-white);
   border-bottom: 1px solid var(--light-gray);
+  flex-shrink: 0;
 }
 
 .compact-label {
@@ -305,7 +512,7 @@
   color: var(--dark-gray);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.5rem;
 }
 
 .type-toggle {
@@ -313,21 +520,22 @@
   grid-template-columns: 1fr 1fr;
   gap: 0.4rem;
   background: var(--white);
-  padding: 3px;
+  padding: 4px;
   border-radius: var(--radius-md);
   border: 1px solid var(--light-gray);
 }
 
 .type-option {
-  padding: 0.5rem;
+  padding: 0.55rem 0.5rem;
   background: transparent;
   border: none;
-  border-radius: calc(var(--radius-md) - 3px);
+  border-radius: calc(var(--radius-md) - 4px);
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--dark-gray);
   cursor: pointer;
   transition: all 0.3s ease;
+  font-family: inherit;
 }
 
 .type-option:hover {
@@ -347,12 +555,13 @@
 .order-summary {
   flex: 1;
   overflow-y: auto;
-  min-height: 200px;
-  max-height: calc(100vh - 500px);
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
 }
 
 .order-summary::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
 }
 
 .order-summary::-webkit-scrollbar-thumb {
@@ -360,36 +569,41 @@
   border-radius: 10px;
 }
 
+.order-summary::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-lg);
   text-align: center;
-  min-height: 200px;
+  min-height: 120px;
+  flex: 1;
 }
 
 .empty-cart-icon {
-  font-size: 2.5rem;
-  margin-bottom: 0.75rem;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
   opacity: 0.3;
 }
 
 .empty-state p {
   color: var(--dark-gray);
   font-weight: 700;
-  margin: 0 0 0.25rem 0;
-  font-size: 0.95rem;
+  margin: 0 0 0.2rem 0;
+  font-size: 0.9rem;
 }
 
 .empty-state span {
   color: var(--medium-gray);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
 /* ==========================================
-   ORDER ITEMS (CART) - GOLD THEME
+   ORDER ITEMS (CART)
    ========================================== */
 
 .order-items {
@@ -401,7 +615,7 @@
 
 .order-item {
   background: var(--off-white);
-  padding: 0.75rem;
+  padding: 0.7rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--light-gray);
   transition: all 0.3s ease;
@@ -409,13 +623,13 @@
 
 .order-item:hover {
   border-color: var(--gold-primary);
-  transform: translateX(-2px);
+  background: #fefef8;
 }
 
 .item-details {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: flex-start;
   margin-bottom: 0.5rem;
   gap: 0.5rem;
 }
@@ -423,17 +637,18 @@
 .item-name {
   font-weight: 700;
   color: var(--primary-dark);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   flex: 1;
   line-height: 1.2;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .item-price {
   color: var(--medium-gray);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -442,34 +657,37 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .qty-control {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.25rem;
   background: var(--white);
   border-radius: var(--radius-full);
-  padding: 3px;
+  padding: 2px;
   border: 1px solid var(--light-gray);
+  flex-shrink: 0;
 }
 
 .qty-btn {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   border: none;
   background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
   color: var(--primary-dark);
   font-weight: 800;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 6px rgba(212, 175, 55, 0.3);
+  flex-shrink: 0;
+  font-family: inherit;
 }
 
 .qty-btn:hover {
@@ -482,18 +700,20 @@
 }
 
 .qty-value {
-  min-width: 24px;
+  min-width: 22px;
   text-align: center;
   font-weight: 800;
   color: var(--primary-dark);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  line-height: 1;
 }
 
 .item-subtotal {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 800;
   color: var(--gold-primary);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* ==========================================
@@ -504,48 +724,59 @@
   padding: var(--spacing-md);
   background: var(--white);
   border-top: 1px solid var(--light-gray);
+  flex-shrink: 0;
 }
 
 .total-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 0;
-  margin-bottom: 0.75rem;
+  padding: 0.7rem 0;
+  margin-bottom: 0.8rem;
 }
 
 .total-label {
   font-weight: 800;
   color: var(--primary-dark);
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .total-value {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: var(--gold-primary);
+  line-height: 1;
 }
 
 .place-order-btn {
   width: 100%;
-  padding: 1rem;
+  padding: 0.9rem;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   border: none;
   border-radius: var(--radius-md);
   color: var(--white);
   font-weight: 800;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-family: inherit;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .place-order-btn:hover:not(:disabled) {
   transform: translateY(-3px);
   box-shadow: 0 8px 24px rgba(16, 185, 129, 0.5);
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.place-order-btn:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .place-order-btn:disabled {
@@ -561,7 +792,6 @@
 
 .loading-state,
 .error-state {
-  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -590,6 +820,7 @@
   color: var(--primary-dark);
   cursor: pointer;
   transition: all 0.3s ease;
+  font-family: inherit;
 }
 
 .retry-btn:hover {
@@ -598,76 +829,94 @@
 }
 
 /* ==========================================
-   NOTIFICATION
-   ========================================== */
-
-.notification {
-  position: fixed;
-  top: 90px;
-  right: 1rem;
-  z-index: 1001;
-  background: var(--white);
-  padding: 1rem 1.5rem;
-  border-radius: var(--radius-lg);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  animation: slideIn 0.3s ease-out;
-  max-width: 400px;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.notification--success {
-  border-left: 4px solid var(--success);
-  color: var(--success);
-}
-
-.notification--error {
-  border-left: 4px solid var(--error);
-  color: var(--error);
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* ==========================================
-   RESPONSIVE - MOBILE
+   RESPONSIVE - TABLET (1024px and below)
    ========================================== */
 
 @media (max-width: 1023px) {
-  .restaurant-billing {
-    grid-template-columns: 1fr;
-    padding: var(--spacing-sm);
-    padding-bottom: 420px;
+  .unified-header-bar {
+    flex-wrap: wrap;
+    padding: 0.65rem var(--spacing-sm);
   }
 
-  .dishes-section {
+  .header-left {
     order: 1;
+    width: 100%;
+  }
+
+  .page-view-btn {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    font-size: 0.75rem;
+    text-align: center;
+  }
+
+  .header-center {
+    order: 2;
+    flex: 1;
+  }
+
+  .meal-type-btn {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.75rem;
+    min-width: 100px;
+  }
+
+  .header-right {
+    order: 3;
+  }
+
+  .refresh-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+  }
+
+  .billing-content {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    padding-bottom: 400px;
   }
 
   .order-section {
-    order: 2;
     position: fixed;
     bottom: 60px;
     left: 0;
     right: 0;
     z-index: 100;
     width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: 50vh;
     background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
     backdrop-filter: blur(20px);
     border-top: 2px solid var(--gold-primary);
-    max-height: 55vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
+    margin: 0;
+    padding: 0;
+    top: auto;
+    sticky: unset;
+  }
+
+  .order-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: var(--gold-primary);
   }
 
   .order-summary {
-    max-height: 25vh;
+    max-height: 22vh;
+  }
+
+  .dish-name-billing {
+    font-size: 0.95rem;
+  }
+
+  .dish-price-billing {
+    font-size: 1.1rem;
   }
 
   .dishes-grid-billing {
@@ -675,8 +924,221 @@
   }
 }
 
+/* ==========================================
+   RESPONSIVE - MOBILE (640px and below)
+   ========================================== */
+
 @media (max-width: 640px) {
-  .dishes-grid-billing {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  .unified-header-bar {
+    padding: 0.55rem 0.5rem;
+    gap: 0.4rem;
   }
+
+  .header-left {
+    order: 1;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-view-btn {
+    font-size: 0.65rem;
+    padding: 0.55rem 0.8rem;
+  }
+
+  .header-center {
+    order: 2;
+    gap: 0.3rem;
+  }
+
+  .meal-type-btn {
+    flex: 1;
+    min-width: 70px;
+    padding: 0.5rem 0.5rem;
+    font-size: 0.65rem;
+  }
+
+  .header-right {
+    order: 3;
+  }
+
+  .refresh-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 0.95rem;
+  }
+
+  .billing-content {
+    padding: var(--spacing-sm) 0.5rem;
+    padding-bottom: 350px;
+  }
+
+  .dishes-grid-billing {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--spacing-sm);
+  }
+
+  .dish-card-billing {
+    padding: 0.5rem;
+  }
+
+  .dish-img-billing {
+    height: 90px;
+  }
+
+  .dish-name-billing {
+    font-size: 0.9rem;
+    min-height: 2.4em;
+  }
+
+  .dish-secondary-name-billing {
+    font-size: 0.8rem;
+  }
+
+  .dish-price-billing {
+    font-size: 1rem;
+  }
+
+  .order-section {
+    bottom: 56px;
+    max-height: 45vh;
+  }
+
+  .order-summary {
+    max-height: 18vh;
+  }
+
+  .item-name {
+    font-size: 0.75rem;
+  }
+
+  .item-price {
+    font-size: 0.65rem;
+  }
+
+  .total-label {
+    font-size: 0.95rem;
+  }
+
+  .total-value {
+    font-size: 1.2rem;
+  }
+
+  .place-order-btn {
+    padding: 0.8rem;
+    font-size: 0.85rem;
+    min-height: 42px;
+  }
+}
+
+/* ==========================================
+   RESPONSIVE - SMALL MOBILE (480px and below)
+   ========================================== */
+
+@media (max-width: 480px) {
+  .unified-header-bar {
+    padding: 0.5rem 0.3rem;
+    gap: 0.3rem;
+  }
+
+  .header-left {
+    width: 100%;
+    margin-bottom: 0.4rem;
+  }
+
+  .page-view-btn {
+    font-size: 0.6rem;
+    padding: 0.5rem 0.6rem;
+  }
+
+  .header-center {
+    gap: 0.25rem;
+  }
+
+  .meal-type-btn {
+    min-width: 65px;
+    padding: 0.45rem 0.4rem;
+    font-size: 0.6rem;
+  }
+
+  .refresh-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+
+  .billing-content {
+    padding: var(--spacing-sm) 0.3rem;
+    padding-bottom: 320px;
+  }
+
+  .dishes-grid-billing {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .dish-card-billing {
+    padding: 0.4rem;
+  }
+
+  .dish-img-billing {
+    height: 80px;
+  }
+
+  .dish-name-billing {
+    font-size: 0.85rem;
+  }
+
+  .dish-price-billing {
+    font-size: 0.95rem;
+  }
+
+  .order-section {
+    max-height: 40vh;
+  }
+
+  .order-summary {
+    max-height: 15vh;
+  }
+}
+
+/* ==========================================
+   ANIMATIONS
+   ========================================== */
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================
+   FOCUS VISIBLE FOR ACCESSIBILITY
+   ========================================== */
+
+button:focus-visible {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 2px;
+}
+
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 2px;
 }
