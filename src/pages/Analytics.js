@@ -17,11 +17,7 @@ const Analytics = () => {
   const [endDate, setEndDate] = useState('');
   const [trendDays, setTrendDays] = useState(7);
 
-  // Get today's date in YYYY-MM-DD format
-  function getTodayString() {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  }
+
 
   // Helper function to build filter params
   const getFilterParams = useCallback(() => {
