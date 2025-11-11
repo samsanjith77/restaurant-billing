@@ -11,11 +11,10 @@ const Analytics = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Filter state
+  // Global filter state
   const [filterType, setFilterType] = useState('today');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [workerDate, setWorkerDate] = useState(getTodayString());
   const [trendDays, setTrendDays] = useState(7);
 
   // Get today's date in YYYY-MM-DD format
@@ -24,21 +23,30 @@ const Analytics = () => {
     return today.toISOString().split('T')[0];
   }
 
+  // Helper function to build filter params
+  const getFilterParams = useCallback(() => {
+    const params = {};
+
+    if (filterType === 'all') {
+      params.filter = 'all';
+    } else if (filterType === 'custom' && startDate && endDate) {
+      params.filter = 'custom';
+      params.start_date = startDate;
+      params.end_date = endDate;
+    } else {
+      params.filter = 'today';
+    }
+
+    return params;
+  }, [filterType, startDate, endDate]);
+
   // Fetch analytics summary
   const fetchSummary = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      let params = {};
-
-      if (filterType === 'all') {
-        params.filter = 'all';
-      } else if (filterType === 'custom' && startDate && endDate) {
-        params.start_date = startDate;
-        params.end_date = endDate;
-      }
-
+      const params = getFilterParams();
       console.log('📊 Fetching analytics with params:', params);
       const data = await ApiService.getAnalyticsSummary(params);
       console.log('✅ Analytics data:', data);
@@ -49,68 +57,62 @@ const Analytics = () => {
     } finally {
       setLoading(false);
     }
-  }, [filterType, startDate, endDate]);
+  }, [getFilterParams]);
 
-  // Fetch worker expense
+  // Fetch worker expense with global filters
   const fetchWorkerExpense = useCallback(async () => {
     try {
-      console.log('👷 Fetching worker expense for:', workerDate);
-      const data = await ApiService.getWorkerExpense(workerDate);
+      const params = getFilterParams();
+      console.log('👷 Fetching worker expense with params:', params);
+      const data = await ApiService.getWorkerExpense(params);
       console.log('✅ Worker expense:', data);
       setWorkerExpense(data);
     } catch (err) {
       console.error('❌ Error:', err);
     }
-  }, [workerDate]);
+  }, [getFilterParams]);
 
-  // Fetch daily revenue trend
+  // Fetch daily revenue trend with global filters
   const fetchRevenueTrend = useCallback(async () => {
     try {
-      console.log('📈 Fetching revenue trend for', trendDays, 'days');
-      const data = await ApiService.getDailyRevenueTrend(trendDays);
+      const params = {
+        ...getFilterParams(),
+        days: trendDays
+      };
+      console.log('📈 Fetching revenue trend with params:', params);
+      const data = await ApiService.getDailyRevenueTrend(params);
       console.log('✅ Revenue trend:', data);
       setRevenueTrend(data);
     } catch (err) {
       console.error('❌ Error:', err);
     }
-  }, [trendDays]);
+  }, [getFilterParams, trendDays]);
 
-  // Fetch top selling dishes
+  // Fetch all dishes sold with global filters
   const fetchTopDishes = useCallback(async () => {
     try {
-      console.log('🍽️ Fetching top selling dishes');
-      const data = await ApiService.getTopSellingDishes();
-      console.log('✅ Top dishes:', data);
+      const params = getFilterParams();
+      console.log('🍽️ Fetching all dishes sold with params:', params);
+      const data = await ApiService.getTopSellingDishes(params);
+      console.log('✅ Dishes sold:', data);
       setTopDishes(data);
     } catch (err) {
       console.error('❌ Error:', err);
     }
-  }, []);
+  }, [getFilterParams]);
 
-  // Fetch on mount and when filters change
+  // Fetch all data when filters change
   useEffect(() => {
     fetchSummary();
-  }, [fetchSummary]);
-
-  useEffect(() => {
     fetchWorkerExpense();
-  }, [fetchWorkerExpense]);
-
-  useEffect(() => {
     fetchRevenueTrend();
-  }, [fetchRevenueTrend]);
-
-  useEffect(() => {
     fetchTopDishes();
-  }, [fetchTopDishes]);
+  }, [fetchSummary, fetchWorkerExpense, fetchRevenueTrend, fetchTopDishes]);
 
   // Quick filter handlers
   const applyFilter = (type) => {
     setFilterType(type);
-    if (type === 'today') {
-      setStartDate('');
-      setEndDate('');
-    } else if (type === 'all') {
+    if (type === 'today' || type === 'all') {
       setStartDate('');
       setEndDate('');
     }
@@ -147,7 +149,7 @@ const Analytics = () => {
         <p>Business insights and performance metrics</p>
       </div>
 
-      {/* Filter Section */}
+      {/* Global Filter Section */}
       <div className="analytics-filters">
         <div className="filter-buttons">
           <button
@@ -190,7 +192,12 @@ const Analytics = () => {
             />
             <button 
               className="apply-btn" 
-              onClick={fetchSummary}
+              onClick={() => {
+                fetchSummary();
+                fetchWorkerExpense();
+                fetchRevenueTrend();
+                fetchTopDishes();
+              }}
               disabled={!startDate || !endDate || loading}
             >
               Apply
@@ -215,7 +222,16 @@ const Analytics = () => {
         <div className="analytics-section">
           <div className="section-header">
             <h2>{summary.label}</h2>
-            <button onClick={fetchSummary} className="refresh-btn" disabled={loading}>
+            <button 
+              onClick={() => {
+                fetchSummary();
+                fetchWorkerExpense();
+                fetchRevenueTrend();
+                fetchTopDishes();
+              }} 
+              className="refresh-btn" 
+              disabled={loading}
+            >
               {loading ? '⏳' : '🔄'}
             </button>
           </div>
@@ -251,7 +267,7 @@ const Analytics = () => {
             </div>
           </div>
 
-          {/* FIXED: Income vs Expense Bar */}
+          {/* Income vs Expense Bar */}
           {summary.total_income > 0 && (
             <div className="breakdown-bar">
               <div className="breakdown-header">
@@ -332,21 +348,23 @@ const Analytics = () => {
         </div>
       )}
 
-      {/* Top Selling Dishes */}
-      {topDishes && topDishes.top_dishes && topDishes.top_dishes.length > 0 && (
+      {/* All Dishes Sold (Ordered by Revenue) */}
+      {topDishes && topDishes.dishes && topDishes.dishes.length > 0 && (
         <div className="analytics-section">
           <div className="section-header">
-            <h2>🍽️ Top Selling Dishes</h2>
+            <h2>🍽️ Dishes Sold</h2>
+            <span className="section-subtitle">Ordered by highest revenue</span>
           </div>
 
           <div className="dishes-list">
-            {topDishes.top_dishes.map((dish, index) => (
+            {topDishes.dishes.map((dish, index) => (
               <div key={index} className="dish-item">
                 <div className="dish-rank">#{index + 1}</div>
                 <div className="dish-info">
                   <div className="dish-name">{dish.dish_name}</div>
                   <div className="dish-stats">
                     <span className="dish-quantity">Sold: {dish.total_sold}</span>
+                    <span className="dish-orders">Orders: {dish.total_orders}</span>
                   </div>
                 </div>
                 <div className="dish-revenue">{formatCurrency(dish.total_revenue)}</div>
@@ -360,14 +378,6 @@ const Analytics = () => {
       <div className="analytics-section">
         <div className="section-header">
           <h2>👷 Worker Expense</h2>
-          <div className="worker-date-filter">
-            <input
-              type="date"
-              value={workerDate}
-              onChange={(e) => setWorkerDate(e.target.value)}
-              className="date-input"
-            />
-          </div>
         </div>
 
         {workerExpense && (
@@ -375,7 +385,7 @@ const Analytics = () => {
             <div className="worker-icon">👨‍🔧</div>
             <div className="worker-content">
               <div className="worker-label">
-                Total Worker Expense on {workerExpense.date}
+                Total Worker Expense {workerExpense.date ? `on ${workerExpense.date}` : ''}
               </div>
               <div className="worker-value">
                 {formatCurrency(workerExpense.total_worker_expense)}

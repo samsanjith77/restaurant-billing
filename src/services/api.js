@@ -304,11 +304,21 @@ class ApiService {
     }
   }
 
-  static async getWorkerExpense(date = null) {
+  static async getWorkerExpense(params = {}) {
     try {
-      const url = date
-        ? `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.WORKER_EXPENSE}?date=${date}`
-        : `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.WORKER_EXPENSE}`;
+      const queryParams = new URLSearchParams();
+
+      if (params.date) {
+        queryParams.append('date', params.date);
+      } else if (params.filter) {
+        queryParams.append('filter', params.filter);
+        if (params.start_date) queryParams.append('start_date', params.start_date);
+        if (params.end_date) queryParams.append('end_date', params.end_date);
+      }
+
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.WORKER_EXPENSE}${
+        queryParams.toString() ? `?${queryParams.toString()}` : ''
+      }`;
 
       const response = await this.authenticatedFetch(url, {
         headers: this.getHeaders()
@@ -322,9 +332,19 @@ class ApiService {
     }
   }
 
-  static async getDailyRevenueTrend(days = 7) {
+
+  static async getDailyRevenueTrend(params = {}) {
     try {
-      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DAILY_REVENUE_TREND}?days=${days}`;
+      const queryParams = new URLSearchParams();
+
+      if (params.days) queryParams.append('days', params.days);
+      if (params.filter) queryParams.append('filter', params.filter);
+      if (params.start_date) queryParams.append('start_date', params.start_date);
+      if (params.end_date) queryParams.append('end_date', params.end_date);
+
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DAILY_REVENUE_TREND}${
+        queryParams.toString() ? `?${queryParams.toString()}` : ''
+      }`;
 
       const response = await this.authenticatedFetch(url, {
         headers: this.getHeaders()
@@ -338,9 +358,17 @@ class ApiService {
     }
   }
 
-  static async getTopSellingDishes() {
+  static async getTopSellingDishes(params = {}) {
     try {
-      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.TOP_SELLING_DISHES}`;
+      const queryParams = new URLSearchParams();
+
+      if (params.filter) queryParams.append('filter', params.filter);
+      if (params.start_date) queryParams.append('start_date', params.start_date);
+      if (params.end_date) queryParams.append('end_date', params.end_date);
+
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.TOP_SELLING_DISHES}${
+        queryParams.toString() ? `?${queryParams.toString()}` : ''
+      }`;
 
       const response = await this.authenticatedFetch(url, {
         headers: this.getHeaders()
