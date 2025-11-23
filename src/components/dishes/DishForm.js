@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ApiService from '../../services/api';
+import { MEAL_TYPES, DISH_TYPES } from '../../utils/constants';
 import '../../styles/components/DishForm.css';
 
 const DishForm = ({ onDishCreated }) => {
@@ -8,6 +9,7 @@ const DishForm = ({ onDishCreated }) => {
     secondary_name: '',
     price: '',
     meal_type: 'afternoon',
+    dish_type: 'meals', // NEW
     image: null
   });
   const [preview, setPreview] = useState(null);
@@ -18,6 +20,16 @@ const DishForm = ({ onDishCreated }) => {
     { value: 'morning', label: '🌅 Morning' },
     { value: 'afternoon', label: '🍽️ Afternoon' },
     { value: 'night', label: '🌙 Night' }
+  ];
+
+  // NEW: Dish Type Options
+  const dishTypeOptions = [
+    { value: 'meals', label: '🍽️ Meals' },
+    { value: 'chinese', label: '🥡 Chinese' },
+    { value: 'indian', label: '🍛 Indian' },
+    { value: 'addons', label: '🍦 Add-ons' },
+    { value: 'beverages', label: '🥤 Beverages' },
+    { value: 'desserts', label: '🍰 Desserts' }
   ];
 
   const handleInputChange = (e) => {
@@ -65,6 +77,7 @@ const DishForm = ({ onDishCreated }) => {
       formDataPayload.append('secondary_name', formData.secondary_name.trim());
       formDataPayload.append('price', parseFloat(formData.price));
       formDataPayload.append('meal_type', formData.meal_type);
+      formDataPayload.append('dish_type', formData.dish_type); // NEW
       
       if (formData.image) {
         formDataPayload.append('image', formData.image);
@@ -79,6 +92,7 @@ const DishForm = ({ onDishCreated }) => {
         secondary_name: '', 
         price: '', 
         meal_type: 'afternoon',
+        dish_type: 'meals', // NEW
         image: null 
       });
       setPreview(null);
@@ -88,6 +102,7 @@ const DishForm = ({ onDishCreated }) => {
       setMessage({ type: 'error', text: err.message || 'Failed to create dish' });
     } finally {
       setLoading(false);
+      setTimeout(() => setMessage(null), 3000);
     }
   };
 
@@ -147,7 +162,7 @@ const DishForm = ({ onDishCreated }) => {
 
         {/* Meal Type Field */}
         <div className="form-group-mobile">
-          <label htmlFor="meal-type">Meal Type *</label>
+          <label htmlFor="meal-type">Meal Time *</label>
           <select
             id="meal-type"
             name="meal_type"
@@ -162,6 +177,27 @@ const DishForm = ({ onDishCreated }) => {
               </option>
             ))}
           </select>
+          <small className="field-hint">When to serve this dish</small>
+        </div>
+
+        {/* Dish Category/Type Field - NEW */}
+        <div className="form-group-mobile">
+          <label htmlFor="dish-type">Dish Category *</label>
+          <select
+            id="dish-type"
+            name="dish_type"
+            value={formData.dish_type}
+            onChange={handleInputChange}
+            required
+            className="dish-type-select"
+          >
+            {dishTypeOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <small className="field-hint">Type of dish (Meals, Chinese, Add-ons, etc.)</small>
         </div>
 
         {/* Image Upload Field */}

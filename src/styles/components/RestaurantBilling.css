@@ -40,10 +40,11 @@
   flex-direction: column;
   min-height: 100vh;
   background: transparent;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* ==========================================
-   UNIFIED HEADER BAR - ALL IN ONE
+   UNIFIED HEADER BAR
    ========================================== */
 
 .unified-header-bar {
@@ -51,7 +52,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem var(--spacing-md);
-  background: linear-gradient(135deg, #d4af37 0%, #c99a2e 100%);
+  background: var(--gradient-gold);
   border-bottom: 2px solid #b8941f;
   box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
   width: 100%;
@@ -60,7 +61,6 @@
   flex-wrap: wrap;
 }
 
-/* LEFT SECTION - LANGUAGE BUTTON */
 .header-left {
   display: flex;
   align-items: center;
@@ -96,13 +96,11 @@
   transform: scale(0.98);
 }
 
-/* CENTER SECTION - MEAL TYPE BUTTONS */
 .header-center {
   display: flex;
   gap: 0.5rem;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
   flex: 1;
   min-width: 0;
 }
@@ -132,14 +130,14 @@
   background-color: var(--white);
   color: var(--primary-dark);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
 }
 
 .meal-type-btn.active {
   background: var(--primary-dark);
   color: var(--gold-primary);
   border-color: var(--primary-dark);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
   transform: none;
 }
 
@@ -147,7 +145,6 @@
   transform: scale(0.97);
 }
 
-/* RIGHT SECTION - REFRESH BUTTON */
 .header-right {
   display: flex;
   align-items: center;
@@ -248,18 +245,10 @@
   width: 100%;
 }
 
-.section-header {
-  display: none;
-}
-
-/* ==========================================
-   DISHES GRID - COMPACT SMALL VIEW
-   ========================================== */
-
 .dishes-grid-billing {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* smaller cards */
-  gap: 0.4rem; /* reduced spacing */
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.6rem;
   width: 100%;
   padding: 0.3rem;
 }
@@ -267,7 +256,7 @@
 .dish-card-billing {
   background: rgba(255, 255, 255, 0.95);
   border-radius: var(--radius-sm);
-  padding: 0.4rem;
+  padding: 0.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease;
   display: flex;
@@ -282,12 +271,11 @@
   border-color: var(--gold-primary);
 }
 
-/* Dish Image - smaller height */
 .dish-img-billing {
   width: 100%;
-  height: 70px;
+  height: 80px;
   border-radius: var(--radius-sm);
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.4rem;
   overflow: hidden;
   background: var(--light-gray);
 }
@@ -298,58 +286,37 @@
   object-fit: cover;
 }
 
-/* Dish Info - tighter spacing */
 .dish-info-billing {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  margin-bottom: 0.3rem;
+  gap: 0.3rem;
+  margin-bottom: 0.4rem;
+  flex-grow: 1;
 }
 
 .dish-name-billing {
-  font-size: 1.0rem;
-  font-weight: 900;
+  font-size: 0.95rem;
+  font-weight: 700;
   color: var(--primary-dark);
   line-height: 1.2;
-  min-height: 1.8em;
+  min-height: 2em;
   -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  overflow: hidden;
 }
 
 .dish-secondary-name-billing {
-  display: none !important;
+  font-size: 0.8rem;
+  color: var(--medium-gray);
+  font-style: italic;
 }
 
 .dish-price-billing {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 800;
-  color:  #111111;
+  color: var(--gold-primary);
 }
-
-/* Compact Quantity Controls */
-.qty-controls-billing {
-  padding: 0.35rem;
-  gap: 0.25rem;
-}
-
-.qty-btn-billing {
-  width: 22px;
-  height: 22px;
-  font-size: 0.8rem;
-}
-
-.qty-display {
-  font-size: 0.75rem;
-}
-
-/* Compact Add Button */
-.add-btn-billing {
-  padding: 0.45rem;
-  font-size: 0.7rem;
-  min-height: 32px;
-}
-/* ==========================================
-   DISH QUANTITY CONTROLS
-   ========================================== */
 
 .dish-quantity-control {
   margin-top: auto;
@@ -363,19 +330,19 @@
   justify-content: center;
   gap: 0.4rem;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  padding: 0.5rem 0.4rem;
+  padding: 0.4rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--light-gray);
   width: 100%;
 }
 
 .qty-btn-billing {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   border: none;
   font-weight: 800;
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -389,38 +356,38 @@
 }
 
 .qty-btn-billing:hover {
-  transform: scale(1.15);
+  transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(212, 175, 55, 0.5);
 }
 
 .qty-btn-billing:active {
-  transform: scale(0.9);
+  transform: scale(0.95);
 }
 
 .qty-display {
-  min-width: 30px;
+  min-width: 28px;
   text-align: center;
   font-weight: 800;
   color: var(--primary-dark);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   line-height: 1;
 }
 
 .add-btn-billing {
   width: 100%;
-  padding: 0.7rem 0.5rem;
+  padding: 0.6rem 0.5rem;
   background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
   border: none;
   border-radius: var(--radius-md);
   color: var(--primary-dark);
   font-weight: 800;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  min-height: 38px;
+  min-height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -444,7 +411,6 @@
 .order-section {
   display: flex;
   flex-direction: column;
-  gap: 0;
   position: sticky;
   top: var(--spacing-md);
   width: 340px;
@@ -455,7 +421,7 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-left: 3px solid var(--gold-primary);
   overflow: hidden;
-  max-height: calc(100vh - 250px);
+  max-height: calc(100vh - 120px);
 }
 
 .order-header {
@@ -500,67 +466,105 @@
 }
 
 /* ==========================================
-   ORDER TYPE SELECTOR
+   ORDER CONTROLS - COMPACT HORIZONTAL LAYOUT
    ========================================== */
 
-.order-type-compact {
-  padding: var(--spacing-sm) var(--spacing-md);
+.order-controls {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  padding: 0.75rem var(--spacing-md);
   background: var(--off-white);
   border-bottom: 1px solid var(--light-gray);
   flex-shrink: 0;
+  align-items: flex-start;
+}
+
+.order-type-compact,
+.payment-type-section,
+.addons-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
 .compact-label {
   display: block;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 700;
   color: var(--dark-gray);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.2rem;
 }
 
-.type-toggle {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.4rem;
+.type-toggle,
+.payment-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.type-option,
+.payment-option {
+  padding: 0.45rem 0.4rem;
   background: var(--white);
-  padding: 4px;
-  border-radius: var(--radius-md);
   border: 1px solid var(--light-gray);
-}
-
-.type-option {
-  padding: 0.55rem 0.5rem;
-  background: transparent;
-  border: none;
-  border-radius: calc(var(--radius-md) - 4px);
-  font-weight: 700;
-  font-size: 0.75rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.7rem;
   color: var(--dark-gray);
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: inherit;
+  text-align: center;
 }
 
-.type-option:hover {
+.type-option:hover,
+.payment-option:hover {
   background: var(--off-white);
+  border-color: var(--gold-primary);
 }
 
-.type-option.active {
+.type-option.active,
+.payment-option.active {
   background: var(--gradient-gold);
   color: var(--primary-dark);
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+  border-color: var(--gold-primary);
+  box-shadow: 0 2px 6px rgba(212, 175, 55, 0.3);
+  font-weight: 700;
+}
+
+.addons-btn-compact {
+  padding: 0.5rem 0.5rem;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  margin-top: 1.4rem;
+  white-space: nowrap;
+}
+
+.addons-btn-compact:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
 /* ==========================================
-   ORDER SUMMARY (CART ITEMS)
+   ORDER SUMMARY (SCROLLABLE CART ITEMS)
    ========================================== */
 
 .order-summary {
   flex: 1;
   overflow-y: auto;
-  min-height: 120px;
+  min-height: 150px;
   display: flex;
   flex-direction: column;
 }
@@ -585,7 +589,7 @@
   justify-content: center;
   padding: var(--spacing-lg);
   text-align: center;
-  min-height: 120px;
+  min-height: 150px;
   flex: 1;
 }
 
@@ -606,10 +610,6 @@
   color: var(--medium-gray);
   font-size: 0.75rem;
 }
-
-/* ==========================================
-   ORDER ITEMS (CART)
-   ========================================== */
 
 .order-items {
   display: flex;
@@ -721,23 +721,60 @@
   flex-shrink: 0;
 }
 
+/* Addons Divider */
+.addons-divider {
+  margin: 12px 0 8px;
+  padding: 6px 10px;
+  background-color: #e8f5e9;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  color: #2e7d32;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.addon-item-display {
+  background-color: #f1f8f4;
+  border-left: 3px solid #4caf50;
+}
+
+.remove-addon-btn {
+  background: none;
+  border: none;
+  color: #ff4444;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 0 6px;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.remove-addon-btn:hover {
+  color: #cc0000;
+  transform: scale(1.2);
+}
+
 /* ==========================================
-   ORDER FOOTER (TOTAL & PLACE ORDER)
+   ORDER FOOTER (STICKY AT BOTTOM)
    ========================================== */
 
 .order-footer {
   padding: var(--spacing-md);
   background: var(--white);
-  border-top: 1px solid var(--light-gray);
+  border-top: 2px solid var(--light-gray);
   flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }
 
 .total-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.7rem 0;
-  margin-bottom: 0.8rem;
+  padding: 0.6rem 0;
+  margin-bottom: 0.75rem;
 }
 
 .total-label {
@@ -755,8 +792,8 @@
 
 .place-order-btn {
   width: 100%;
-  padding: 0.9rem;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  padding: 0.85rem;
+  background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
   border: none;
   border-radius: var(--radius-md);
   color: var(--white);
@@ -789,6 +826,7 @@
   cursor: not-allowed;
   transform: none;
   background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+  box-shadow: none;
 }
 
 /* ==========================================
@@ -885,43 +923,34 @@
 
   .order-section {
     position: fixed;
-    bottom: 60px;
+    bottom: 0;
     left: 0;
     right: 0;
     z-index: 100;
     width: 100%;
     max-width: 100%;
-    height: auto;
-    max-height: 50vh;
+    max-height: 55vh;
     background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
     backdrop-filter: blur(20px);
-    border-top: 2px solid var(--gold-primary);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     border-left: none;
     border-right: none;
     border-bottom: none;
     box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
-    margin: 0;
-    padding: 0;
     top: auto;
-    sticky: unset;
   }
 
   .order-header {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    color: var(--gold-primary);
+  }
+
+  .order-controls {
+    flex-direction: row;
+    padding: 0.6rem 0.75rem;
   }
 
   .order-summary {
-    max-height: 22vh;
-  }
-
-  .dish-name-billing {
-    font-size: 0.95rem;
-  }
-
-  .dish-price-billing {
-    font-size: 1.1rem;
+    max-height: calc(55vh - 180px);
   }
 
   .dishes-grid-billing {
@@ -982,54 +1011,16 @@
     gap: var(--spacing-sm);
   }
 
-  .dish-card-billing {
-    padding: 0.5rem;
-  }
-
-  .dish-img-billing {
-    height: 90px;
-  }
-
-  .dish-name-billing {
-    font-size: 0.9rem;
-    min-height: 2.4em;
-  }
-
-  .dish-secondary-name-billing {
-    font-size: 0.8rem;
-  }
-
-  .dish-price-billing {
-    font-size: 1rem;
-  }
-
   .order-section {
-    bottom: 56px;
-    max-height: 45vh;
+    max-height: 50vh;
   }
 
   .order-summary {
-    max-height: 18vh;
-  }
-
-  .item-name {
-    font-size: 0.75rem;
-  }
-
-  .item-price {
-    font-size: 0.65rem;
-  }
-
-  .total-label {
-    font-size: 0.95rem;
-  }
-
-  .total-value {
-    font-size: 1.2rem;
+    max-height: calc(50vh - 170px);
   }
 
   .place-order-btn {
-    padding: 0.8rem;
+    padding: 0.75rem;
     font-size: 0.85rem;
     min-height: 42px;
   }
@@ -1081,28 +1072,28 @@
     gap: 0.5rem;
   }
 
-  .dish-card-billing {
-    padding: 0.4rem;
-  }
-
-  .dish-img-billing {
-    height: 80px;
-  }
-
-  .dish-name-billing {
-    font-size: 0.85rem;
-  }
-
-  .dish-price-billing {
-    font-size: 0.95rem;
-  }
-
   .order-section {
-    max-height: 40vh;
+    max-height: 45vh;
   }
 
   .order-summary {
-    max-height: 15vh;
+    max-height: calc(45vh - 160px);
+  }
+
+  .order-controls {
+    gap: 0.3rem;
+    padding: 0.5rem;
+  }
+
+  .compact-label {
+    font-size: 0.6rem;
+  }
+
+  .type-option,
+  .payment-option,
+  .addons-btn-compact {
+    font-size: 0.65rem;
+    padding: 0.4rem 0.3rem;
   }
 }
 
@@ -1133,15 +1124,7 @@
   }
 }
 
-/* ==========================================
-   FOCUS VISIBLE FOR ACCESSIBILITY
-   ========================================== */
-
-button:focus-visible {
-  outline: 2px solid var(--gold-primary);
-  outline-offset: 2px;
-}
-
+button:focus-visible,
 input:focus-visible,
 select:focus-visible {
   outline: 2px solid var(--gold-primary);

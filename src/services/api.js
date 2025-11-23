@@ -25,7 +25,6 @@ class ApiService {
         try {
           await AuthService.refreshToken();
 
-          // Retry request with new token
           options.headers = {
             ...options.headers,
             'Authorization': `Bearer ${AuthService.getAccessToken()}`
@@ -47,14 +46,17 @@ class ApiService {
 
   // ============= DISHES =============
 
-  // Get all dishes or filter by meal_type
-  static async getDishes(mealType = null) {
+  // Get all dishes or filter by meal_type and dish_type
+  static async getDishes(mealType = null, dishType = null) {
     try {
       let url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DISHES}`;
       
-      // Add meal_type query parameter if specified
-      if (mealType) {
-        url += `?meal_type=${mealType}`;
+      const params = new URLSearchParams();
+      if (mealType) params.append('meal_type', mealType);
+      if (dishType) params.append('dish_type', dishType);
+      
+      if (params.toString()) {
+        url += `?${params.toString()}`;
       }
 
       const response = await this.authenticatedFetch(url, {
@@ -86,7 +88,7 @@ class ApiService {
     }
   }
 
-  // Create dish with meal_type
+  // Create dish with meal_type and dish_type
   static async createDish(formData) {
     try {
       const response = await this.authenticatedFetch(
@@ -124,10 +126,10 @@ class ApiService {
     }
   }
 
-  // Update dish price
+  // Update dish price - CORRECTED
   static async updateDishPrice(dishId, priceData) {
     try {
-      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DISHES}${dishId}/price/`;
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.UPDATE_DISH_PRICE}${dishId}/update-price/`;
 
       const response = await this.authenticatedFetch(url, {
         method: 'PATCH',
@@ -135,7 +137,10 @@ class ApiService {
         body: JSON.stringify(priceData)
       });
 
-      if (!response.ok) throw new Error('Failed to update dish price');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update dish price');
+      }
       return await response.json();
     } catch (error) {
       console.error('Error updating dish price:', error);
@@ -143,10 +148,13 @@ class ApiService {
     }
   }
 
-  // Update dish image
-  static async updateDishImage(dishId, formData) {
+  // Update dish image - CORRECTED
+  static async updateDishImage(dishId, imageFile) {
     try {
-      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DISHES}${dishId}/image/`;
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.UPDATE_DISH_IMAGE}${dishId}/update-image/`;
+
+      const formData = new FormData();
+      formData.append('image', imageFile);
 
       const response = await this.authenticatedFetch(url, {
         method: 'PATCH',
@@ -154,7 +162,10 @@ class ApiService {
         body: formData
       });
 
-      if (!response.ok) throw new Error('Failed to update dish image');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update dish image');
+      }
       return await response.json();
     } catch (error) {
       console.error('Error updating dish image:', error);
@@ -203,7 +214,6 @@ class ApiService {
   }
 
   // ============= PERSONS =============
-
   static async getPersons() {
     try {
       const response = await this.authenticatedFetch(
@@ -331,7 +341,6 @@ class ApiService {
       throw error;
     }
   }
-
 
   static async getDailyRevenueTrend(params = {}) {
     try {
