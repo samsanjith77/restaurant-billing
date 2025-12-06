@@ -75,31 +75,28 @@ const RestaurantBilling = () => {
     setIsProcessing(true);
     setMessage(null);
 
-    try {
-      const items = Object.entries(orderItems).map(([dishId, qty]) => ({
-        dish_id: parseInt(dishId),
-        quantity: qty,
-      }));
+      try {
+    const items = Object.entries(orderItems).map(([dishId, qty]) => ({
+      dish_id: parseInt(dishId),
+      quantity: qty,
+    }));
 
-      const addonItems = addons.map(addon => ({
-        dish_id: addon.dish_id,
-        quantity: addon.quantity,
-      }));
+    // ✅ Removed addonItems - don't add addons to items array
 
-      const orderData = {
-        items: [...items, ...addonItems],
-        total_amount: calculateTotal(),
-        order_type: orderType,
-        payment_type: paymentType,
-        addons: addons.map(a => ({
-          id: a.id,
-          dish_id: a.dish_id,
-          name: a.name,
-          secondary_name: a.secondary_name,
-          price: a.price,
-          quantity: a.quantity,
-        })),
-      };
+    const orderData = {
+      items: items,  // ✅ CORRECT - only dishes, no addons
+      total_amount: calculateTotal(),
+      order_type: orderType,
+      payment_type: paymentType,
+      addons: addons.map(a => ({
+        id: a.id,
+        dish_id: a.dish_id,
+        name: a.name,
+        secondary_name: a.secondary_name,
+        price: a.price,
+        quantity: a.quantity,
+      })),
+    };
 
       const response = await ApiService.createOrder(orderData);
       setMessage({ type: 'success', text: response.message || MESSAGES.SUCCESS_ORDER });
