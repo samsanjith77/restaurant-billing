@@ -315,7 +315,7 @@
 .dish-price-billing {
   font-size: 0.9rem;
   font-weight: 800;
-  color: var(--gold-primary);
+  color:#e00000;
 }
 
 .dish-quantity-control {
