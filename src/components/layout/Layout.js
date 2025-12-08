@@ -4,8 +4,10 @@ import { useAuth } from '../../contexts/AuthContext';
 import Header from './Header';
 import '../../styles/components/Layout.css';
 
+
 const Layout = () => {
   const { isAdmin } = useAuth();
+
 
   return (
     <div className="app-layout">
@@ -23,6 +25,10 @@ const Layout = () => {
         <NavLink to="/dishes" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
           <span className="nav-icon">🍽️</span>
           <span className="nav-label">Dishes</span>
+        </NavLink>
+        <NavLink to="/dish-ordering" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
+          <span className="nav-icon">🔄</span>
+          <span className="nav-label">Ordering</span>
         </NavLink>
         <NavLink to="/orders" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
           <span className="nav-icon">📋</span>
@@ -43,5 +49,6 @@ const Layout = () => {
     </div>
   );
 };
+
 
 export default Layout;

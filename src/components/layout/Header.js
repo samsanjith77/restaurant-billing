@@ -3,10 +3,12 @@ import { useNavigate, NavLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import '../../styles/components/Header.css';
 
+
 const Header = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user, isAdmin, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,11 +19,13 @@ const Header = () => {
       }
     };
 
+
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
 
   const handleLogout = () => {
     if (window.confirm('Are you sure you want to logout?')) {
@@ -30,9 +34,11 @@ const Header = () => {
     }
   };
 
+
   const handleLogin = () => {
     navigate('/login');
   };
+
 
   return (
     <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
@@ -43,6 +49,7 @@ const Header = () => {
             <span className="tagline">Restaurant Management System</span>
           </div>
 
+
           {isAuthenticated && (
             <nav className="header-main-nav">
               <NavLink to="/billing" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
@@ -50,6 +57,9 @@ const Header = () => {
               </NavLink>
               <NavLink to="/dishes" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
                 🍽️ Dishes
+              </NavLink>
+              <NavLink to="/dish-ordering" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+                🔄 Ordering
               </NavLink>
               <NavLink to="/orders" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
                 📋 Orders
@@ -65,6 +75,7 @@ const Header = () => {
               )}
             </nav>
           )}
+
 
           <nav className="header-nav">
             {isAuthenticated ? (
@@ -99,5 +110,6 @@ const Header = () => {
     </header>
   );
 };
+
 
 export default Header;

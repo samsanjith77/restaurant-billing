@@ -2,14 +2,17 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import '../../styles/components/Sidebar.css';
 
+
 const Sidebar = () => {
   const navItems = [
     { path: '/billing', label: 'Billing', icon: '💰' },
     { path: '/dishes', label: 'Dishes', icon: '🍽️' },
+    { path: '/dish-ordering', label: 'Dish Ordering', icon: '🔄' },
     { path: '/orders', label: 'Orders', icon: '📋' },
     { path: '/expenditure', label: 'Expenditure', icon: '💸' },
     { path: '/register', label: 'Register User', icon: '👤' }
   ];
+
 
   return (
     <aside className="sidebar">
@@ -30,5 +33,6 @@ const Sidebar = () => {
     </aside>
   );
 };
+
 
 export default Sidebar;

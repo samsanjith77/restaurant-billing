@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import '../../styles/components/Navigation.css';
 
+
 const Navigation = () => {
   const navItems = [
     {
@@ -13,6 +14,11 @@ const Navigation = () => {
       path: '/dishes',
       label: 'Dish Management',
       icon: '🍽️'
+    },
+    {
+      path: '/dish-ordering',
+      label: 'Dish Ordering',
+      icon: '🔄'
     },
     {
       path: '/orders',
@@ -27,9 +33,10 @@ const Navigation = () => {
     {
       path: '/expenditure',
       label: 'Expenditure',
-      icon: '📊'
+      icon: '💸'
     }
   ];
+
 
   return (
     <nav className="main-navigation">
@@ -52,5 +59,6 @@ const Navigation = () => {
     </nav>
   );
 };
+
 
 export default Navigation;

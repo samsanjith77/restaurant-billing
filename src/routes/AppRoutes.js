@@ -7,9 +7,11 @@ import Register from '../components/auth/Register';
 import Layout from '../components/layout/Layout';
 import RestaurantBilling from '../pages/RestaurantBilling';
 import DishManagement from '../pages/DishManagement';
+import DishOrdering from '../pages/DishOrdering';
 import OrderHistory from '../pages/OrderHistory';
 import Expenditure from '../pages/Expenditure';
 import Analytics from '../pages/Analytics';
+
 
 const AppRoutes = () => {
   return (
@@ -26,6 +28,7 @@ const AppRoutes = () => {
         <Route index element={<Navigate to="/billing" replace />} />
         <Route path="billing" element={<RestaurantBilling />} />
         <Route path="dishes" element={<DishManagement />} />
+        <Route path="dish-ordering" element={<DishOrdering />} />
         <Route path="orders" element={<OrderHistory />} />
         <Route path="expenditure" element={<Expenditure />} />
         
@@ -42,10 +45,12 @@ const AppRoutes = () => {
         } />
       </Route>
 
+
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 };
+
 
 export default AppRoutes;

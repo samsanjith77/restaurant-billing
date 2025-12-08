@@ -1,6 +1,7 @@
 import { API_CONFIG } from '../utils/constants';
 import AuthService from './authService';
 
+
 class ApiService {
   // Helper method to get default headers with auth token
   static getHeaders(isFormData = false) {
@@ -15,15 +16,18 @@ class ApiService {
     return headers;
   }
 
+
   // Make authenticated fetch request with token refresh logic
   static async authenticatedFetch(url, options = {}) {
     try {
       let response = await fetch(url, options);
 
+
       if (response.status === 401) {
         console.log('Token expired, refreshing...');
         try {
           await AuthService.refreshToken();
+
 
           options.headers = {
             ...options.headers,
@@ -37,6 +41,7 @@ class ApiService {
         }
       }
 
+
       return response;
     } catch (error) {
       console.error('API request error:', error);
@@ -44,7 +49,9 @@ class ApiService {
     }
   }
 
+
   // ============= DISHES =============
+
 
   // Get all dishes or filter by meal_type and dish_type
   static async getDishes(mealType = null, dishType = null) {
@@ -59,9 +66,11 @@ class ApiService {
         url += `?${params.toString()}`;
       }
 
+
       const response = await this.authenticatedFetch(url, {
         headers: this.getHeaders()
       });
+
 
       if (!response.ok) throw new Error('Failed to fetch dishes');
       return await response.json();
@@ -71,14 +80,17 @@ class ApiService {
     }
   }
 
+
   // Get single dish by ID
   static async getDishDetail(dishId) {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DISHES}${dishId}/`;
 
+
       const response = await this.authenticatedFetch(url, {
         headers: this.getHeaders()
       });
+
 
       if (!response.ok) throw new Error('Failed to fetch dish details');
       return await response.json();
@@ -87,6 +99,7 @@ class ApiService {
       throw error;
     }
   }
+
 
   // Create dish with meal_type and dish_type
   static async createDish(formData) {
@@ -100,6 +113,7 @@ class ApiService {
         }
       );
 
+
       if (!response.ok) throw new Error('Failed to create dish');
       return await response.json();
     } catch (error) {
@@ -108,15 +122,18 @@ class ApiService {
     }
   }
 
+
   // Delete dish
   static async deleteDish(dishId) {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DISHES}${dishId}/delete/`;
 
+
       const response = await this.authenticatedFetch(url, {
         method: 'DELETE',
         headers: this.getHeaders()
       });
+
 
       if (!response.ok) throw new Error('Failed to delete dish');
       return await response.json();
@@ -126,16 +143,19 @@ class ApiService {
     }
   }
 
-  // Update dish price - CORRECTED
+
+  // Update dish price
   static async updateDishPrice(dishId, priceData) {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.UPDATE_DISH_PRICE}${dishId}/update-price/`;
+
 
       const response = await this.authenticatedFetch(url, {
         method: 'PATCH',
         headers: this.getHeaders(),
         body: JSON.stringify(priceData)
       });
+
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -148,19 +168,23 @@ class ApiService {
     }
   }
 
-  // Update dish image - CORRECTED
+
+  // Update dish image
   static async updateDishImage(dishId, imageFile) {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.UPDATE_DISH_IMAGE}${dishId}/update-image/`;
 
+
       const formData = new FormData();
       formData.append('image', imageFile);
+
 
       const response = await this.authenticatedFetch(url, {
         method: 'PATCH',
         headers: this.getHeaders(true),
         body: formData
       });
+
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -173,7 +197,93 @@ class ApiService {
     }
   }
 
+
+  // ============= DISH ORDERING =============
+
+
+  // Get dishes grouped by meal type for ordering page
+  static async getDishesForOrdering() {
+    try {
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DISHES}?group_by_meal=true`;
+
+      console.log('Fetching dishes for ordering from:', url);
+
+      const response = await this.authenticatedFetch(url, {
+        headers: this.getHeaders()
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error response:', errorData);
+        throw new Error('Failed to fetch dishes for ordering');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching dishes for ordering:', error);
+      throw error;
+    }
+  }
+
+
+  // Reorder dishes within a meal type
+  static async reorderDishes(mealType, dishesOrder) {
+    try {
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REORDER_DISHES}`;
+
+      console.log('Reordering dishes at URL:', url);
+      console.log('Payload:', { meal_type: mealType, dishes: dishesOrder });
+
+      const response = await this.authenticatedFetch(url, {
+        method: 'PUT',
+        headers: this.getHeaders(),
+        body: JSON.stringify({
+          meal_type: mealType,
+          dishes: dishesOrder
+        })
+      });
+
+      console.log('Response status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error response:', errorData);
+        throw new Error(errorData.error || 'Failed to reorder dishes');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error reordering dishes:', error);
+      throw error;
+    }
+  }
+
+
+  // Initialize dish orders (one-time setup)
+  static async initializeDishOrders() {
+    try {
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.INITIALIZE_ORDERS}`;
+
+      const response = await this.authenticatedFetch(url, {
+        method: 'POST',
+        headers: this.getHeaders()
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to initialize dish orders');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error initializing dish orders:', error);
+      throw error;
+    }
+  }
+
+
   // ============= ORDERS =============
+
 
   static async createOrder(orderData) {
     try {
@@ -186,6 +296,7 @@ class ApiService {
         }
       );
 
+
       if (!response.ok) throw new Error('Failed to create order');
       return await response.json();
     } catch (error) {
@@ -193,6 +304,7 @@ class ApiService {
       throw error;
     }
   }
+
 
   static async getOrderHistory(payload = {}) {
     try {
@@ -205,6 +317,7 @@ class ApiService {
         }
       );
 
+
       if (!response.ok) throw new Error('Failed to fetch order history');
       return await response.json();
     } catch (error) {
@@ -213,13 +326,17 @@ class ApiService {
     }
   }
 
+
   // ============= PERSONS =============
+  
+  
   static async getPersons() {
     try {
       const response = await this.authenticatedFetch(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PERSONS}`,
         { headers: this.getHeaders() }
       );
+
 
       if (!response.ok) throw new Error('Failed to fetch persons');
       return await response.json();
@@ -228,6 +345,7 @@ class ApiService {
       throw error;
     }
   }
+
 
   static async addPerson(personData) {
     try {
@@ -240,6 +358,7 @@ class ApiService {
         }
       );
 
+
       if (!response.ok) throw new Error('Failed to add person');
       return await response.json();
     } catch (error) {
@@ -248,7 +367,9 @@ class ApiService {
     }
   }
 
+
   // ============= EXPENSES =============
+
 
   static async filterExpenses(filterData) {
     try {
@@ -261,6 +382,7 @@ class ApiService {
         }
       );
 
+
       if (!response.ok) throw new Error('Failed to filter expenses');
       return await response.json();
     } catch (error) {
@@ -268,6 +390,7 @@ class ApiService {
       throw error;
     }
   }
+
 
   static async addExpense(expenseData) {
     try {
@@ -280,6 +403,7 @@ class ApiService {
         }
       );
 
+
       if (!response.ok) throw new Error('Failed to add expense');
       return await response.json();
     } catch (error) {
@@ -288,23 +412,29 @@ class ApiService {
     }
   }
 
+
   // ============= ANALYTICS =============
+
 
   static async getAnalyticsSummary(params = {}) {
     try {
       const queryParams = new URLSearchParams();
 
+
       if (params.filter) queryParams.append('filter', params.filter);
       if (params.start_date) queryParams.append('start_date', params.start_date);
       if (params.end_date) queryParams.append('end_date', params.end_date);
+
 
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ANALYTICS_SUMMARY}${
         queryParams.toString() ? `?${queryParams.toString()}` : ''
       }`;
 
+
       const response = await this.authenticatedFetch(url, {
         headers: this.getHeaders()
       });
+
 
       if (!response.ok) throw new Error('Failed to fetch analytics summary');
       return await response.json();
@@ -314,9 +444,11 @@ class ApiService {
     }
   }
 
+
   static async getWorkerExpense(params = {}) {
     try {
       const queryParams = new URLSearchParams();
+
 
       if (params.date) {
         queryParams.append('date', params.date);
@@ -326,13 +458,16 @@ class ApiService {
         if (params.end_date) queryParams.append('end_date', params.end_date);
       }
 
+
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.WORKER_EXPENSE}${
         queryParams.toString() ? `?${queryParams.toString()}` : ''
       }`;
 
+
       const response = await this.authenticatedFetch(url, {
         headers: this.getHeaders()
       });
+
 
       if (!response.ok) throw new Error('Failed to fetch worker expense');
       return await response.json();
@@ -342,22 +477,27 @@ class ApiService {
     }
   }
 
+
   static async getDailyRevenueTrend(params = {}) {
     try {
       const queryParams = new URLSearchParams();
+
 
       if (params.days) queryParams.append('days', params.days);
       if (params.filter) queryParams.append('filter', params.filter);
       if (params.start_date) queryParams.append('start_date', params.start_date);
       if (params.end_date) queryParams.append('end_date', params.end_date);
 
+
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DAILY_REVENUE_TREND}${
         queryParams.toString() ? `?${queryParams.toString()}` : ''
       }`;
 
+
       const response = await this.authenticatedFetch(url, {
         headers: this.getHeaders()
       });
+
 
       if (!response.ok) throw new Error('Failed to fetch daily revenue trend');
       return await response.json();
@@ -367,21 +507,26 @@ class ApiService {
     }
   }
 
+
   static async getTopSellingDishes(params = {}) {
     try {
       const queryParams = new URLSearchParams();
+
 
       if (params.filter) queryParams.append('filter', params.filter);
       if (params.start_date) queryParams.append('start_date', params.start_date);
       if (params.end_date) queryParams.append('end_date', params.end_date);
 
+
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.TOP_SELLING_DISHES}${
         queryParams.toString() ? `?${queryParams.toString()}` : ''
       }`;
 
+
       const response = await this.authenticatedFetch(url, {
         headers: this.getHeaders()
       });
+
 
       if (!response.ok) throw new Error('Failed to fetch top selling dishes');
       return await response.json();
@@ -391,5 +536,6 @@ class ApiService {
     }
   }
 }
+
 
 export default ApiService;

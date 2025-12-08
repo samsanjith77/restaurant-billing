@@ -29,7 +29,10 @@ export const API_CONFIG = {
     ANALYTICS_SUMMARY: '/bill/analytics/summary/',
     WORKER_EXPENSE: '/bill/analytics/worker-expense/',
     DAILY_REVENUE_TREND: '/bill/analytics/daily-revenue-trend/',
-    TOP_SELLING_DISHES: '/bill/analytics/top-selling-dishes/' 
+    TOP_SELLING_DISHES: '/bill/analytics/top-selling-dishes/' ,
+
+    REORDER_DISHES: '/bill/dishes/reorder/',
+    INITIALIZE_ORDERS: '/bill/dishes/initialize-orders/',
   }
 };
 
