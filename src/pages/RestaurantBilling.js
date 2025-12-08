@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import useDishes from '../hooks/useDishes';
 import ApiService from '../services/api';
 import { ORDER_TYPES, PAYMENT_TYPES, MESSAGES } from '../utils/constants';
 import AddonsModal from '../components/AddonsModal';
 import '../styles/components/RestaurantBilling.css';
+
 
 const RestaurantBilling = () => {
   const [activeMealType, setActiveMealType] = useState('afternoon');
@@ -16,12 +17,28 @@ const RestaurantBilling = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [message, setMessage] = useState(null);
   const [showSecondaryNames, setShowSecondaryNames] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
 
   const mealTypes = [
     { key: 'morning', label: 'Morning' },
     { key: 'afternoon', label: 'Afternoon' },
     { key: 'night', label: 'Night' },
   ];
+
+
+  // Filter dishes based on search query
+  const filteredDishes = useMemo(() => {
+    if (!searchQuery.trim()) return dishes;
+    
+    const query = searchQuery.toLowerCase();
+    return dishes.filter(dish => {
+      const dishName = dish.name?.toLowerCase() || '';
+      const secondaryName = dish.secondary_name?.toLowerCase() || '';
+      return dishName.includes(query) || secondaryName.includes(query);
+    });
+  }, [dishes, searchQuery]);
+
 
   const handleQuantityChange = (dishId, quantity) => {
     setOrderItems(prev => {
@@ -35,6 +52,7 @@ const RestaurantBilling = () => {
     });
   };
 
+
   const calculateDishesTotal = () => {
     return Object.entries(orderItems).reduce((total, [dishId, qty]) => {
       const dish = dishes.find(d => d.id === parseInt(dishId));
@@ -42,11 +60,14 @@ const RestaurantBilling = () => {
     }, 0);
   };
 
+
   const calculateAddonsTotal = () => {
     return addons.reduce((total, addon) => total + (addon.price * addon.quantity), 0);
   };
 
+
   const calculateTotal = () => calculateDishesTotal() + calculateAddonsTotal();
+
 
   const getOrderedDishes = () => {
     return Object.entries(orderItems)
@@ -57,14 +78,17 @@ const RestaurantBilling = () => {
       .filter(Boolean);
   };
 
+
   const handleAddonsConfirm = (selectedAddons) => {
     setAddons(selectedAddons);
     setShowAddonsModal(false);
   };
 
+
   const handleRemoveAddon = (addonId) => {
     setAddons(prev => prev.filter(addon => addon.id !== addonId));
   };
+
 
   const handlePlaceOrder = async () => {
     if (Object.keys(orderItems).length === 0 && addons.length === 0) {
@@ -75,36 +99,39 @@ const RestaurantBilling = () => {
     setIsProcessing(true);
     setMessage(null);
 
-      try {
-    const items = Object.entries(orderItems).map(([dishId, qty]) => ({
-      dish_id: parseInt(dishId),
-      quantity: qty,
-    }));
 
-    // ✅ Removed addonItems - don't add addons to items array
+    try {
+      const items = Object.entries(orderItems).map(([dishId, qty]) => ({
+        dish_id: parseInt(dishId),
+        quantity: qty,
+      }));
 
-    const orderData = {
-      items: items,  // ✅ CORRECT - only dishes, no addons
-      total_amount: calculateTotal(),
-      order_type: orderType,
-      payment_type: paymentType,
-      addons: addons.map(a => ({
-        id: a.id,
-        dish_id: a.dish_id,
-        name: a.name,
-        secondary_name: a.secondary_name,
-        price: a.price,
-        quantity: a.quantity,
-      })),
-    };
+
+      const orderData = {
+        items: items,
+        total_amount: calculateTotal(),
+        order_type: orderType,
+        payment_type: paymentType,
+        addons: addons.map(a => ({
+          id: a.id,
+          dish_id: a.dish_id,
+          name: a.name,
+          secondary_name: a.secondary_name,
+          price: a.price,
+          quantity: a.quantity,
+        })),
+      };
+
 
       const response = await ApiService.createOrder(orderData);
       setMessage({ type: 'success', text: response.message || MESSAGES.SUCCESS_ORDER });
+
 
       setOrderItems({});
       setAddons([]);
       setOrderType(ORDER_TYPES.DINE_IN);
       setPaymentType(PAYMENT_TYPES.CASH);
+      setSearchQuery('');
       setTimeout(() => setMessage(null), 3000);
     } catch (err) {
       setMessage({ type: 'error', text: err.message || MESSAGES.ERROR_CREATE_ORDER });
@@ -112,6 +139,7 @@ const RestaurantBilling = () => {
       setIsProcessing(false);
     }
   };
+
 
   const handleClearCart = () => {
     if (Object.keys(orderItems).length === 0 && addons.length === 0) return;
@@ -121,17 +149,26 @@ const RestaurantBilling = () => {
     }
   };
 
+
   const getTotalItems = () => {
     const dishCount = Object.values(orderItems).reduce((sum, qty) => sum + qty, 0);
     const addonCount = addons.reduce((sum, a) => sum + a.quantity, 0);
     return dishCount + addonCount;
   };
 
+
   const orderedDishes = getOrderedDishes();
+
 
   const getDishDisplayName = (dish) => {
     return showSecondaryNames && dish.secondary_name ? dish.secondary_name : dish.name;
   };
+
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+  };
+
 
   return (
     <div className="restaurant-billing">
@@ -144,7 +181,25 @@ const RestaurantBilling = () => {
           >
             {showSecondaryNames ? "Main Language" : "Secondary Language"}
           </button>
+          
+          {/* SEARCH BOX IN HEADER */}
+          <div className="search-input-wrapper-header">
+            <span className="search-icon-header">🔍</span>
+            <input
+              type="text"
+              className="search-input-header"
+              placeholder="Search dishes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button className="clear-search-btn-header" onClick={handleClearSearch} title="Clear">
+                ×
+              </button>
+            )}
+          </div>
         </div>
+
 
         <div className="header-center">
           {mealTypes.map(m => (
@@ -158,7 +213,11 @@ const RestaurantBilling = () => {
           ))}
         </div>
 
+
         <div className="header-right">
+          {searchQuery && filteredDishes.length > 0 && (
+            <span className="search-count-header">{filteredDishes.length} found</span>
+          )}
           <button
             className="refresh-btn"
             onClick={refetch}
@@ -170,12 +229,14 @@ const RestaurantBilling = () => {
         </div>
       </div>
 
+
       {/* NOTIFICATION */}
       {message && (
         <div className={`notification notification--${message.type}`}>
           {message.text}
         </div>
       )}
+
 
       {/* MAIN CONTENT */}
       <div className="billing-content">
@@ -188,13 +249,20 @@ const RestaurantBilling = () => {
               <p>{error}</p>
               <button onClick={refetch} className="retry-btn">Retry</button>
             </div>
-          ) : dishes.length === 0 ? (
+          ) : filteredDishes.length === 0 ? (
             <div className="empty-state">
-              <p>No dishes available for this meal type</p>
+              {searchQuery ? (
+                <>
+                  <p>No dishes found for "{searchQuery}"</p>
+                  <button onClick={handleClearSearch} className="retry-btn">Clear Search</button>
+                </>
+              ) : (
+                <p>No dishes available for this meal type</p>
+              )}
             </div>
           ) : (
             <div className="dishes-grid-billing">
-              {dishes.map(dish => (
+              {filteredDishes.map(dish => (
                 <div key={dish.id} className="dish-card-billing">
                   {dish.image && (
                     <div className="dish-img-billing">
@@ -240,6 +308,7 @@ const RestaurantBilling = () => {
           )}
         </div>
 
+
         {/* RIGHT - ORDER SECTION */}
         <div className="order-section">
           {/* HEADER */}
@@ -249,6 +318,7 @@ const RestaurantBilling = () => {
               <button className="text-btn text-btn--danger" onClick={handleClearCart}>Clear</button>
             )}
           </div>
+
 
           {/* COMPACT CONTROLS - ORDER TYPE, PAYMENT, ADDONS */}
           <div className="order-controls">
@@ -272,6 +342,7 @@ const RestaurantBilling = () => {
                 </button>
               </div>
             </div>
+
 
             {/* PAYMENT TYPE */}
             <div className="payment-type-section">
@@ -301,6 +372,7 @@ const RestaurantBilling = () => {
               </div>
             </div>
 
+
             {/* ADDONS BUTTON */}
             <div className="addons-section">
               <button
@@ -312,6 +384,7 @@ const RestaurantBilling = () => {
               </button>
             </div>
           </div>
+
 
           {/* ORDER SUMMARY - SCROLLABLE */}
           <div className="order-summary">
@@ -347,6 +420,7 @@ const RestaurantBilling = () => {
                   </div>
                 ))}
 
+
                 {/* ADDONS */}
                 {addons.length > 0 && (
                   <>
@@ -374,6 +448,7 @@ const RestaurantBilling = () => {
             )}
           </div>
 
+
           {/* ORDER FOOTER - TOTAL & PLACE ORDER */}
           <div className="order-footer">
             <div className="total-row">
@@ -391,6 +466,7 @@ const RestaurantBilling = () => {
         </div>
       </div>
 
+
       {/* ADDONS MODAL */}
       <AddonsModal
         isOpen={showAddonsModal}
@@ -401,5 +477,6 @@ const RestaurantBilling = () => {
     </div>
   );
 };
+
 
 export default RestaurantBilling;
