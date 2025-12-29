@@ -9,43 +9,103 @@ const DishOrdering = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [hasChanges, setHasChanges] = useState(false);
+  
+  // Filter states
+  const [selectedMealType, setSelectedMealType] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // Fetch dishes grouped by meal type
+  // Fetch dishes grouped by meal type and category
   useEffect(() => {
     fetchDishesForOrdering();
   }, []);
 
   const fetchDishesForOrdering = async () => {
-    try {
-      setLoading(true);
-      console.log('Fetching dishes for ordering...');
-      const data = await ApiService.getDishesForOrdering();
-      console.log('Received data:', data);
+  try {
+    setLoading(true);
+    const data = await ApiService.getDishesForOrdering();
+    
+    // DEBUG: Check what backend actually returns
+    console.log('🔍 First meal type:', data[0]);
+    console.log('🔍 First category:', data[0]?.categories[0]);
+    console.log('🔍 Category value:', data[0]?.categories[0]?.category);
+    console.log('🔍 Category type:', typeof data[0]?.categories[0]?.category);
+      
+      // Check if data is valid
+      if (!data) {
+        throw new Error('No data received from server');
+      }
+
+      if (!Array.isArray(data)) {
+        console.error('❌ Data is not an array:', data);
+        throw new Error('Invalid data format received from server');
+      }
+
+      if (data.length === 0) {
+        console.warn('⚠️ No meal types data available');
+        setMealTypesData([]);
+        setLoading(false);
+        setMessage({ type: 'info', text: 'No dishes available for ordering' });
+        return;
+      }
       
       // Transform data to add unique id for sortable
-      const transformedData = data.map(mealType => ({
-        ...mealType,
-        dishes: mealType.dishes.map(dish => ({
-          ...dish,
-          chosen: false,
-          selected: false
-        }))
-      }));
+      const transformedData = data.map(mealType => {
+        console.log('🍽️ Processing meal type:', mealType.meal_type, mealType);
+        
+        // Check if categories exist
+        if (!mealType.categories || !Array.isArray(mealType.categories)) {
+          console.warn(`⚠️ No categories for ${mealType.meal_type}`);
+          return {
+            ...mealType,
+            categories: []
+          };
+        }
+
+        return {
+          ...mealType,
+          categories: mealType.categories.map(category => {
+            console.log('  📂 Processing category:', category.category, category);
+            
+            // Check if dishes exist
+            if (!category.dishes || !Array.isArray(category.dishes)) {
+              console.warn(`  ⚠️ No dishes for ${category.category}`);
+              return {
+                ...category,
+                dishes: []
+              };
+            }
+
+            return {
+              ...category,
+              dishes: category.dishes.map(dish => ({
+                ...dish,
+                chosen: false,
+                selected: false
+              }))
+            };
+          })
+        };
+      });
       
-      console.log('Transformed data:', transformedData);
+      console.log('✅ Transformed data:', transformedData);
       setMealTypesData(transformedData);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching dishes:', error);
-      setMessage({ type: 'error', text: `Failed to load dishes: ${error.message}` });
+      console.error('❌ Error fetching dishes:', error);
+      console.error('❌ Error stack:', error.stack);
+      setMessage({ 
+        type: 'error', 
+        text: `Failed to load dishes: ${error.message}` 
+      });
+      setMealTypesData([]);
       setLoading(false);
     }
   };
 
-  // Handle dish reorder within a meal type
-  const handleReorder = (mealTypeIndex, newDishes) => {
+  // Handle dish reorder within a category
+  const handleReorder = (mealTypeIndex, categoryIndex, newDishes) => {
     const updatedMealTypes = [...mealTypesData];
-    updatedMealTypes[mealTypeIndex].dishes = newDishes;
+    updatedMealTypes[mealTypeIndex].categories[categoryIndex].dishes = newDishes;
     setMealTypesData(updatedMealTypes);
     setHasChanges(true);
   };
@@ -56,29 +116,35 @@ const DishOrdering = () => {
       setSaving(true);
       setMessage({ type: '', text: '' });
 
-      console.log('Starting save process...');
-      console.log('Meal types data:', mealTypesData);
+      console.log('💾 Starting save process...');
 
-      // Save order for each meal type
+      // Save order for each meal type and category
       for (const mealType of mealTypesData) {
-        console.log(`Saving order for ${mealType.meal_type}:`, mealType.dishes);
-        
-        const dishesOrder = mealType.dishes.map((dish, index) => ({
-          dish_id: dish.id,
-          order: index
-        }));
+        for (const category of mealType.categories) {
+          console.log(`💾 Saving order for ${mealType.meal_type} - ${category.category}:`, category.dishes);
+          
+          const dishesOrder = category.dishes.map((dish, index) => ({
+            dish_id: dish.id,
+            order: index
+          }));
 
-        console.log('Dishes order payload:', {
-          meal_type: mealType.meal_type,
-          dishes: dishesOrder
-        });
+          console.log('📤 Dishes order payload:', {
+            meal_type: mealType.meal_type,
+            category: category.category,
+            dishes: dishesOrder
+          });
 
-        try {
-          const result = await ApiService.reorderDishes(mealType.meal_type, dishesOrder);
-          console.log('Save result:', result);
-        } catch (error) {
-          console.error(`Error saving ${mealType.meal_type}:`, error);
-          throw error; // Re-throw to catch in outer try-catch
+          try {
+            const result = await ApiService.reorderDishes(
+              mealType.meal_type, 
+              category.category, 
+              dishesOrder
+            );
+            console.log('✅ Save result:', result);
+          } catch (error) {
+            console.error(`❌ Error saving ${mealType.meal_type} - ${category.category}:`, error);
+            throw error;
+          }
         }
       }
 
@@ -89,11 +155,9 @@ const DishOrdering = () => {
       setHasChanges(false);
       setSaving(false);
 
-      // Clear message after 3 seconds
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
     } catch (error) {
-      console.error('Error saving order:', error);
-      console.error('Error details:', error.message);
+      console.error('❌ Error saving order:', error);
       setMessage({ 
         type: 'error', 
         text: `Failed to save dish orders: ${error.message}` 
@@ -110,6 +174,64 @@ const DishOrdering = () => {
     setTimeout(() => setMessage({ type: '', text: '' }), 3000);
   };
 
+  // Get all unique meal types
+  const getMealTypes = () => {
+    if (!Array.isArray(mealTypesData) || mealTypesData.length === 0) {
+      return [];
+    }
+    return mealTypesData.map(mt => ({
+      value: mt.meal_type,
+      label: mt.meal_type_display
+    }));
+  };
+
+  // Get all unique categories
+  const getCategories = () => {
+    if (!Array.isArray(mealTypesData) || mealTypesData.length === 0) {
+      return [];
+    }
+    
+    const categoriesSet = new Set();
+    mealTypesData.forEach(mt => {
+      if (mt.categories && Array.isArray(mt.categories)) {
+        mt.categories.forEach(cat => {
+          categoriesSet.add(JSON.stringify({
+            value: cat.category,
+            label: cat.category_display
+          }));
+        });
+      }
+    });
+    return Array.from(categoriesSet).map(c => JSON.parse(c));
+  };
+
+  // Filter data based on selections
+  const getFilteredData = () => {
+    if (!Array.isArray(mealTypesData)) {
+      return [];
+    }
+
+    let filtered = mealTypesData;
+
+    // Filter by meal type
+    if (selectedMealType !== 'all') {
+      filtered = filtered.filter(mt => mt.meal_type === selectedMealType);
+    }
+
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      filtered = filtered.map(mt => ({
+        ...mt,
+        categories: (mt.categories || []).filter(cat => cat.category === selectedCategory),
+        total_dishes: (mt.categories || [])
+          .filter(cat => cat.category === selectedCategory)
+          .reduce((sum, cat) => sum + (cat.total_dishes || 0), 0)
+      })).filter(mt => mt.categories.length > 0);
+    }
+
+    return filtered;
+  };
+
   if (loading) {
     return (
       <div className="dish-ordering-container">
@@ -121,12 +243,59 @@ const DishOrdering = () => {
     );
   }
 
+  const filteredData = getFilteredData();
+
   return (
     <div className="dish-ordering-container">
       <div className="ordering-header">
         <h1>Manage Dish Order</h1>
-        <p className="subtitle">Drag and drop to reorder dishes within each meal time</p>
+        <p className="subtitle">Drag and drop to reorder dishes within each category</p>
         
+        {/* Filters */}
+        <div className="filters-section">
+          <div className="filter-group">
+            <label htmlFor="meal-filter">Meal Type</label>
+            <select
+              id="meal-filter"
+              value={selectedMealType}
+              onChange={(e) => setSelectedMealType(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Meal Types</option>
+              {getMealTypes().map(mt => (
+                <option key={mt.value} value={mt.value}>{mt.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label htmlFor="category-filter">Category</label>
+            <select
+              id="category-filter"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Categories</option>
+              {getCategories().map(cat => (
+                <option key={cat.value} value={cat.value}>{cat.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {(selectedMealType !== 'all' || selectedCategory !== 'all') && (
+            <button
+              className="clear-filters-btn"
+              onClick={() => {
+                setSelectedMealType('all');
+                setSelectedCategory('all');
+              }}
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
+
         {message.text && (
           <div className={`alert alert-${message.type}`}>
             {message.text}
@@ -152,70 +321,101 @@ const DishOrdering = () => {
       </div>
 
       <div className="meal-types-grid">
-        {mealTypesData.map((mealType, mealIndex) => (
-          <div key={mealType.meal_type} className="meal-type-column">
+        {filteredData.map((mealType, mealIndex) => (
+          <div key={mealType.meal_type} className="meal-type-section">
             <div className="meal-type-header">
               <h2>{mealType.meal_type_display}</h2>
-              <span className="dish-count">{mealType.total_dishes} dishes</span>
+              <span className="dish-count">{mealType.total_dishes || 0} dishes</span>
             </div>
 
-            <ReactSortable
-              list={mealType.dishes}
-              setList={(newList) => handleReorder(mealIndex, newList)}
-              animation={200}
-              ghostClass="sortable-ghost"
-              chosenClass="sortable-chosen"
-              dragClass="sortable-drag"
-              className="dishes-list"
-              handle=".drag-handle"
-            >
-              {mealType.dishes.map((dish, index) => (
-                <div key={dish.id} className="dish-item">
-                  <div className="drag-handle">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                      <circle cx="5" cy="5" r="1.5"/>
-                      <circle cx="5" cy="10" r="1.5"/>
-                      <circle cx="5" cy="15" r="1.5"/>
-                      <circle cx="10" cy="5" r="1.5"/>
-                      <circle cx="10" cy="10" r="1.5"/>
-                      <circle cx="10" cy="15" r="1.5"/>
-                    </svg>
-                  </div>
-                  
-                  <div className="dish-image">
-                    {dish.image ? (
-                      <img src={dish.image} alt={dish.name} />
-                    ) : (
-                      <div className="no-image">No Image</div>
-                    )}
-                  </div>
-
-                  <div className="dish-details">
-                    <div className="dish-name">{dish.name}</div>
-                    {dish.secondary_name && (
-                      <div className="dish-secondary-name">{dish.secondary_name}</div>
-                    )}
-                    <div className="dish-meta">
-                      <span className="dish-type">{dish.dish_type_display}</span>
-                      <span className="dish-price">₹{dish.price}</span>
-                    </div>
-                  </div>
-
-                  <div className="dish-order-number">
-                    #{index + 1}
-                  </div>
+            {(mealType.categories || []).map((category, categoryIndex) => (
+              <div key={category.category} className="category-section">
+                <div className="category-header">
+                  <h3>{category.category_display}</h3>
+                  <span className="category-count">{category.total_dishes || 0} dishes</span>
                 </div>
-              ))}
-            </ReactSortable>
 
-            {mealType.dishes.length === 0 && (
-              <div className="empty-state">
-                <p>No dishes in this meal time</p>
+                <ReactSortable
+                  list={category.dishes || []}
+                  setList={(newList) => {
+                    const actualMealIndex = mealTypesData.findIndex(
+                      mt => mt.meal_type === mealType.meal_type
+                    );
+                    const actualCategoryIndex = mealTypesData[actualMealIndex].categories.findIndex(
+                      cat => cat.category === category.category
+                    );
+                    handleReorder(actualMealIndex, actualCategoryIndex, newList);
+                  }}
+                  animation={200}
+                  ghostClass="sortable-ghost"
+                  chosenClass="sortable-chosen"
+                  dragClass="sortable-drag"
+                  className="dishes-list"
+                  handle=".drag-handle"
+                >
+                  {(category.dishes || []).map((dish, index) => (
+                    <div key={dish.id} className="dish-item">
+                      <div className="drag-handle">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                          <circle cx="5" cy="5" r="1.5"/>
+                          <circle cx="5" cy="10" r="1.5"/>
+                          <circle cx="5" cy="15" r="1.5"/>
+                          <circle cx="10" cy="5" r="1.5"/>
+                          <circle cx="10" cy="10" r="1.5"/>
+                          <circle cx="10" cy="15" r="1.5"/>
+                        </svg>
+                      </div>
+                      
+                      <div className="dish-image">
+                        {dish.image ? (
+                          <img src={dish.image} alt={dish.name} />
+                        ) : (
+                          <div className="no-image">No Image</div>
+                        )}
+                      </div>
+
+                      <div className="dish-details">
+                        <div className="dish-name">{dish.name}</div>
+                        {dish.secondary_name && (
+                          <div className="dish-secondary-name">{dish.secondary_name}</div>
+                        )}
+                        <div className="dish-meta">
+                          <span className="dish-price">₹{dish.price}</span>
+                        </div>
+                      </div>
+
+                      <div className="dish-order-number">
+                        #{index + 1}
+                      </div>
+                    </div>
+                  ))}
+                </ReactSortable>
+
+                {(!category.dishes || category.dishes.length === 0) && (
+                  <div className="empty-state">
+                    <p>No dishes in this category</p>
+                  </div>
+                )}
               </div>
-            )}
+            ))}
           </div>
         ))}
       </div>
+
+      {filteredData.length === 0 && (
+        <div className="empty-state-main">
+          <p>No dishes found matching your filters</p>
+          <button
+            className="btn btn-secondary"
+            onClick={() => {
+              setSelectedMealType('all');
+              setSelectedCategory('all');
+            }}
+          >
+            Clear Filters
+          </button>
+        </div>
+      )}
     </div>
   );
 };

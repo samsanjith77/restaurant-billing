@@ -67,15 +67,35 @@ const OrderHistory = () => {
         utc: payload
       });
       
-      const data = await ApiService.getOrderHistory(payload);
+      const response = await ApiService.getOrderHistory(payload);
       
-      console.log('✅ Received orders:', data.length);
+      console.log('✅ API Response:', response);
+
+      // Handle different response formats safely
+      let ordersList = [];
       
-      setOrders(data);
-      setFilteredOrders(data);
+      if (response) {
+        if (Array.isArray(response)) {
+          // Response is directly an array
+          ordersList = response;
+        } else if (response.orders && Array.isArray(response.orders)) {
+          // Response has orders property
+          ordersList = response.orders;
+        } else if (typeof response === 'object') {
+          // Response is object but not array, might be single order or error
+          console.warn('Unexpected response format:', response);
+        }
+      }
+
+      console.log('✅ Processed orders:', ordersList.length);
+      
+      setOrders(ordersList);
+      setFilteredOrders(ordersList);
     } catch (err) {
       console.error('❌ Error:', err);
       setError(err.message || 'Failed to load order history');
+      setOrders([]);
+      setFilteredOrders([]);
     } finally {
       setLoading(false);
     }
@@ -83,6 +103,13 @@ const OrderHistory = () => {
 
   // Filter orders with useCallback to prevent warning
   const filterOrders = useCallback(() => {
+    // Safety check - ensure orders is an array
+    if (!Array.isArray(orders)) {
+      console.warn('Orders is not an array:', orders);
+      setFilteredOrders([]);
+      return;
+    }
+
     let filtered = [...orders];
 
     console.log('🔍 Filtering:', {
@@ -93,6 +120,8 @@ const OrderHistory = () => {
 
     if (filterType !== 'all') {
       filtered = filtered.filter(order => {
+        if (!order.order_type) return false;
+        
         const orderTypeNormalized = order.order_type.toLowerCase().replace(/[\s_-]+/g, '');
         const filterNormalized = filterType.toLowerCase().replace(/[\s_-]+/g, '');
         
@@ -115,9 +144,12 @@ const OrderHistory = () => {
       filtered = filtered.filter(order => {
         const searchLower = searchTerm.toLowerCase();
         const orderIdMatch = order.id.toString().includes(searchLower);
-        const dishMatch = order.items.some(item => 
-          item.dish_name.toLowerCase().includes(searchLower)
+        
+        // Safe check for items array
+        const dishMatch = Array.isArray(order.items) && order.items.some(item => 
+          item.dish_name && item.dish_name.toLowerCase().includes(searchLower)
         );
+        
         return orderIdMatch || dishMatch;
       });
     }
@@ -191,16 +223,25 @@ const OrderHistory = () => {
   };
 
   const getTotalItems = (items) => {
-    return items.reduce((sum, item) => sum + item.quantity, 0);
+    // Safety check for items array
+    if (!Array.isArray(items)) {
+      return 0;
+    }
+    return items.reduce((sum, item) => sum + (item.quantity || 0), 0);
   };
 
   const getOrderTypeIcon = (orderType) => {
+    if (!orderType) return '📦';
     const normalized = orderType.toLowerCase().replace(/[\s_-]+/g, '');
     return normalized === 'dinein' ? '🍽️' : '🏍️';
   };
 
   const getTotalRevenue = () => {
-    return orders.reduce((sum, order) => sum + parseFloat(order.total_amount), 0);
+    // Safety check - ensure orders is an array
+    if (!Array.isArray(orders) || orders.length === 0) {
+      return 0;
+    }
+    return orders.reduce((sum, order) => sum + parseFloat(order.total_amount || 0), 0);
   };
 
   if (loading && orders.length === 0) {
@@ -218,7 +259,7 @@ const OrderHistory = () => {
         <h1>📋 Orders</h1>
         <div className="header-stats">
           <span className="stat-badge">
-            <strong>{orders.length}</strong> orders
+            <strong>{Array.isArray(orders) ? orders.length : 0}</strong> orders
           </span>
           <span className="stat-badge gold">
             <strong>₹{getTotalRevenue().toFixed(0)}</strong>
@@ -328,14 +369,14 @@ const OrderHistory = () => {
 
       {/* Results Count */}
       <div className="results-info">
-        {filteredOrders.length} of {orders.length} orders
+        {Array.isArray(filteredOrders) ? filteredOrders.length : 0} of {Array.isArray(orders) ? orders.length : 0} orders
       </div>
 
       {/* Error State */}
       {error && <ErrorMessage message={error} onRetry={fetchOrders} />}
 
       {/* Compact Orders List */}
-      {filteredOrders.length === 0 && !loading ? (
+      {(!Array.isArray(filteredOrders) || filteredOrders.length === 0) && !loading ? (
         <div className="no-orders">
           <span className="icon">📭</span>
           <p>No orders found</p>
@@ -361,13 +402,17 @@ const OrderHistory = () => {
                     {getOrderTypeIcon(order.order_type)}
                   </span>
                   <span className="order-amount">
-                    ₹{parseFloat(order.total_amount).toFixed(2)}
+                    ₹{parseFloat(order.total_amount || 0).toFixed(2)}
                   </span>
                 </div>
               </div>
               <div className="order-preview">
-                {getTotalItems(order.items)} items: {order.items.slice(0, 2).map(i => i.dish_name).join(', ')}
-                {order.items.length > 2 && ` +${order.items.length - 2} more`}
+                {getTotalItems(order.items)} items: {
+                  Array.isArray(order.items) && order.items.length > 0
+                    ? order.items.slice(0, 2).map(i => i.dish_name).join(', ')
+                    : 'No items'
+                }
+                {Array.isArray(order.items) && order.items.length > 2 && ` +${order.items.length - 2} more`}
               </div>
             </div>
           ))}
@@ -387,11 +432,15 @@ const OrderHistory = () => {
               <div className="modal-info">
                 <div className="info-row">
                   <span>Type</span>
-                  <span>{getOrderTypeIcon(selectedOrder.order_type)} {selectedOrder.order_type}</span>
+                  <span>{getOrderTypeIcon(selectedOrder.order_type)} {selectedOrder.order_type || 'N/A'}</span>
                 </div>
                 <div className="info-row">
                   <span>Date</span>
                   <span>{formatDate(selectedOrder.created_at)}</span>
+                </div>
+                <div className="info-row">
+                  <span>Payment</span>
+                  <span>{selectedOrder.payment_type || 'N/A'}</span>
                 </div>
                 <div className="info-row">
                   <span>Items</span>
@@ -401,18 +450,36 @@ const OrderHistory = () => {
 
               <div className="modal-items">
                 <h3>Items</h3>
-                {selectedOrder.items.map((item, index) => (
-                  <div key={index} className="modal-item">
-                    <span className="item-qty">{item.quantity}×</span>
-                    <span className="item-name">{item.dish_name}</span>
-                    <span className="item-price">₹{parseFloat(item.price).toFixed(2)}</span>
-                  </div>
-                ))}
+                {Array.isArray(selectedOrder.items) && selectedOrder.items.length > 0 ? (
+                  selectedOrder.items.map((item, index) => (
+                    <div key={index} className="modal-item">
+                      <span className="item-qty">{item.quantity}×</span>
+                      <span className="item-name">{item.dish_name || 'Unknown Item'}</span>
+                      <span className="item-price">₹{parseFloat(item.price || 0).toFixed(2)}</span>
+                    </div>
+                  ))
+                ) : (
+                  <p>No items</p>
+                )}
+
+                {/* Show Addons/Extras if available */}
+                {Array.isArray(selectedOrder.addons) && selectedOrder.addons.length > 0 && (
+                  <>
+                    <h3 className="extras-heading">✨ Extras</h3>
+                    {selectedOrder.addons.map((addon, index) => (
+                      <div key={index} className="modal-item modal-addon">
+                        <span className="item-qty">{addon.quantity}×</span>
+                        <span className="item-name">{addon.dish_name || 'Unknown Extra'}</span>
+                        <span className="item-price">₹{parseFloat(addon.price || 0).toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </>
+                )}
               </div>
 
               <div className="modal-total">
                 <span>Total</span>
-                <span>₹{parseFloat(selectedOrder.total_amount).toFixed(2)}</span>
+                <span>₹{parseFloat(selectedOrder.total_amount || 0).toFixed(2)}</span>
               </div>
             </div>
           </div>
