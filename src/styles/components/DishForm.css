@@ -10,6 +10,8 @@
   --medium-gray: #999999;
   --success: #10b981;
   --error: #ef4444;
+  --warning: #ffc107;
+  --info: #17a2b8;
   --gold-primary: #d4af37;
   --gold-glow: rgba(212, 175, 55, 0.15);
   --gradient-gold: linear-gradient(135deg, #d4af37 0%, #c99a2e 100%);
@@ -240,6 +242,123 @@
 }
 
 /* ==========================================
+   SELECT FIELDS (Meal Type, Category, Dish Type)
+   ========================================== */
+
+.meal-type-select,
+.category-select,
+.dish-type-select {
+  width: 100%;
+  height: 48px;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  border: 2px solid var(--light-gray);
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--primary-dark);
+  background-color: var(--white);
+  font-family: inherit;
+  cursor: pointer;
+  
+  /* Remove browser defaults */
+  -webkit-appearance: none;
+  appearance: none;
+  
+  /* Custom dropdown arrow */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.25rem;
+  
+  /* Transitions */
+  transition: all 0.3s ease;
+  
+  /* Remove outline on focus */
+  outline: none;
+}
+
+/* Focus state for select fields */
+.meal-type-select:focus,
+.category-select:focus,
+.dish-type-select:focus {
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 0 4px var(--gold-glow);
+  background-color: var(--off-white);
+}
+
+/* Hover state for select fields */
+.meal-type-select:hover:not(:focus),
+.category-select:hover:not(:focus),
+.dish-type-select:hover:not(:focus) {
+  border-color: #d0d0d0;
+  background-color: #fcfcfc;
+}
+
+/* Disabled state for select fields */
+.meal-type-select:disabled,
+.category-select:disabled,
+.dish-type-select:disabled {
+  background-color: var(--off-white);
+  color: var(--medium-gray);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Option styling */
+.meal-type-select option,
+.category-select option,
+.dish-type-select option {
+  padding: 0.75rem 1rem;
+  background-color: var(--white);
+  color: var(--primary-dark);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* ==========================================
+   FIELD HINT TEXT
+   ========================================== */
+
+.field-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: var(--medium-gray);
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* ==========================================
+   FIELD ALERT/WARNING (NEW)
+   ========================================== */
+
+.field-alert {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
+}
+
+.field-alert--warning {
+  background-color: #fff3cd;
+  border: 1px solid var(--warning);
+  color: #856404;
+}
+
+.field-alert--info {
+  background-color: #d1ecf1;
+  border: 1px solid var(--info);
+  color: #0c5460;
+}
+
+/* ==========================================
    UPLOAD AREA
    ========================================== */
 
@@ -259,15 +378,22 @@
   width: 100%;
 }
 
-.upload-area-mobile:hover {
+.upload-area-mobile:hover:not(.upload-disabled) {
   border-color: #d0d0d0;
   background-color: var(--white);
 }
 
-.upload-area-mobile:active {
+.upload-area-mobile:active:not(.upload-disabled) {
   border-color: var(--gold-primary);
   background-color: var(--white);
   transform: scale(0.98);
+}
+
+/* Upload Disabled State (NEW) */
+.upload-area-mobile.upload-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .file-input-hidden {
@@ -364,12 +490,12 @@
   appearance: none;
 }
 
-.remove-btn:hover {
+.remove-btn:hover:not(:disabled) {
   background-color: #d9d9d9;
   border-color: #d0d0d0;
 }
 
-.remove-btn:active {
+.remove-btn:active:not(:disabled) {
   transform: scale(0.98);
   background-color: var(--error);
   color: var(--white);
@@ -403,6 +529,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   transition: all 0.3s ease;
   outline: none;
   -webkit-appearance: none;
@@ -427,6 +554,26 @@
 }
 
 /* ==========================================
+   SPINNER FOR LOADING STATE (NEW)
+   ========================================== */
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(26, 26, 26, 0.2);
+  border-top-color: var(--primary-dark);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================
    RESPONSIVE DESIGN - TABLET (640px+)
    ========================================== */
 
@@ -446,10 +593,28 @@
   }
 
   .form-group-mobile input[type="text"],
-  .form-group-mobile input[type="number"] {
+  .form-group-mobile input[type="number"],
+  .meal-type-select,
+  .category-select,
+  .dish-type-select {
     height: 52px;
     padding: 0.875rem 1.25rem;
     font-size: 1rem;
+  }
+
+  .meal-type-select,
+  .category-select,
+  .dish-type-select {
+    padding-right: 2.75rem;
+  }
+
+  .field-hint {
+    font-size: 0.8rem;
+  }
+
+  .field-alert {
+    padding: 12px 16px;
+    font-size: 0.85rem;
   }
 
   .upload-area-mobile {
@@ -481,6 +646,11 @@
     font-size: 1.05rem;
     margin-top: 1rem;
   }
+
+  .spinner {
+    width: 18px;
+    height: 18px;
+  }
 }
 
 /* ==========================================
@@ -503,10 +673,28 @@
   }
 
   .form-group-mobile input[type="text"],
-  .form-group-mobile input[type="number"] {
+  .form-group-mobile input[type="number"],
+  .meal-type-select,
+  .category-select,
+  .dish-type-select {
     padding: 1rem 1.5rem;
     font-size: 1.05rem;
     height: 54px;
+  }
+
+  .meal-type-select,
+  .category-select,
+  .dish-type-select {
+    padding-right: 3rem;
+  }
+
+  .field-hint {
+    font-size: 0.85rem;
+  }
+
+  .field-alert {
+    padding: 14px 18px;
+    font-size: 0.9rem;
   }
 
   .upload-area-mobile {
@@ -534,6 +722,11 @@
     height: 58px;
     padding: 1.25rem 2.5rem;
     font-size: 1.1rem;
+  }
+
+  .spinner {
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -565,7 +758,10 @@
 }
 
 /* Focus visible for accessibility */
-.form-group-mobile input:focus-visible {
+.form-group-mobile input:focus-visible,
+.meal-type-select:focus-visible,
+.category-select:focus-visible,
+.dish-type-select:focus-visible {
   outline: 2px solid var(--gold-primary);
   outline-offset: 2px;
 }
@@ -592,6 +788,18 @@
     background-color: #7f1d1d;
     color: #fca5a5;
   }
+
+  .field-alert--warning {
+    background-color: #7c2d12;
+    border-color: #ea580c;
+    color: #fdba74;
+  }
+
+  .field-alert--info {
+    background-color: #0c4a6e;
+    border-color: #0284c7;
+    color: #7dd3fc;
+  }
 }
 
 /* ==========================================
@@ -603,195 +811,12 @@
     padding: 0;
   }
 
-  .form-message {
+  .form-message,
+  .field-alert {
     display: none;
   }
 
   .submit-btn-mobile {
     display: none;
   }
-}
-
-/* ==========================================
-   MEAL TYPE SELECT FIELD
-   ========================================== */
-
-.meal-type-select {
-  width: 100%;
-  height: 48px;
-  padding: 0.75rem 1rem;
-  border: 2px solid var(--light-gray);
-  border-radius: var(--radius-lg);
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--primary-dark);
-  background-color: var(--white);
-  font-family: inherit;
-  
-  /* Remove browser defaults */
-  -webkit-appearance: none;
-  appearance: none;
-  
-  /* Transitions */
-  transition: all 0.3s ease;
-  
-  /* Remove outline on focus */
-  outline: none;
-  
-  /* Cursor */
-  cursor: pointer;
-}
-
-/* Placeholder styling */
-.meal-type-select::placeholder {
-  color: var(--medium-gray);
-  font-weight: 400;
-}
-
-/* Focus state */
-.meal-type-select:focus {
-  border-color: var(--gold-primary);
-  box-shadow: 0 0 0 4px var(--gold-glow);
-  background-color: var(--off-white);
-}
-
-/* Hover state */
-.meal-type-select:hover:not(:focus) {
-  border-color: #d0d0d0;
-  background-color: #fcfcfc;
-}
-
-/* Disabled state */
-.meal-type-select:disabled {
-  background-color: var(--off-white);
-  color: var(--medium-gray);
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* Option styling */
-.meal-type-select option {
-  padding: 0.75rem 1rem;
-  background-color: var(--white);
-  color: var(--primary-dark);
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.meal-type-select option:checked {
-  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
-  color: var(--primary-dark);
-}
-
-/* Custom select wrapper styling for better appearance */
-.meal-type-select {
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1.25rem;
-  padding-right: 2.5rem;
-}
-
-@media (min-width: 640px) {
-  .meal-type-select {
-    height: 52px;
-    padding: 0.875rem 1.25rem;
-    padding-right: 2.75rem;
-  }
-}
-
-/* Dish Type Select Styling */
-.dish-type-select {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 1rem;
-  background-color: white;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
-}
-
-.dish-type-select:focus {
-  outline: none;
-  border-color: #4CAF50;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
-}
-
-.dish-type-select option {
-  padding: 10px;
-}
-
-/* Field Hint Text */
-.field-hint {
-  display: block;
-  margin-top: 6px;
-  font-size: 0.85rem;
-  color: #666;
-  font-style: italic;
-}
-
-/* Form Group Spacing */
-.form-group-mobile {
-  margin-bottom: 20px;
-}
-
-.form-group-mobile label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #333;
-  font-size: 0.95rem;
-}
-
-/* Meal Type Select - Consistent Styling */
-.meal-type-select {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 1rem;
-  background-color: white;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
-}
-
-.meal-type-select:focus {
-  outline: none;
-  border-color: #ff6b6b;
-  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
-}
-
-/* Form Message Improvements */
-.form-message {
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  font-weight: 500;
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.form-message--success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.form-message--error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
 }

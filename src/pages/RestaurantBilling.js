@@ -1,394 +1,480 @@
-import React, { useState, useMemo } from 'react';
-import useDishes from '../hooks/useDishes';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ApiService from '../services/api';
-import { ORDER_TYPES, PAYMENT_TYPES, MESSAGES } from '../utils/constants';
 import AddonsModal from '../components/AddonsModal';
 import '../styles/components/RestaurantBilling.css';
 
-
 const RestaurantBilling = () => {
-  const [activeMealType, setActiveMealType] = useState('afternoon');
-  const { dishes, loading, error, refetch } = useDishes(activeMealType, 'meals');
-  const [orderItems, setOrderItems] = useState({});
-  const [orderType, setOrderType] = useState(ORDER_TYPES.DINE_IN);
-  const [paymentType, setPaymentType] = useState(PAYMENT_TYPES.CASH);
-  const [addons, setAddons] = useState([]);
-  const [showAddonsModal, setShowAddonsModal] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [message, setMessage] = useState(null);
-  const [showSecondaryNames, setShowSecondaryNames] = useState(false);
+  const navigate = useNavigate();
+  
+  // State management
+  const [selectedMealType, setSelectedMealType] = useState('afternoon');
+  const [categoriesData, setCategoriesData] = useState([]);
+  const [cart, setCart] = useState([]);
+  const [selectedAddons, setSelectedAddons] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filteredDishesCount, setFilteredDishesCount] = useState(0);
+  const [showExtrasModal, setShowExtrasModal] = useState(false);
+  const [showSecondaryLanguage, setShowSecondaryLanguage] = useState(false); // Language toggle state
+  
+  // Order details
+  const [orderType, setOrderType] = useState('dine-in');
+  const [paymentType, setPaymentType] = useState('cash');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [notification, setNotification] = useState(null);
 
-
+  // Meal type options
   const mealTypes = [
-    { key: 'morning', label: 'Morning' },
-    { key: 'afternoon', label: 'Afternoon' },
-    { key: 'night', label: 'Night' },
+    { value: 'morning', label: 'Morning' },
+    { value: 'afternoon', label: 'Afternoon' },
+    { value: 'night', label: 'Night' }
   ];
 
+  // Fetch dishes grouped by category on mount and meal type change
+  useEffect(() => {
+    fetchDishesByCategory();
+  }, [selectedMealType]);
 
-  // Filter dishes based on search query
-  const filteredDishes = useMemo(() => {
+  // Update filtered dishes count when search changes
+  useEffect(() => {
+    let count = 0;
+    categoriesData.forEach(category => {
+      const filtered = filterDishesBySearch(category.dishes);
+      count += filtered.length;
+    });
+    setFilteredDishesCount(count);
+  }, [searchQuery, categoriesData]);
+
+  const fetchDishesByCategory = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Fetch dishes grouped by category (automatically excludes extras)
+      const data = await ApiService.getDishesByCategory(selectedMealType);
+      setCategoriesData(data);
+    } catch (err) {
+      console.error('Error fetching dishes:', err);
+      setError(err.message || 'Failed to load menu');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Open extras modal
+  const handleOpenExtrasModal = () => {
+    setShowExtrasModal(true);
+  };
+
+  // Handle extras confirmation
+  const handleExtrasConfirm = (addons) => {
+    setSelectedAddons(addons);
+    if (addons.length > 0) {
+      showNotification(`${addons.length} extras added`);
+    }
+  };
+
+  // Filter dishes by search query
+  const filterDishesBySearch = (dishes) => {
     if (!searchQuery.trim()) return dishes;
     
     const query = searchQuery.toLowerCase();
-    return dishes.filter(dish => {
-      const dishName = dish.name?.toLowerCase() || '';
-      const secondaryName = dish.secondary_name?.toLowerCase() || '';
-      return dishName.includes(query) || secondaryName.includes(query);
-    });
-  }, [dishes, searchQuery]);
+    return dishes.filter(dish => 
+      dish.name.toLowerCase().includes(query) ||
+      (dish.secondary_name && dish.secondary_name.toLowerCase().includes(query))
+    );
+  };
 
+  // Show notification
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
-  const handleQuantityChange = (dishId, quantity) => {
-    setOrderItems(prev => {
-      const updated = { ...prev };
-      if (quantity > 0) {
-        updated[dishId] = quantity;
-      } else {
-        delete updated[dishId];
+  // Toggle language display
+  const toggleLanguage = () => {
+    setShowSecondaryLanguage(!showSecondaryLanguage);
+  };
+
+  // Get dish name based on language preference
+  const getDishName = (dish) => {
+    if (showSecondaryLanguage && dish.secondary_name) {
+      return dish.secondary_name;
+    }
+    return dish.name;
+  };
+
+  // Cart functions
+  const addToCart = (dish) => {
+    const existingItem = cart.find(item => item.id === dish.id);
+    
+    if (existingItem) {
+      setCart(cart.map(item =>
+        item.id === dish.id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      ));
+    } else {
+      setCart([...cart, { ...dish, quantity: 1 }]);
+    }
+    const displayName = getDishName(dish);
+    showNotification(`${displayName} added to cart`);
+  };
+
+  const updateQuantity = (dishId, change) => {
+    setCart(cart.map(item => {
+      if (item.id === dishId) {
+        const newQuantity = item.quantity + change;
+        return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
       }
-      return updated;
-    });
+      return item;
+    }).filter(Boolean));
   };
 
-
-  const calculateDishesTotal = () => {
-    return Object.entries(orderItems).reduce((total, [dishId, qty]) => {
-      const dish = dishes.find(d => d.id === parseInt(dishId));
-      return total + (dish ? parseFloat(dish.price) * qty : 0);
-    }, 0);
+  const removeFromCart = (dishId) => {
+    setCart(cart.filter(item => item.id !== dishId));
   };
 
-
-  const calculateAddonsTotal = () => {
-    return addons.reduce((total, addon) => total + (addon.price * addon.quantity), 0);
+  const clearCart = () => {
+    if (window.confirm('Clear all items from cart?')) {
+      setCart([]);
+      setSelectedAddons([]);
+      showNotification('Cart cleared', 'error');
+    }
   };
 
-
-  const calculateTotal = () => calculateDishesTotal() + calculateAddonsTotal();
-
-
-  const getOrderedDishes = () => {
-    return Object.entries(orderItems)
-      .map(([dishId, quantity]) => {
-        const dish = dishes.find(d => d.id === parseInt(dishId));
-        return dish ? { ...dish, quantity } : null;
-      })
-      .filter(Boolean);
+  // Extras/Addons functions
+  const updateAddonQuantity = (extraId, change) => {
+    setSelectedAddons(selectedAddons.map(addon => {
+      if (addon.id === extraId) {
+        const newQuantity = addon.quantity + change;
+        return newQuantity > 0 ? { ...addon, quantity: newQuantity } : null;
+      }
+      return addon;
+    }).filter(Boolean));
   };
 
-
-  const handleAddonsConfirm = (selectedAddons) => {
-    setAddons(selectedAddons);
-    setShowAddonsModal(false);
+  const removeAddon = (extraId) => {
+    setSelectedAddons(selectedAddons.filter(addon => addon.id !== extraId));
   };
 
-
-  const handleRemoveAddon = (addonId) => {
-    setAddons(prev => prev.filter(addon => addon.id !== addonId));
+  // Calculate total
+  const calculateTotal = () => {
+    const cartTotal = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+    const addonsTotal = selectedAddons.reduce((sum, addon) => sum + (parseFloat(addon.price) * addon.quantity), 0);
+    return cartTotal + addonsTotal;
   };
 
+  // Get quantity for a dish from cart
+  const getQuantityInCart = (dishId) => {
+    const item = cart.find(i => i.id === dishId);
+    return item ? item.quantity : 0;
+  };
 
+  // Navigate back to previous page
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
+  // Submit order
   const handlePlaceOrder = async () => {
-    if (Object.keys(orderItems).length === 0 && addons.length === 0) {
-      setMessage({ type: 'error', text: MESSAGES.EMPTY_ORDER });
-      setTimeout(() => setMessage(null), 3000);
+    if (cart.length === 0) {
+      showNotification('Please add items to your cart', 'error');
       return;
     }
-    setIsProcessing(true);
-    setMessage(null);
 
+    const confirmOrder = window.confirm(
+      `Place order for ₹${calculateTotal().toFixed(2)}?`
+    );
 
+    if (!confirmOrder) return;
+
+    setIsSubmitting(true);
     try {
-      const items = Object.entries(orderItems).map(([dishId, qty]) => ({
-        dish_id: parseInt(dishId),
-        quantity: qty,
-      }));
-
-
       const orderData = {
-        items: items,
+        items: cart.map(item => ({
+          dish_id: item.id,
+          quantity: item.quantity
+        })),
+        addons: selectedAddons.map(addon => ({
+          dish_id: addon.id,
+          quantity: addon.quantity
+        })),
         total_amount: calculateTotal(),
         order_type: orderType,
-        payment_type: paymentType,
-        addons: addons.map(a => ({
-          id: a.id,
-          dish_id: a.dish_id,
-          name: a.name,
-          secondary_name: a.secondary_name,
-          price: a.price,
-          quantity: a.quantity,
-        })),
+        payment_type: paymentType
       };
 
-
-      const response = await ApiService.createOrder(orderData);
-      setMessage({ type: 'success', text: response.message || MESSAGES.SUCCESS_ORDER });
-
-
-      setOrderItems({});
-      setAddons([]);
-      setOrderType(ORDER_TYPES.DINE_IN);
-      setPaymentType(PAYMENT_TYPES.CASH);
-      setSearchQuery('');
-      setTimeout(() => setMessage(null), 3000);
+      await ApiService.createOrder(orderData);
+      
+      showNotification('Order placed successfully!');
+      setCart([]);
+      setSelectedAddons([]);
     } catch (err) {
-      setMessage({ type: 'error', text: err.message || MESSAGES.ERROR_CREATE_ORDER });
+      showNotification(err.message || 'Failed to place order', 'error');
     } finally {
-      setIsProcessing(false);
+      setIsSubmitting(false);
     }
   };
-
-
-  const handleClearCart = () => {
-    if (Object.keys(orderItems).length === 0 && addons.length === 0) return;
-    if (window.confirm('Clear all items from cart?')) {
-      setOrderItems({});
-      setAddons([]);
-    }
-  };
-
-
-  const getTotalItems = () => {
-    const dishCount = Object.values(orderItems).reduce((sum, qty) => sum + qty, 0);
-    const addonCount = addons.reduce((sum, a) => sum + a.quantity, 0);
-    return dishCount + addonCount;
-  };
-
-
-  const orderedDishes = getOrderedDishes();
-
-
-  const getDishDisplayName = (dish) => {
-    return showSecondaryNames && dish.secondary_name ? dish.secondary_name : dish.name;
-  };
-
-
-  const handleClearSearch = () => {
-    setSearchQuery('');
-  };
-
 
   return (
     <div className="restaurant-billing">
-      {/* HEADER BAR */}
+      {/* Notification */}
+      {notification && (
+        <div className={`notification notification--${notification.type}`}>
+          {notification.message}
+        </div>
+      )}
+
+      {/* Unified Header Bar */}
       <div className="unified-header-bar">
         <div className="header-left">
-          <button
-            className="page-view-btn"
-            onClick={() => setShowSecondaryNames(prev => !prev)}
-          >
-            {showSecondaryNames ? "Main Language" : "Secondary Language"}
+          <button className="page-view-btn" onClick={handleGoBack}>
+            ← Back
           </button>
-          
-          {/* SEARCH BOX IN HEADER */}
+
+          {/* Language Toggle Button */}
+          <button 
+            className={`language-toggle-btn ${showSecondaryLanguage ? 'active' : ''}`}
+            onClick={toggleLanguage}
+            title={showSecondaryLanguage ? 'Show English' : 'Show Tamil'}
+          >
+            {showSecondaryLanguage ? 'EN' : 'தமிழ்'}
+          </button>
+
+          {/* Search Box */}
           <div className="search-input-wrapper-header">
             <span className="search-icon-header">🔍</span>
             <input
               type="text"
-              className="search-input-header"
               placeholder="Search dishes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input-header"
             />
             {searchQuery && (
-              <button className="clear-search-btn-header" onClick={handleClearSearch} title="Clear">
+              <button
+                className="clear-search-btn-header"
+                onClick={() => setSearchQuery('')}
+              >
                 ×
               </button>
             )}
           </div>
         </div>
 
-
+        {/* Meal Type Selector */}
         <div className="header-center">
-          {mealTypes.map(m => (
+          {mealTypes.map(meal => (
             <button
-              key={m.key}
-              className={`meal-type-btn ${activeMealType === m.key ? 'active' : ''}`}
-              onClick={() => setActiveMealType(m.key)}
+              key={meal.value}
+              className={`meal-type-btn ${selectedMealType === meal.value ? 'active' : ''}`}
+              onClick={() => setSelectedMealType(meal.value)}
             >
-              {m.label}
+              {meal.label}
             </button>
           ))}
         </div>
 
-
         <div className="header-right">
-          {searchQuery && filteredDishes.length > 0 && (
-            <span className="search-count-header">{filteredDishes.length} found</span>
+          {searchQuery && (
+            <span className="search-count-header">
+              {filteredDishesCount} dishes found
+            </span>
           )}
-          <button
-            className="refresh-btn"
-            onClick={refetch}
+          <button 
+            className="refresh-btn" 
+            onClick={fetchDishesByCategory}
             disabled={loading}
-            title="Refresh"
           >
-            ↻
+            🔄
           </button>
         </div>
       </div>
 
-
-      {/* NOTIFICATION */}
-      {message && (
-        <div className={`notification notification--${message.type}`}>
-          {message.text}
-        </div>
-      )}
-
-
-      {/* MAIN CONTENT */}
+      {/* Main Content - Grid Layout */}
       <div className="billing-content">
-        {/* LEFT - DISHES SECTION */}
+        {/* Left - Dishes Section with Horizontal Scroll */}
         <div className="dishes-section">
           {loading ? (
-            <div className="loading-state">Loading menu...</div>
+            <div className="loading-state">
+              <div className="spinner-large"></div>
+              <p>Loading menu...</p>
+            </div>
           ) : error ? (
             <div className="error-state">
               <p>{error}</p>
-              <button onClick={refetch} className="retry-btn">Retry</button>
+              <button onClick={fetchDishesByCategory} className="retry-btn">
+                Retry
+              </button>
             </div>
-          ) : filteredDishes.length === 0 ? (
+          ) : categoriesData.length === 0 ? (
             <div className="empty-state">
-              {searchQuery ? (
-                <>
-                  <p>No dishes found for "{searchQuery}"</p>
-                  <button onClick={handleClearSearch} className="retry-btn">Clear Search</button>
-                </>
-              ) : (
-                <p>No dishes available for this meal type</p>
-              )}
+              <p>No dishes available for {selectedMealType}</p>
             </div>
           ) : (
-            <div className="dishes-grid-billing">
-              {filteredDishes.map(dish => (
-                <div key={dish.id} className="dish-card-billing">
-                  {dish.image && (
-                    <div className="dish-img-billing">
-                      <img src={dish.image} alt={getDishDisplayName(dish)} />
+            <div className="categories-horizontal-container">
+              {categoriesData.map(category => {
+                const filteredDishes = filterDishesBySearch(category.dishes);
+                
+                // Skip category if no dishes match search
+                if (searchQuery && filteredDishes.length === 0) return null;
+
+                return (
+                  <div key={category.category} className="category-column">
+                    {/* Category Header */}
+                    <div className="category-header-column">
+                      <h3>{category.category_display}</h3>
+                      <span className="category-count-badge">
+                        {searchQuery ? filteredDishes.length : category.total_dishes}
+                      </span>
                     </div>
-                  )}
-                  <div className="dish-info-billing">
-                    <h4 className="dish-name-billing">{getDishDisplayName(dish)}</h4>
-                    {showSecondaryNames && dish.secondary_name && (
-                      <p className="dish-secondary-name-billing">{dish.name}</p>
-                    )}
-                    <p className="dish-price-billing">₹{parseFloat(dish.price).toFixed(2)}</p>
+
+                    {/* Dishes in Rows with Vertical Scroll */}
+                    <div className="dishes-rows-container">
+                      {filteredDishes.map(dish => {
+                        const quantityInCart = getQuantityInCart(dish.id);
+                        const displayName = getDishName(dish);
+
+                        return (
+                          <div key={dish.id} className="dish-row-item">
+                            {dish.image && (
+                              <div className="dish-img-row">
+                                <img src={dish.image} alt={displayName} />
+                              </div>
+                            )}
+                            
+                            <div className="dish-info-row">
+                              <h4 className="dish-name-row">{displayName}</h4>
+                              {/* Show both languages on hover or as subtitle */}
+                              {!showSecondaryLanguage && dish.secondary_name && (
+                                <p className="dish-secondary-name-row">
+                                  {dish.secondary_name}
+                                </p>
+                              )}
+                              {showSecondaryLanguage && dish.name && (
+                                <p className="dish-secondary-name-row">
+                                  {dish.name}
+                                </p>
+                              )}
+                              <p className="dish-price-row">
+                                ₹{parseFloat(dish.price).toFixed(2)}
+                              </p>
+                            </div>
+
+                            <div className="dish-action-row">
+                              {quantityInCart > 0 ? (
+                                <div className="qty-controls-row">
+                                  <button
+                                    className="qty-btn-row"
+                                    onClick={() => updateQuantity(dish.id, -1)}
+                                  >
+                                    −
+                                  </button>
+                                  <span className="qty-display-row">{quantityInCart}</span>
+                                  <button
+                                    className="qty-btn-row"
+                                    onClick={() => updateQuantity(dish.id, 1)}
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  className="add-btn-row"
+                                  onClick={() => addToCart(dish)}
+                                >
+                                  + Add
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <div className="dish-quantity-control">
-                    {orderItems[dish.id] ? (
-                      <div className="qty-controls-billing">
-                        <button
-                          className="qty-btn-billing qty-minus"
-                          onClick={() => handleQuantityChange(dish.id, (orderItems[dish.id] || 0) - 1)}
-                        >
-                          −
-                        </button>
-                        <span className="qty-display">{orderItems[dish.id]}</span>
-                        <button
-                          className="qty-btn-billing qty-plus"
-                          onClick={() => handleQuantityChange(dish.id, (orderItems[dish.id] || 0) + 1)}
-                        >
-                          +
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        className="add-btn-billing"
-                        onClick={() => handleQuantityChange(dish.id, 1)}
-                      >
-                        + Add
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
 
-
-        {/* RIGHT - ORDER SECTION */}
+        {/* Right - Order Section (Sticky Cart) */}
         <div className="order-section">
-          {/* HEADER */}
+          {/* Order Header */}
           <div className="order-header">
-            <h3>Cart ({getTotalItems()})</h3>
-            {getTotalItems() > 0 && (
-              <button className="text-btn text-btn--danger" onClick={handleClearCart}>Clear</button>
+            <h3>Current Order ({cart.length + selectedAddons.length})</h3>
+            {(cart.length > 0 || selectedAddons.length > 0) && (
+              <button className="text-btn text-btn--danger" onClick={clearCart}>
+                Clear
+              </button>
             )}
           </div>
 
-
-          {/* COMPACT CONTROLS - ORDER TYPE, PAYMENT, ADDONS */}
+          {/* Order Controls */}
           <div className="order-controls">
-            {/* ORDER TYPE */}
+            {/* Order Type */}
             <div className="order-type-compact">
-              <label className="compact-label">Type</label>
+              <label className="compact-label">Order Type</label>
               <div className="type-toggle">
                 <button
-                  className={`type-option ${orderType === ORDER_TYPES.DINE_IN ? 'active' : ''}`}
-                  onClick={() => setOrderType(ORDER_TYPES.DINE_IN)}
-                  title="Dine In"
+                  className={`type-option ${orderType === 'dine-in' ? 'active' : ''}`}
+                  onClick={() => setOrderType('dine-in')}
                 >
-                  Dine
+                  Dine In
                 </button>
                 <button
-                  className={`type-option ${orderType === ORDER_TYPES.DELIVERY ? 'active' : ''}`}
-                  onClick={() => setOrderType(ORDER_TYPES.DELIVERY)}
-                  title="Delivery"
+                  className={`type-option ${orderType === 'delivery' ? 'active' : ''}`}
+                  onClick={() => setOrderType('delivery')}
                 >
                   Delivery
                 </button>
               </div>
             </div>
 
-
-            {/* PAYMENT TYPE */}
+            {/* Payment Type */}
             <div className="payment-type-section">
-              <label className="compact-label">Pay</label>
+              <label className="compact-label">Payment</label>
               <div className="payment-toggle">
                 <button
-                  className={`payment-option ${paymentType === PAYMENT_TYPES.CASH ? 'active' : ''}`}
-                  onClick={() => setPaymentType(PAYMENT_TYPES.CASH)}
-                  title="Cash"
+                  className={`payment-option ${paymentType === 'cash' ? 'active' : ''}`}
+                  onClick={() => setPaymentType('cash')}
                 >
                   Cash
                 </button>
                 <button
-                  className={`payment-option ${paymentType === PAYMENT_TYPES.UPI ? 'active' : ''}`}
-                  onClick={() => setPaymentType(PAYMENT_TYPES.UPI)}
-                  title="UPI"
+                  className={`payment-option ${paymentType === 'upi' ? 'active' : ''}`}
+                  onClick={() => setPaymentType('upi')}
                 >
                   UPI
                 </button>
                 <button
-                  className={`payment-option ${paymentType === PAYMENT_TYPES.CARD ? 'active' : ''}`}
-                  onClick={() => setPaymentType(PAYMENT_TYPES.CARD)}
-                  title="Card"
+                  className={`payment-option ${paymentType === 'card' ? 'active' : ''}`}
+                  onClick={() => setPaymentType('card')}
                 >
                   Card
                 </button>
               </div>
             </div>
 
-
-            {/* ADDONS BUTTON */}
+            {/* Extras Button */}
             <div className="addons-section">
               <button
                 className="addons-btn-compact"
-                onClick={() => setShowAddonsModal(true)}
-                title="Add Extras"
+                onClick={handleOpenExtrasModal}
               >
-                Extras {addons.length > 0 && `(${addons.length})`}
+                + Extras
+                {selectedAddons.length > 0 && (
+                  <span className="extras-badge">{selectedAddons.length}</span>
+                )}
               </button>
             </div>
           </div>
 
-
-          {/* ORDER SUMMARY - SCROLLABLE */}
+          {/* Order Summary */}
           <div className="order-summary">
-            {(orderedDishes.length === 0 && addons.length === 0) ? (
+            {cart.length === 0 && selectedAddons.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-cart-icon">🛒</div>
                 <p>Cart is empty</p>
@@ -396,87 +482,135 @@ const RestaurantBilling = () => {
               </div>
             ) : (
               <div className="order-items">
-                {/* DISHES */}
-                {orderedDishes.map(dish => (
-                  <div key={dish.id} className="order-item">
-                    <div className="item-details">
-                      <span className="item-name">{getDishDisplayName(dish)}</span>
-                      <span className="item-price">₹{parseFloat(dish.price).toFixed(2)}</span>
-                    </div>
-                    <div className="item-actions">
-                      <div className="qty-control">
-                        <button
-                          className="qty-btn"
-                          onClick={() => handleQuantityChange(dish.id, dish.quantity - 1)}
-                        >−</button>
-                        <span className="qty-value">{dish.quantity}</span>
-                        <button
-                          className="qty-btn"
-                          onClick={() => handleQuantityChange(dish.id, dish.quantity + 1)}
-                        >+</button>
-                      </div>
-                      <span className="item-subtotal">₹{(parseFloat(dish.price) * dish.quantity).toFixed(2)}</span>
-                    </div>
-                  </div>
-                ))}
-
-
-                {/* ADDONS */}
-                {addons.length > 0 && (
-                  <>
-                    <div className="addons-divider">Extras</div>
-                    {addons.map(addon => (
-                      <div key={addon.id} className="order-item addon-item-display">
-                        <div className="item-details">
-                          <span className="item-name">{addon.name}</span>
-                          <span className="item-price">₹{addon.price.toFixed(2)}</span>
+                {/* Main Cart Items */}
+                {cart.map(item => {
+                  const itemDisplayName = getDishName(item);
+                  
+                  return (
+                    <div key={item.id} className="order-item">
+                      <div className="item-details">
+                        <div className="item-name">
+                          {itemDisplayName}
+                          {!showSecondaryLanguage && item.secondary_name && (
+                            <span className="item-secondary"> • {item.secondary_name}</span>
+                          )}
+                          {showSecondaryLanguage && item.name && item.name !== item.secondary_name && (
+                            <span className="item-secondary"> • {item.name}</span>
+                          )}
                         </div>
-                        <div className="item-actions">
-                          <span className="qty-value">× {addon.quantity}</span>
+                        <div className="item-price">₹{parseFloat(item.price).toFixed(2)}</div>
+                      </div>
+                      <div className="item-actions">
+                        <div className="qty-control">
                           <button
-                            className="remove-addon-btn"
-                            onClick={() => handleRemoveAddon(addon.id)}
-                            title="Remove"
-                          >×</button>
-                          <span className="item-subtotal">₹{(addon.price * addon.quantity).toFixed(2)}</span>
+                            className="qty-btn"
+                            onClick={() => updateQuantity(item.id, -1)}
+                          >
+                            −
+                          </button>
+                          <span className="qty-value">{item.quantity}</span>
+                          <button
+                            className="qty-btn"
+                            onClick={() => updateQuantity(item.id, 1)}
+                          >
+                            +
+                          </button>
+                        </div>
+                        <div className="item-subtotal">
+                          ₹{(parseFloat(item.price) * item.quantity).toFixed(2)}
                         </div>
                       </div>
-                    ))}
+                    </div>
+                  );
+                })}
+
+                {/* Addons/Extras Divider */}
+                {selectedAddons.length > 0 && (
+                  <>
+                    <div className="addons-divider">
+                      ✨ Extras ({selectedAddons.length})
+                    </div>
+                    {selectedAddons.map(addon => {
+                      const addonDisplayName = getDishName(addon);
+                      
+                      return (
+                        <div key={addon.id} className="order-item addon-item-display">
+                          <div className="item-details">
+                            <div className="item-name">
+                              {addonDisplayName}
+                              {!showSecondaryLanguage && addon.secondary_name && (
+                                <span className="item-secondary"> • {addon.secondary_name}</span>
+                              )}
+                              {showSecondaryLanguage && addon.name && addon.name !== addon.secondary_name && (
+                                <span className="item-secondary"> • {addon.name}</span>
+                              )}
+                            </div>
+                            <div className="item-price">₹{parseFloat(addon.price).toFixed(2)}</div>
+                          </div>
+                          <div className="item-actions">
+                            <div className="qty-control">
+                              <button
+                                className="qty-btn"
+                                onClick={() => updateAddonQuantity(addon.id, -1)}
+                              >
+                                −
+                              </button>
+                              <span className="qty-value">{addon.quantity}</span>
+                              <button
+                                className="qty-btn"
+                                onClick={() => updateAddonQuantity(addon.id, 1)}
+                              >
+                                +
+                              </button>
+                            </div>
+                            <button
+                              className="remove-addon-btn"
+                              onClick={() => removeAddon(addon.id)}
+                              title="Remove extra"
+                            >
+                              ×
+                            </button>
+                            <div className="item-subtotal">
+                              ₹{(parseFloat(addon.price) * addon.quantity).toFixed(2)}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </>
                 )}
               </div>
             )}
           </div>
 
-
-          {/* ORDER FOOTER - TOTAL & PLACE ORDER */}
-          <div className="order-footer">
-            <div className="total-row">
-              <span className="total-label">Total</span>
-              <span className="total-value">₹{calculateTotal().toFixed(2)}</span>
+          {/* Order Footer */}
+          {(cart.length > 0 || selectedAddons.length > 0) && (
+            <div className="order-footer">
+              <div className="total-row">
+                <span className="total-label">Total</span>
+                <span className="total-value">₹{calculateTotal().toFixed(2)}</span>
+              </div>
+              <button
+                className="place-order-btn"
+                onClick={handlePlaceOrder}
+                disabled={isSubmitting || cart.length === 0}
+              >
+                {isSubmitting ? 'Placing Order...' : 'Place Order'}
+              </button>
             </div>
-            <button
-              className="place-order-btn"
-              onClick={handlePlaceOrder}
-              disabled={isProcessing || getTotalItems() === 0}
-            >
-              {isProcessing ? 'Processing...' : `Place Order (${getTotalItems()})`}
-            </button>
-          </div>
+          )}
         </div>
       </div>
 
-
-      {/* ADDONS MODAL */}
+      {/* Extras Modal */}
       <AddonsModal
-        isOpen={showAddonsModal}
-        onClose={() => setShowAddonsModal(false)}
-        onConfirm={handleAddonsConfirm}
-        fetchParams={{ dishtype: 'addons' }}
+        isOpen={showExtrasModal}
+        onClose={() => setShowExtrasModal(false)}
+        onConfirm={handleExtrasConfirm}
+        selectedAddons={selectedAddons}
       />
     </div>
   );
 };
-
 
 export default RestaurantBilling;
