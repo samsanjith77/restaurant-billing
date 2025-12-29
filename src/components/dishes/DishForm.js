@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ApiService from '../../services/api';
-import { MEAL_TYPES, DISH_CATEGORIES, CATEGORY_DISPLAY_NAMES } from '../../utils/constants';
 import '../../styles/components/DishForm.css';
+
 
 const DishForm = ({ onDishCreated }) => {
   const [formData, setFormData] = useState({
@@ -12,12 +12,13 @@ const DishForm = ({ onDishCreated }) => {
     category: 'rice',
     image: null
   });
-  
+
   const [availableCategories, setAvailableCategories] = useState([]);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [message, setMessage] = useState(null);
+
 
   // Meal type options
   const mealTypeOptions = [
@@ -27,6 +28,7 @@ const DishForm = ({ onDishCreated }) => {
     { value: 'night', label: '🌙 Night' }
   ];
 
+
   // Category restrictions based on meal type
   const CATEGORY_MEAL_RESTRICTIONS = {
     'dosa': ['morning', 'night'],
@@ -35,12 +37,9 @@ const DishForm = ({ onDishCreated }) => {
     // 'extras' has no restrictions - available at all times
   };
 
-  // Fetch available categories when meal type changes
-  useEffect(() => {
-    fetchAvailableCategories(formData.meal_type);
-  }, [formData.meal_type]);
 
-  const fetchAvailableCategories = async (mealType) => {
+  // Fetch available categories - wrapped with useCallback
+  const fetchAvailableCategories = useCallback(async (mealType) => {
     setLoadingCategories(true);
     try {
       // For extras, we don't need meal-specific categories
@@ -50,16 +49,17 @@ const DishForm = ({ onDishCreated }) => {
         return;
       }
 
+
       const categories = await ApiService.getDishCategories(mealType, false); // Don't include extras by default
-      
+
       // Add extras as an option
       const categoriesWithExtras = [
         ...categories,
         { value: 'extras', label: 'Extras' }
       ];
-      
+
       setAvailableCategories(categoriesWithExtras);
-      
+
       // Reset category if current selection is not available for new meal type
       if (!categoriesWithExtras.some(cat => cat.value === formData.category)) {
         setFormData(prev => ({ 
@@ -83,7 +83,14 @@ const DishForm = ({ onDishCreated }) => {
     } finally {
       setLoadingCategories(false);
     }
-  };
+  }, [formData.category]);
+
+
+  // Fetch available categories when meal type changes
+  useEffect(() => {
+    fetchAvailableCategories(formData.meal_type);
+  }, [formData.meal_type, fetchAvailableCategories]);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -92,6 +99,7 @@ const DishForm = ({ onDishCreated }) => {
       [name]: value 
     }));
   };
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -103,12 +111,14 @@ const DishForm = ({ onDishCreated }) => {
         return;
       }
 
+
       // Validate file type
       if (!file.type.startsWith('image/')) {
         setMessage({ type: 'error', text: 'Please select a valid image file' });
         setTimeout(() => setMessage(null), 3000);
         return;
       }
+
 
       setFormData(prev => ({ ...prev, image: file }));
       const reader = new FileReader();
@@ -117,10 +127,12 @@ const DishForm = ({ onDishCreated }) => {
     }
   };
 
+
   const handleRemoveImage = () => {
     setFormData(prev => ({ ...prev, image: null }));
     setPreview(null);
   };
+
 
   // Check if category has meal restrictions
   const getCategoryWarning = () => {
@@ -132,33 +144,36 @@ const DishForm = ({ onDishCreated }) => {
       };
     }
 
+
     const restrictions = CATEGORY_MEAL_RESTRICTIONS[formData.category];
     if (!restrictions) return null;
-    
+
     if (formData.meal_type === 'all') {
       return {
         type: 'info',
         text: `Note: ${capitalizeFirst(formData.category)} is typically available during ${restrictions.join(', ')}`
       };
     }
-    
+
     if (!restrictions.includes(formData.meal_type)) {
       return {
         type: 'warning',
         text: `Warning: ${capitalizeFirst(formData.category)} may not be suitable for ${formData.meal_type} service`
       };
     }
-    
+
     return null;
   };
+
 
   const capitalizeFirst = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validation
     if (!formData.name.trim()) {
       setMessage({ type: 'error', text: 'Dish name is required' });
@@ -166,17 +181,20 @@ const DishForm = ({ onDishCreated }) => {
       return;
     }
 
+
     if (!formData.price.trim()) {
       setMessage({ type: 'error', text: 'Price is required' });
       setTimeout(() => setMessage(null), 3000);
       return;
     }
 
+
     if (isNaN(parseFloat(formData.price)) || parseFloat(formData.price) <= 0) {
       setMessage({ type: 'error', text: 'Price must be a valid positive number' });
       setTimeout(() => setMessage(null), 3000);
       return;
     }
+
 
     // Check category warning
     const warning = getCategoryWarning();
@@ -189,6 +207,7 @@ const DishForm = ({ onDishCreated }) => {
       }
     }
 
+
     setLoading(true);
     try {
       const formDataPayload = new FormData();
@@ -197,14 +216,15 @@ const DishForm = ({ onDishCreated }) => {
       formDataPayload.append('price', parseFloat(formData.price));
       formDataPayload.append('meal_type', formData.meal_type);
       formDataPayload.append('category', formData.category);
-      
+
       if (formData.image) {
         formDataPayload.append('image', formData.image);
       }
 
+
       const result = await ApiService.createDish(formDataPayload);
       setMessage({ type: 'success', text: result.message || 'Dish created successfully!' });
-      
+
       // Reset form
       setFormData({ 
         name: '', 
@@ -215,7 +235,7 @@ const DishForm = ({ onDishCreated }) => {
         image: null 
       });
       setPreview(null);
-      
+
       if (onDishCreated) onDishCreated();
     } catch (err) {
       setMessage({ type: 'error', text: err.message || 'Failed to create dish' });
@@ -225,7 +245,9 @@ const DishForm = ({ onDishCreated }) => {
     }
   };
 
+
   const categoryWarning = getCategoryWarning();
+
 
   return (
     <div className="dish-form-container">
@@ -234,7 +256,7 @@ const DishForm = ({ onDishCreated }) => {
           {message.text}
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit} className="dish-form-mobile">
         {/* Dish Name Field */}
         <div className="form-group-mobile">
@@ -252,6 +274,7 @@ const DishForm = ({ onDishCreated }) => {
           />
         </div>
 
+
         {/* Secondary Name Field */}
         <div className="form-group-mobile">
           <label htmlFor="secondary-name">Secondary Name (Tamil/Hindi)</label>
@@ -267,6 +290,7 @@ const DishForm = ({ onDishCreated }) => {
           />
           <small className="field-hint">Regional language name (Tamil, Hindi, etc.)</small>
         </div>
+
 
         {/* Price Field */}
         <div className="form-group-mobile">
@@ -284,6 +308,7 @@ const DishForm = ({ onDishCreated }) => {
             disabled={loading}
           />
         </div>
+
 
         {/* Meal Type Field */}
         <div className="form-group-mobile">
@@ -310,6 +335,7 @@ const DishForm = ({ onDishCreated }) => {
           </small>
         </div>
 
+
         {/* Category Field */}
         <div className="form-group-mobile">
           <label htmlFor="dish-category">Category *</label>
@@ -335,7 +361,7 @@ const DishForm = ({ onDishCreated }) => {
           <small className="field-hint">
             Select category (Rice, Gravy, Chinese, Extras, etc.)
           </small>
-          
+
           {/* Category Warning/Info */}
           {categoryWarning && (
             <div className={`field-alert field-alert--${categoryWarning.type}`}>
@@ -344,6 +370,7 @@ const DishForm = ({ onDishCreated }) => {
             </div>
           )}
         </div>
+
 
         {/* Image Upload Field */}
         <div className="form-group-mobile">
@@ -379,6 +406,7 @@ const DishForm = ({ onDishCreated }) => {
           )}
         </div>
 
+
         {/* Submit Button */}
         <button 
           type="submit" 
@@ -398,5 +426,6 @@ const DishForm = ({ onDishCreated }) => {
     </div>
   );
 };
+
 
 export default DishForm;
