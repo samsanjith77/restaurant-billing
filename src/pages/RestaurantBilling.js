@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ApiService from '../services/api';
 import AddonsModal from '../components/AddonsModal';
 import '../styles/components/RestaurantBilling.css';
 
+
 const RestaurantBilling = () => {
   const navigate = useNavigate();
-  
+
   // State management
   const [selectedMealType, setSelectedMealType] = useState('afternoon');
   const [categoriesData, setCategoriesData] = useState([]);
@@ -18,12 +19,13 @@ const RestaurantBilling = () => {
   const [filteredDishesCount, setFilteredDishesCount] = useState(0);
   const [showExtrasModal, setShowExtrasModal] = useState(false);
   const [showSecondaryLanguage, setShowSecondaryLanguage] = useState(false); // Language toggle state
-  
+
   // Order details
   const [orderType, setOrderType] = useState('dine-in');
   const [paymentType, setPaymentType] = useState('cash');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
+
 
   // Meal type options
   const mealTypes = [
@@ -32,22 +34,9 @@ const RestaurantBilling = () => {
     { value: 'night', label: 'Night' }
   ];
 
-  // Fetch dishes grouped by category on mount and meal type change
-  useEffect(() => {
-    fetchDishesByCategory();
-  }, [selectedMealType]);
 
-  // Update filtered dishes count when search changes
-  useEffect(() => {
-    let count = 0;
-    categoriesData.forEach(category => {
-      const filtered = filterDishesBySearch(category.dishes);
-      count += filtered.length;
-    });
-    setFilteredDishesCount(count);
-  }, [searchQuery, categoriesData]);
-
-  const fetchDishesByCategory = async () => {
+  // Fetch dishes grouped by category - wrapped with useCallback
+  const fetchDishesByCategory = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -60,12 +49,43 @@ const RestaurantBilling = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedMealType]);
+
+
+  // Filter dishes by search query - wrapped with useCallback
+  const filterDishesBySearch = useCallback((dishes) => {
+    if (!searchQuery.trim()) return dishes;
+
+    const query = searchQuery.toLowerCase();
+    return dishes.filter(dish => 
+      dish.name.toLowerCase().includes(query) ||
+      (dish.secondary_name && dish.secondary_name.toLowerCase().includes(query))
+    );
+  }, [searchQuery]);
+
+
+  // Fetch dishes on mount and meal type change
+  useEffect(() => {
+    fetchDishesByCategory();
+  }, [fetchDishesByCategory]);
+
+
+  // Update filtered dishes count when search changes
+  useEffect(() => {
+    let count = 0;
+    categoriesData.forEach(category => {
+      const filtered = filterDishesBySearch(category.dishes);
+      count += filtered.length;
+    });
+    setFilteredDishesCount(count);
+  }, [categoriesData, filterDishesBySearch]);
+
 
   // Open extras modal
   const handleOpenExtrasModal = () => {
     setShowExtrasModal(true);
   };
+
 
   // Handle extras confirmation
   const handleExtrasConfirm = (addons) => {
@@ -75,16 +95,6 @@ const RestaurantBilling = () => {
     }
   };
 
-  // Filter dishes by search query
-  const filterDishesBySearch = (dishes) => {
-    if (!searchQuery.trim()) return dishes;
-    
-    const query = searchQuery.toLowerCase();
-    return dishes.filter(dish => 
-      dish.name.toLowerCase().includes(query) ||
-      (dish.secondary_name && dish.secondary_name.toLowerCase().includes(query))
-    );
-  };
 
   // Show notification
   const showNotification = (message, type = 'success') => {
@@ -92,10 +102,12 @@ const RestaurantBilling = () => {
     setTimeout(() => setNotification(null), 3000);
   };
 
+
   // Toggle language display
   const toggleLanguage = () => {
     setShowSecondaryLanguage(!showSecondaryLanguage);
   };
+
 
   // Get dish name based on language preference
   const getDishName = (dish) => {
@@ -105,10 +117,11 @@ const RestaurantBilling = () => {
     return dish.name;
   };
 
+
   // Cart functions
   const addToCart = (dish) => {
     const existingItem = cart.find(item => item.id === dish.id);
-    
+
     if (existingItem) {
       setCart(cart.map(item =>
         item.id === dish.id
@@ -122,6 +135,7 @@ const RestaurantBilling = () => {
     showNotification(`${displayName} added to cart`);
   };
 
+
   const updateQuantity = (dishId, change) => {
     setCart(cart.map(item => {
       if (item.id === dishId) {
@@ -132,9 +146,6 @@ const RestaurantBilling = () => {
     }).filter(Boolean));
   };
 
-  const removeFromCart = (dishId) => {
-    setCart(cart.filter(item => item.id !== dishId));
-  };
 
   const clearCart = () => {
     if (window.confirm('Clear all items from cart?')) {
@@ -143,6 +154,7 @@ const RestaurantBilling = () => {
       showNotification('Cart cleared', 'error');
     }
   };
+
 
   // Extras/Addons functions
   const updateAddonQuantity = (extraId, change) => {
@@ -155,9 +167,11 @@ const RestaurantBilling = () => {
     }).filter(Boolean));
   };
 
+
   const removeAddon = (extraId) => {
     setSelectedAddons(selectedAddons.filter(addon => addon.id !== extraId));
   };
+
 
   // Calculate total
   const calculateTotal = () => {
@@ -166,16 +180,19 @@ const RestaurantBilling = () => {
     return cartTotal + addonsTotal;
   };
 
+
   // Get quantity for a dish from cart
   const getQuantityInCart = (dishId) => {
     const item = cart.find(i => i.id === dishId);
     return item ? item.quantity : 0;
   };
 
+
   // Navigate back to previous page
   const handleGoBack = () => {
     navigate(-1);
   };
+
 
   // Submit order
   const handlePlaceOrder = async () => {
@@ -184,11 +201,14 @@ const RestaurantBilling = () => {
       return;
     }
 
+
     const confirmOrder = window.confirm(
       `Place order for ₹${calculateTotal().toFixed(2)}?`
     );
 
+
     if (!confirmOrder) return;
+
 
     setIsSubmitting(true);
     try {
@@ -206,8 +226,9 @@ const RestaurantBilling = () => {
         payment_type: paymentType
       };
 
+
       await ApiService.createOrder(orderData);
-      
+
       showNotification('Order placed successfully!');
       setCart([]);
       setSelectedAddons([]);
@@ -218,6 +239,7 @@ const RestaurantBilling = () => {
     }
   };
 
+
   return (
     <div className="restaurant-billing">
       {/* Notification */}
@@ -227,12 +249,14 @@ const RestaurantBilling = () => {
         </div>
       )}
 
+
       {/* Unified Header Bar */}
       <div className="unified-header-bar">
         <div className="header-left">
           <button className="page-view-btn" onClick={handleGoBack}>
             ← Back
           </button>
+
 
           {/* Language Toggle Button */}
           <button 
@@ -242,6 +266,7 @@ const RestaurantBilling = () => {
           >
             {showSecondaryLanguage ? 'EN' : 'தமிழ்'}
           </button>
+
 
           {/* Search Box */}
           <div className="search-input-wrapper-header">
@@ -264,6 +289,7 @@ const RestaurantBilling = () => {
           </div>
         </div>
 
+
         {/* Meal Type Selector */}
         <div className="header-center">
           {mealTypes.map(meal => (
@@ -276,6 +302,7 @@ const RestaurantBilling = () => {
             </button>
           ))}
         </div>
+
 
         <div className="header-right">
           {searchQuery && (
@@ -292,6 +319,7 @@ const RestaurantBilling = () => {
           </button>
         </div>
       </div>
+
 
       {/* Main Content - Grid Layout */}
       <div className="billing-content">
@@ -317,9 +345,10 @@ const RestaurantBilling = () => {
             <div className="categories-horizontal-container">
               {categoriesData.map(category => {
                 const filteredDishes = filterDishesBySearch(category.dishes);
-                
+
                 // Skip category if no dishes match search
                 if (searchQuery && filteredDishes.length === 0) return null;
+
 
                 return (
                   <div key={category.category} className="category-column">
@@ -331,11 +360,13 @@ const RestaurantBilling = () => {
                       </span>
                     </div>
 
+
                     {/* Dishes in Rows with Vertical Scroll */}
                     <div className="dishes-rows-container">
                       {filteredDishes.map(dish => {
                         const quantityInCart = getQuantityInCart(dish.id);
                         const displayName = getDishName(dish);
+
 
                         return (
                           <div key={dish.id} className="dish-row-item">
@@ -344,7 +375,7 @@ const RestaurantBilling = () => {
                                 <img src={dish.image} alt={displayName} />
                               </div>
                             )}
-                            
+
                             <div className="dish-info-row">
                               <h4 className="dish-name-row">{displayName}</h4>
                               {/* Show both languages on hover or as subtitle */}
@@ -362,6 +393,7 @@ const RestaurantBilling = () => {
                                 ₹{parseFloat(dish.price).toFixed(2)}
                               </p>
                             </div>
+
 
                             <div className="dish-action-row">
                               {quantityInCart > 0 ? (
@@ -400,6 +432,7 @@ const RestaurantBilling = () => {
           )}
         </div>
 
+
         {/* Right - Order Section (Sticky Cart) */}
         <div className="order-section">
           {/* Order Header */}
@@ -411,6 +444,7 @@ const RestaurantBilling = () => {
               </button>
             )}
           </div>
+
 
           {/* Order Controls */}
           <div className="order-controls">
@@ -432,6 +466,7 @@ const RestaurantBilling = () => {
                 </button>
               </div>
             </div>
+
 
             {/* Payment Type */}
             <div className="payment-type-section">
@@ -458,6 +493,7 @@ const RestaurantBilling = () => {
               </div>
             </div>
 
+
             {/* Extras Button */}
             <div className="addons-section">
               <button
@@ -472,6 +508,7 @@ const RestaurantBilling = () => {
             </div>
           </div>
 
+
           {/* Order Summary */}
           <div className="order-summary">
             {cart.length === 0 && selectedAddons.length === 0 ? (
@@ -485,7 +522,7 @@ const RestaurantBilling = () => {
                 {/* Main Cart Items */}
                 {cart.map(item => {
                   const itemDisplayName = getDishName(item);
-                  
+
                   return (
                     <div key={item.id} className="order-item">
                       <div className="item-details">
@@ -524,6 +561,7 @@ const RestaurantBilling = () => {
                   );
                 })}
 
+
                 {/* Addons/Extras Divider */}
                 {selectedAddons.length > 0 && (
                   <>
@@ -532,7 +570,7 @@ const RestaurantBilling = () => {
                     </div>
                     {selectedAddons.map(addon => {
                       const addonDisplayName = getDishName(addon);
-                      
+
                       return (
                         <div key={addon.id} className="order-item addon-item-display">
                           <div className="item-details">
@@ -583,6 +621,7 @@ const RestaurantBilling = () => {
             )}
           </div>
 
+
           {/* Order Footer */}
           {(cart.length > 0 || selectedAddons.length > 0) && (
             <div className="order-footer">
@@ -602,6 +641,7 @@ const RestaurantBilling = () => {
         </div>
       </div>
 
+
       {/* Extras Modal */}
       <AddonsModal
         isOpen={showExtrasModal}
@@ -612,5 +652,6 @@ const RestaurantBilling = () => {
     </div>
   );
 };
+
 
 export default RestaurantBilling;
