@@ -3,12 +3,10 @@ import { useNavigate, NavLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import '../../styles/components/Header.css';
 
-
 const Header = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user, isAdmin, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
-
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,13 +17,11 @@ const Header = () => {
       }
     };
 
-
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
 
   const handleLogout = () => {
     if (window.confirm('Are you sure you want to logout?')) {
@@ -34,11 +30,9 @@ const Header = () => {
     }
   };
 
-
   const handleLogin = () => {
     navigate('/login');
   };
-
 
   return (
     <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
@@ -48,7 +42,6 @@ const Header = () => {
             <h1 className="restaurant-name">Appatha's Kitchen</h1>
             <span className="tagline">Restaurant Management System</span>
           </div>
-
 
           {isAuthenticated && (
             <nav className="header-main-nav">
@@ -67,15 +60,20 @@ const Header = () => {
               <NavLink to="/expenditure" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
                 💸 Expenditure
               </NavLink>
+              
+              {/* NEW: Report Link (Available to all authenticated users) */}
+              <NavLink to="/report" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+                📊 Report
+              </NavLink>
+              
               {/* Show Analytics only for Admin */}
               {isAdmin && (
                 <NavLink to="/analytics" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-                  📊 Analytics
+                  📈 Analytics
                 </NavLink>
               )}
             </nav>
           )}
-
 
           <nav className="header-nav">
             {isAuthenticated ? (
@@ -110,6 +108,5 @@ const Header = () => {
     </header>
   );
 };
-
 
 export default Header;

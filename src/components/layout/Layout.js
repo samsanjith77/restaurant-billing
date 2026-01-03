@@ -4,10 +4,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import Header from './Header';
 import '../../styles/components/Layout.css';
 
-
 const Layout = () => {
   const { isAdmin } = useAuth();
-
 
   return (
     <div className="app-layout">
@@ -38,10 +36,17 @@ const Layout = () => {
           <span className="nav-icon">💸</span>
           <span className="nav-label">Expense</span>
         </NavLink>
+        
+        {/* NEW: Report Page Link */}
+        <NavLink to="/report" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
+          <span className="nav-icon">📊</span>
+          <span className="nav-label">Report</span>
+        </NavLink>
+        
         {/* Show Analytics only for Admin */}
         {isAdmin && (
           <NavLink to="/analytics" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-            <span className="nav-icon">📊</span>
+            <span className="nav-icon">📈</span>
             <span className="nav-label">Analytics</span>
           </NavLink>
         )}
@@ -49,6 +54,5 @@ const Layout = () => {
     </div>
   );
 };
-
 
 export default Layout;
