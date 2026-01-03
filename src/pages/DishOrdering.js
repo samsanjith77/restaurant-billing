@@ -9,28 +9,19 @@ const DishOrdering = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [hasChanges, setHasChanges] = useState(false);
-  
-  // Filter states
+
   const [selectedMealType, setSelectedMealType] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // Fetch dishes grouped by meal type and category
   useEffect(() => {
     fetchDishesForOrdering();
   }, []);
 
   const fetchDishesForOrdering = async () => {
-  try {
-    setLoading(true);
-    const data = await ApiService.getDishesForOrdering();
-    
-    // DEBUG: Check what backend actually returns
-    console.log('🔍 First meal type:', data[0]);
-    console.log('🔍 First category:', data[0]?.categories[0]);
-    console.log('🔍 Category value:', data[0]?.categories[0]?.category);
-    console.log('🔍 Category type:', typeof data[0]?.categories[0]?.category);
-      
-      // Check if data is valid
+    try {
+      setLoading(true);
+      const data = await ApiService.getDishesForOrdering();
+
       if (!data) {
         throw new Error('No data received from server');
       }
@@ -47,14 +38,9 @@ const DishOrdering = () => {
         setMessage({ type: 'info', text: 'No dishes available for ordering' });
         return;
       }
-      
-      // Transform data to add unique id for sortable
+
       const transformedData = data.map(mealType => {
-        console.log('🍽️ Processing meal type:', mealType.meal_type, mealType);
-        
-        // Check if categories exist
         if (!mealType.categories || !Array.isArray(mealType.categories)) {
-          console.warn(`⚠️ No categories for ${mealType.meal_type}`);
           return {
             ...mealType,
             categories: []
@@ -64,11 +50,7 @@ const DishOrdering = () => {
         return {
           ...mealType,
           categories: mealType.categories.map(category => {
-            console.log('  📂 Processing category:', category.category, category);
-            
-            // Check if dishes exist
             if (!category.dishes || !Array.isArray(category.dishes)) {
-              console.warn(`  ⚠️ No dishes for ${category.category}`);
               return {
                 ...category,
                 dishes: []
@@ -86,13 +68,12 @@ const DishOrdering = () => {
           })
         };
       });
-      
+
       console.log('✅ Transformed data:', transformedData);
       setMealTypesData(transformedData);
       setLoading(false);
     } catch (error) {
       console.error('❌ Error fetching dishes:', error);
-      console.error('❌ Error stack:', error.stack);
       setMessage({ 
         type: 'error', 
         text: `Failed to load dishes: ${error.message}` 
@@ -102,7 +83,6 @@ const DishOrdering = () => {
     }
   };
 
-  // Handle dish reorder within a category
   const handleReorder = (mealTypeIndex, categoryIndex, newDishes) => {
     const updatedMealTypes = [...mealTypesData];
     updatedMealTypes[mealTypeIndex].categories[categoryIndex].dishes = newDishes;
@@ -110,7 +90,6 @@ const DishOrdering = () => {
     setHasChanges(true);
   };
 
-  // Save all changes
   const handleSaveAll = async () => {
     try {
       setSaving(true);
@@ -118,21 +97,49 @@ const DishOrdering = () => {
 
       console.log('💾 Starting save process...');
 
-      // Save order for each meal type and category
-      for (const mealType of mealTypesData) {
+      // Get the data to save (either filtered or all)
+      const dataToSave = getFilteredData();
+
+      if (dataToSave.length === 0) {
+        setMessage({ 
+          type: 'error', 
+          text: 'No data to save. Please check your filters.' 
+        });
+        setSaving(false);
+        return;
+      }
+
+      // Check if any category is 'all'
+      for (const mealType of dataToSave) {
         for (const category of mealType.categories) {
-          console.log(`💾 Saving order for ${mealType.meal_type} - ${category.category}:`, category.dishes);
-          
+          if (category.category === 'all') {
+            setMessage({ 
+              type: 'error', 
+              text: 'Cannot save with "All Categories" filter. Please select a specific category.' 
+            });
+            setSaving(false);
+            return;
+          }
+        }
+      }
+
+      // Save each meal type and category
+      for (const mealType of dataToSave) {
+        for (const category of mealType.categories) {
+          console.log(`💾 Saving order for ${mealType.meal_type} - ${category.category}`);
+
           const dishesOrder = category.dishes.map((dish, index) => ({
             dish_id: dish.id,
             order: index
           }));
 
-          console.log('📤 Dishes order payload:', {
+          const payload = {
             meal_type: mealType.meal_type,
             category: category.category,
             dishes: dishesOrder
-          });
+          };
+
+          console.log('📤 Payload:', payload);
 
           try {
             const result = await ApiService.reorderDishes(
@@ -166,7 +173,6 @@ const DishOrdering = () => {
     }
   };
 
-  // Reset to original order
   const handleReset = () => {
     fetchDishesForOrdering();
     setHasChanges(false);
@@ -174,7 +180,6 @@ const DishOrdering = () => {
     setTimeout(() => setMessage({ type: '', text: '' }), 3000);
   };
 
-  // Get all unique meal types
   const getMealTypes = () => {
     if (!Array.isArray(mealTypesData) || mealTypesData.length === 0) {
       return [];
@@ -185,12 +190,11 @@ const DishOrdering = () => {
     }));
   };
 
-  // Get all unique categories
   const getCategories = () => {
     if (!Array.isArray(mealTypesData) || mealTypesData.length === 0) {
       return [];
     }
-    
+
     const categoriesSet = new Set();
     mealTypesData.forEach(mt => {
       if (mt.categories && Array.isArray(mt.categories)) {
@@ -205,7 +209,6 @@ const DishOrdering = () => {
     return Array.from(categoriesSet).map(c => JSON.parse(c));
   };
 
-  // Filter data based on selections
   const getFilteredData = () => {
     if (!Array.isArray(mealTypesData)) {
       return [];
@@ -213,12 +216,10 @@ const DishOrdering = () => {
 
     let filtered = mealTypesData;
 
-    // Filter by meal type
     if (selectedMealType !== 'all') {
       filtered = filtered.filter(mt => mt.meal_type === selectedMealType);
     }
 
-    // Filter by category
     if (selectedCategory !== 'all') {
       filtered = filtered.map(mt => ({
         ...mt,
@@ -244,14 +245,14 @@ const DishOrdering = () => {
   }
 
   const filteredData = getFilteredData();
+  const canSave = hasChanges && selectedCategory !== 'all';
 
   return (
     <div className="dish-ordering-container">
       <div className="ordering-header">
         <h1>Manage Dish Order</h1>
         <p className="subtitle">Drag and drop to reorder dishes within each category</p>
-        
-        {/* Filters */}
+
         <div className="filters-section">
           <div className="filter-group">
             <label htmlFor="meal-filter">Meal Type</label>
@@ -296,6 +297,12 @@ const DishOrdering = () => {
           )}
         </div>
 
+        {selectedCategory === 'all' && hasChanges && (
+          <div className="alert alert-warning">
+            ⚠️ Please select a specific category to save changes. Cannot save with "All Categories" selected.
+          </div>
+        )}
+
         {message.text && (
           <div className={`alert alert-${message.type}`}>
             {message.text}
@@ -306,7 +313,8 @@ const DishOrdering = () => {
           <button 
             className="btn btn-primary"
             onClick={handleSaveAll}
-            disabled={!hasChanges || saving}
+            disabled={!canSave || saving}
+            title={selectedCategory === 'all' ? 'Please select a specific category to save' : ''}
           >
             {saving ? 'Saving...' : 'Save All Changes'}
           </button>
@@ -365,7 +373,7 @@ const DishOrdering = () => {
                           <circle cx="10" cy="15" r="1.5"/>
                         </svg>
                       </div>
-                      
+
                       <div className="dish-image">
                         {dish.image ? (
                           <img src={dish.image} alt={dish.name} />

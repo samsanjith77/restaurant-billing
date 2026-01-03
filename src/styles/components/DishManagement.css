@@ -7,31 +7,31 @@
   --primary-medium: #1e293b;
   --primary-accent: #334155;
   --primary-light: #475569;
-  
+
   --gold-primary: #d4af37;
   --gold-light: #f4e4c1;
   --gold-dark: #b8941f;
   --gold-glow: rgba(212, 175, 55, 0.3);
-  
+
   --white: #ffffff;
   --off-white: #fafafa;
   --light-gray: #f1f5f9;
   --medium-gray: #94a3b8;
   --dark-gray: #64748b;
-  
+
   --success: #10b981;
   --error: #ef4444;
-  
+
   --gradient-gold: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
   --gradient-primary: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  
+
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-2xl: 24px;
   --radius-full: 9999px;
-  
+
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -186,76 +186,131 @@
 }
 
 /* ==========================================
-   FILTERS SECTION - IMPROVED LAYOUT
+   FILTERS SECTION - FORCED LEFT ALIGNMENT
    ========================================== */
 
 .filters-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  display: block;
+  width: 100%;
+  margin: 0 0 1rem 0;
   padding: 1rem;
   background: var(--off-white);
   border-radius: var(--radius-lg);
 }
 
 .filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  display: block;
+  width: 100%;
+  margin: 0 0 0.75rem 0;
+}
+
+.filter-group:last-of-type {
+  margin-bottom: 0;
 }
 
 .filter-group label {
+  display: block;
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--primary-dark);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin: 0;
+  margin: 0 0 0.5rem 0;
+  text-align: left;
 }
+
+/* ==========================================
+   SEARCH INPUT & SELECT - STRONG BLACK BORDERS
+   ========================================== */
 
 .search-input,
 .filter-select {
+  display: block;
   width: 100%;
-  padding: 0.75rem;
-  border: 2px solid var(--light-gray);
+  padding: 0.875rem 1rem;
+  border: 3px solid #000000;
   border-radius: var(--radius-md);
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--primary-dark);
   background: var(--white);
   transition: all 0.3s ease;
+  box-sizing: border-box;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  outline: none;
+  line-height: 1.5;
+  min-height: 48px;
 }
 
 .search-input:focus,
 .filter-select:focus {
-  outline: none;
-  border-color: var(--gold-primary);
-  box-shadow: 0 0 0 3px var(--gold-glow);
+  border: 3px solid var(--gold-primary);
+  box-shadow: 0 0 0 4px var(--gold-glow), 0 2px 8px rgba(0, 0, 0, 0.15);
+  background: var(--white);
+}
+
+.search-input:hover,
+.filter-select:hover {
+  border-color: #333333;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .search-input::placeholder {
-  color: var(--medium-gray);
+  color: var(--dark-gray);
   font-weight: 500;
+  opacity: 0.7;
 }
 
+/* Select dropdown arrow styling */
+.filter-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 20px;
+  padding-right: 3rem;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23d4af37' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+/* ==========================================
+   CLEAR FILTERS BUTTON
+   ========================================== */
+
 .clear-filters-btn {
-  padding: 0.75rem;
+  display: block;
+  width: 100%;
+  padding: 0.875rem;
   background: var(--error);
   color: var(--white);
-  border: none;
+  border: 3px solid #dc2626;
   border-radius: var(--radius-md);
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  min-height: 48px;
+  margin-top: 0.75rem;
+  box-sizing: border-box;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.clear-filters-btn:hover {
+  background: #dc2626;
+  border-color: #b91c1c;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
 }
 
 .clear-filters-btn:active {
   transform: scale(0.98);
-  background: #dc2626;
+  box-shadow: 0 1px 3px rgba(239, 68, 68, 0.3);
 }
 
 /* ==========================================
@@ -325,7 +380,7 @@
 }
 
 /* ==========================================
-   COMPACT MANAGEMENT GRID - WIDER LAYOUT
+   COMPACT MANAGEMENT GRID
    ========================================== */
 
 .dishes-grid-manage {
@@ -339,8 +394,8 @@
   border-radius: var(--radius-lg);
   padding: 0.75rem;
   display: grid;
-  grid-template-columns: 60px 1fr 70px;
-  gap: 0.75rem;
+  grid-template-columns: 58px 1fr 62px;
+  gap: 0.7rem;
   align-items: center;
   border: 2px solid var(--light-gray);
   transition: all 0.3s ease;
@@ -358,8 +413,8 @@
    ========================================== */
 
 .dish-img-manage {
-  width: 60px;
-  height: 60px;
+  width: 58px;
+  height: 58px;
   border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--light-gray);
@@ -448,10 +503,7 @@
 }
 
 /* ==========================================
-   BUTTONS - RIGHT SIDE - SMALLER SIZE
-   ========================================== */
-/* ==========================================
-   BUTTONS - RIGHT SIDE - PROPER WIDTH FOR FULL TEXT
+   BUTTONS - RIGHT SIDE
    ========================================== */
 
 .dish-actions-manage {
@@ -515,146 +567,6 @@
   box-shadow: 0 1px 2px rgba(239, 68, 68, 0.15);
   background: #dc2626;
 }
-
-/* ==========================================
-   COMPACT MANAGEMENT GRID - ADJUSTED FOR BUTTONS
-   ========================================== */
-
-.dishes-grid-manage {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-}
-
-.dish-card-manage {
-  background: var(--white);
-  border-radius: var(--radius-lg);
-  padding: 0.75rem;
-  display: grid;
-  grid-template-columns: 58px 1fr 62px;
-  gap: 0.7rem;
-  align-items: center;
-  border: 2px solid var(--light-gray);
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-xs);
-}
-
-.dish-card-manage:active {
-  transform: scale(0.99);
-  border-color: var(--gold-primary);
-  box-shadow: var(--shadow-sm);
-}
-
-/* ==========================================
-   IMAGE - LEFT SIDE (SMALLER)
-   ========================================== */
-
-.dish-img-manage {
-  width: 58px;
-  height: 58px;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  background: var(--light-gray);
-  flex-shrink: 0;
-  box-shadow: var(--shadow-xs);
-}
-
-.dish-img-manage img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* ==========================================
-   TABLET & DESKTOP - UPDATED
-   ========================================== */
-
-@media (min-width: 640px) {
-  .dish-management {
-    padding: 1.5rem;
-  }
-
-  .filters-section {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-end;
-  }
-
-  .filter-group {
-    flex: 1;
-    min-width: 200px;
-  }
-
-  .clear-filters-btn {
-    flex-shrink: 0;
-    align-self: flex-end;
-    padding: 0.75rem 1.25rem;
-  }
-
-  .dishes-grid-manage {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-
-  .dish-card-manage {
-    padding: 0.875rem;
-    grid-template-columns: 70px 1fr 68px;
-  }
-
-  .dish-img-manage {
-    width: 70px;
-    height: 70px;
-  }
-
-  .dish-actions-manage {
-    width: 68px;
-  }
-
-  .action-btn-small {
-    padding: 0.4rem 0.35rem;
-    font-size: 0.62rem;
-    min-height: 28px;
-  }
-
-  .edit-modal {
-    align-items: center;
-  }
-
-  .edit-modal-content {
-    border-radius: var(--radius-2xl);
-  }
-
-  .edit-modal-header {
-    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
-  }
-}
-
-@media (min-width: 1024px) {
-  .dishes-grid-manage {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .dish-card-manage {
-    padding: 1rem;
-    grid-template-columns: 80px 1fr 72px;
-  }
-
-  .dish-img-manage {
-    width: 80px;
-    height: 80px;
-  }
-
-  .dish-actions-manage {
-    width: 72px;
-  }
-
-  .action-btn-small {
-    padding: 0.45rem 0.4rem;
-    font-size: 0.65rem;
-    min-height: 30px;
-  }
-}
-
 
 /* ==========================================
    EDIT MODAL
@@ -1100,7 +1012,7 @@
 }
 
 /* ==========================================
-   TABLET & DESKTOP
+   TABLET+ (640px) - FLEXBOX HORIZONTAL LAYOUT
    ========================================== */
 
 @media (min-width: 640px) {
@@ -1108,21 +1020,27 @@
     padding: 1.5rem;
   }
 
+  /* FLEXBOX LAYOUT - GUARANTEED LEFT ALIGNMENT */
   .filters-section {
+    display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: flex-end;
+    gap: 0.875rem;
+    margin: 0 0 1rem 0;
   }
 
   .filter-group {
-    flex: 1;
-    min-width: 200px;
+    flex: 1 1 0;
+    min-width: 0;
+    margin: 0;
   }
 
   .clear-filters-btn {
-    flex-shrink: 0;
-    align-self: flex-end;
-    padding: 0.75rem 1.25rem;
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 120px;
+    margin: 0;
   }
 
   .dishes-grid-manage {
@@ -1132,7 +1050,7 @@
 
   .dish-card-manage {
     padding: 0.875rem;
-    grid-template-columns: 70px 1fr 75px;
+    grid-template-columns: 70px 1fr 68px;
   }
 
   .dish-img-manage {
@@ -1141,12 +1059,12 @@
   }
 
   .dish-actions-manage {
-    width: 75px;
+    width: 68px;
   }
 
   .action-btn-small {
-    padding: 0.35rem 0.45rem;
-    font-size: 0.65rem;
+    padding: 0.4rem 0.35rem;
+    font-size: 0.62rem;
     min-height: 28px;
   }
 
@@ -1163,28 +1081,159 @@
   }
 }
 
+/* ==========================================
+   DESKTOP (1024px+) - FULL DISH NAMES
+   ========================================== */
+
 @media (min-width: 1024px) {
+  .dish-management {
+    max-width: 1400px;
+  }
+
+  .filters-section {
+    gap: 1rem;
+  }
+
+  .clear-filters-btn {
+    min-width: 140px;
+  }
+
   .dishes-grid-manage {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
   }
 
   .dish-card-manage {
-    padding: 1rem;
-    grid-template-columns: 80px 1fr 78px;
+    padding: 1.125rem;
+    grid-template-columns: 90px 1fr 80px;
+    gap: 1rem;
   }
 
   .dish-img-manage {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
+  }
+
+  /* FULL DISH NAME DISPLAY */
+  .dish-info-manage {
+    gap: 0.375rem;
+  }
+
+  .dish-name-manage {
+    font-size: 1rem;
+    font-weight: 700;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.4;
+    word-break: break-word;
+    hyphens: auto;
+  }
+
+  .dish-secondary-name-manage {
+    font-size: 0.813rem;
+    font-weight: 500;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.4;
+    word-break: break-word;
+    hyphens: auto;
+  }
+
+  .dish-meta-manage {
+    gap: 0.375rem;
+    margin-top: 0.25rem;
+  }
+
+  .dish-badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.688rem;
+  }
+
+  .dish-price-manage {
+    font-size: 1.125rem;
+    font-weight: 800;
   }
 
   .dish-actions-manage {
-    width: 78px;
+    width: 80px;
+    gap: 0.375rem;
   }
 
   .action-btn-small {
-    padding: 0.38rem 0.5rem;
-    font-size: 0.68rem;
-    min-height: 30px;
+    padding: 0.438rem 0.5rem;
+    font-size: 0.688rem;
+    min-height: 32px;
+    letter-spacing: 0.02em;
+  }
+}
+
+/* ==========================================
+   XL DESKTOP (1280px+)
+   ========================================== */
+
+@media (min-width: 1280px) {
+  .dish-management {
+    max-width: 1600px;
+  }
+
+  .filters-section {
+    gap: 1.25rem;
+  }
+
+  .clear-filters-btn {
+    min-width: 160px;
+    padding: 0.875rem 1.5rem;
+  }
+
+  .dishes-grid-manage {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .dish-card-manage {
+    padding: 1.25rem;
+    grid-template-columns: 100px 1fr 85px;
+    gap: 1.125rem;
+  }
+
+  .dish-img-manage {
+    width: 100px;
+    height: 100px;
+  }
+
+  .dish-info-manage {
+    gap: 0.5rem;
+  }
+
+  .dish-name-manage {
+    font-size: 1.063rem;
+    line-height: 1.45;
+  }
+
+  .dish-secondary-name-manage {
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+
+  .dish-badge {
+    padding: 0.281rem 0.563rem;
+    font-size: 0.719rem;
+  }
+
+  .dish-price-manage {
+    font-size: 1.188rem;
+  }
+
+  .dish-actions-manage {
+    width: 85px;
+    gap: 0.438rem;
+  }
+
+  .action-btn-small {
+    padding: 0.5rem 0.563rem;
+    font-size: 0.719rem;
+    min-height: 34px;
   }
 }

@@ -11,7 +11,7 @@ import DishOrdering from '../pages/DishOrdering';
 import OrderHistory from '../pages/OrderHistory';
 import Expenditure from '../pages/Expenditure';
 import Analytics from '../pages/Analytics';
-
+import ReportPage from '../pages/ReportPage'; // NEW IMPORT
 
 const AppRoutes = () => {
   return (
@@ -32,6 +32,9 @@ const AppRoutes = () => {
         <Route path="orders" element={<OrderHistory />} />
         <Route path="expenditure" element={<Expenditure />} />
         
+        {/* Report page - NEW ROUTE */}
+        <Route path="report" element={<ReportPage />} />
+        
         {/* Admin-only routes */}
         <Route path="analytics" element={
           <AdminRoute>
@@ -45,12 +48,10 @@ const AppRoutes = () => {
         } />
       </Route>
 
-
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 };
-
 
 export default AppRoutes;

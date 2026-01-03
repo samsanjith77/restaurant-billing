@@ -679,6 +679,68 @@ static async addMaterialExpense(expenseData) {
   }
 }
 
+
+static async deleteWorker(workerId) {
+  try {
+    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DELETE_WORKER(workerId)}`;
+    const response = await this.authenticatedFetch(url, {
+      method: 'DELETE',
+      headers: this.getHeaders()
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to delete worker');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting worker:', error);
+    throw error;
+  }
+}
+
+static async deleteMaterial(materialId) {
+  try {
+    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DELETE_MATERIAL(materialId)}`;
+    const response = await this.authenticatedFetch(url, {
+      method: 'DELETE',
+      headers: this.getHeaders()
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to delete material');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting material:', error);
+    throw error;
+  }
+}
+
+
+static async deleteExpense(expenseId) {
+  try {
+    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DELETE_EXPENSE(expenseId)}`;
+    const response = await this.authenticatedFetch(url, {
+      method: 'DELETE',
+      headers: this.getHeaders()
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to delete expense');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting expense:', error);
+    throw error;
+  }
+}
+
  
 // ==========================================
 // ANALYTICS API METHODS
@@ -858,6 +920,136 @@ static async getWeeklySummary() {
     throw error;
   }
 }
+
+static async getShiftReport(params = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      
+      // Add date parameter
+      if (params.date) {
+        queryParams.append('date', params.date);
+      }
+      
+      // Add shift parameter
+      if (params.shift) {
+        queryParams.append('shift', params.shift);
+      }
+      
+      // Add timezone parameter
+      if (params.timezone) {
+        queryParams.append('timezone', params.timezone);
+      }
+      
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SHIFT_REPORT}${
+        queryParams.toString() ? '?' + queryParams.toString() : ''
+      }`;
+      
+      console.log('📊 Fetching shift report from:', url);
+      
+      const response = await this.authenticatedFetch(url, {
+        headers: this.getHeaders()
+      });
+      
+      console.log('📊 Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('📊 Error response:', errorData);
+        throw new Error(errorData.error || 'Failed to fetch shift report');
+      }
+      
+      const data = await response.json();
+      console.log('📊 Shift report data:', data);
+      
+      return data;
+    } catch (error) {
+      console.error('📊 Error fetching shift report:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get report for a specific shift on a specific date
+   * @param {string} date - Date in YYYY-MM-DD format
+   * @param {string} shiftType - 'morning', 'afternoon', or 'night'
+   * @returns {Promise<Object>} Single shift report data
+   */
+  static async getSingleShiftReport(date, shiftType) {
+    try {
+      return await this.getShiftReport({
+        date: date,
+        shift: shiftType
+      });
+    } catch (error) {
+      console.error('📊 Error fetching single shift report:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get today's full report (all shifts)
+   * @returns {Promise<Object>} Today's complete report
+   */
+  static async getTodayReport() {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      return await this.getShiftReport({
+        date: today,
+        shift: 'all'
+      });
+    } catch (error) {
+      console.error('📊 Error fetching today\'s report:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get yesterday's report (all shifts)
+   * @returns {Promise<Object>} Yesterday's complete report
+   */
+  static async getYesterdayReport() {
+    try {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayDate = yesterday.toISOString().split('T')[0];
+      
+      return await this.getShiftReport({
+        date: yesterdayDate,
+        shift: 'all'
+      });
+    } catch (error) {
+      console.error('📊 Error fetching yesterday\'s report:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get date range report (multiple days)
+   * @param {string} startDate - Start date in YYYY-MM-DD format
+   * @param {string} endDate - End date in YYYY-MM-DD format
+   * @returns {Promise<Array>} Array of daily reports
+   */
+  static async getDateRangeReport(startDate, endDate) {
+    try {
+      const reports = [];
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      
+      for (let date = start; date <= end; date.setDate(date.getDate() + 1)) {
+        const dateStr = date.toISOString().split('T')[0];
+        const report = await this.getShiftReport({
+          date: dateStr,
+          shift: 'all'
+        });
+        reports.push(report);
+      }
+      
+      return reports;
+    } catch (error) {
+      console.error('📊 Error fetching date range report:', error);
+      throw error;
+    }
+  }
   
 }
 
