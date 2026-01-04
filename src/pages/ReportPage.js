@@ -3,24 +3,20 @@ import ApiService from '../services/api';
 import { SHIFT_DISPLAY_NAMES } from '../utils/constants';
 import '../styles/components/ReportPage.css';
 
-
 const ReportPage = () => {
   const [selectedDate, setSelectedDate] = useState(getTodayDate());
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-
   useEffect(() => {
     fetchReportData(selectedDate);
   }, [selectedDate]);
-
 
   function getTodayDate() {
     const today = new Date();
     return today.toISOString().split('T')[0];
   }
-
 
   const fetchReportData = async (date) => {
     setLoading(true);
@@ -42,11 +38,9 @@ const ReportPage = () => {
     }
   };
 
-
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value);
   };
-
 
   const formatCurrency = (amount) => {
     return `₹${parseFloat(amount).toLocaleString('en-IN', {
@@ -55,11 +49,9 @@ const ReportPage = () => {
     })}`;
   };
 
-
   const getShiftDisplayName = (shiftType) => {
     return SHIFT_DISPLAY_NAMES[shiftType] || shiftType;
   };
-
 
   if (loading) {
     return (
@@ -74,7 +66,6 @@ const ReportPage = () => {
       </div>
     );
   }
-
 
   if (error) {
     return (
@@ -91,7 +82,6 @@ const ReportPage = () => {
       </div>
     );
   }
-
 
   return (
     <div className="report-page-table">
@@ -110,7 +100,6 @@ const ReportPage = () => {
           />
         </div>
       </div>
-
 
       {reportData && (
         <>
@@ -131,7 +120,6 @@ const ReportPage = () => {
                     </div>
                   </div>
 
-
                   {/* Main Report Table */}
                   <div className="report-table-wrapper">
                     <table className="report-main-table">
@@ -144,16 +132,33 @@ const ReportPage = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {/* Income Rows */}
+                        {/* ✅ NEW: Category-wise breakdown for EACH payment type */}
+                        {/* Cash Payments by Category */}
                         <tr>
-                          <td className="label-cell">Cash Payment</td>
-                          <td className="amount-cell income-value">{formatCurrency(shift.cash_income)}</td>
+                          <td className="label-cell cash-category-header" colSpan="2">
+                            💰 Cash Payments
+                          </td>
                           <td className="label-cell expense-label">Labour Expenses</td>
                           <td className="amount-cell"></td>
                         </tr>
+                        {shift.cash_category_breakdown && shift.cash_category_breakdown.length > 0 ? (
+                          shift.cash_category_breakdown.map((cat, idx) => (
+                            <tr key={`cash-${idx}`}>
+                              <td className="label-cell category-subitem">• {cat.category_display}</td>
+                              <td className="amount-cell income-value">{formatCurrency(cat.amount)}</td>
+                              <td colSpan="2"></td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td className="label-cell category-subitem">• No cash transactions</td>
+                            <td className="amount-cell income-value">-</td>
+                            <td colSpan="2"></td>
+                          </tr>
+                        )}
                         <tr>
-                          <td className="label-cell">UPI Payment</td>
-                          <td className="amount-cell income-value">{formatCurrency(shift.upi_income)}</td>
+                          <td className="label-cell"><strong>Cash Total</strong></td>
+                          <td className="amount-cell income-value"><strong>{formatCurrency(shift.cash_income)}</strong></td>
                           <td colSpan="2" className="nested-table-cell">
                             {shift.worker_expenses_list.length > 0 ? (
                               <div className="nested-table-container">
@@ -176,26 +181,62 @@ const ReportPage = () => {
                             )}
                           </td>
                         </tr>
+
+                        {/* UPI Payments by Category */}
                         <tr>
-                          <td className="label-cell">Card Payment</td>
-                          <td className="amount-cell income-value">{formatCurrency(shift.card_income)}</td>
+                          <td className="label-cell upi-category-header" colSpan="2">
+                            💳 UPI Payments
+                          </td>
                           <td className="label-cell subtotal-label">Labour Subtotal</td>
                           <td className="amount-cell expense-value">{formatCurrency(shift.worker_expense)}</td>
                         </tr>
+                        {shift.upi_category_breakdown && shift.upi_category_breakdown.length > 0 ? (
+                          shift.upi_category_breakdown.map((cat, idx) => (
+                            <tr key={`upi-${idx}`}>
+                              <td className="label-cell category-subitem">• {cat.category_display}</td>
+                              <td className="amount-cell income-value">{formatCurrency(cat.amount)}</td>
+                              <td colSpan="2"></td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td className="label-cell category-subitem">• No UPI transactions</td>
+                            <td className="amount-cell income-value">-</td>
+                            <td colSpan="2"></td>
+                          </tr>
+                        )}
+                        <tr>
+                          <td className="label-cell"><strong>UPI Total</strong></td>
+                          <td className="amount-cell income-value"><strong>{formatCurrency(shift.upi_income)}</strong></td>
+                          <td colSpan="2"></td>
+                        </tr>
 
-
-                        {/* Income Subtotal */}
-                        <tr className="subtotal-row">
-                          <td className="label-cell"><strong>Total Income</strong></td>
-                          <td className="amount-cell income-value"><strong>{formatCurrency(shift.total_income)}</strong></td>
+                        {/* Card Payments by Category */}
+                        <tr>
+                          <td className="label-cell card-category-header" colSpan="2">
+                            💳 Card Payments
+                          </td>
                           <td className="label-cell expense-label">Material Expenses</td>
                           <td className="amount-cell"></td>
                         </tr>
-
-
-                        {/* Material Expenses */}
+                        {shift.card_category_breakdown && shift.card_category_breakdown.length > 0 ? (
+                          shift.card_category_breakdown.map((cat, idx) => (
+                            <tr key={`card-${idx}`}>
+                              <td className="label-cell category-subitem">• {cat.category_display}</td>
+                              <td className="amount-cell income-value">{formatCurrency(cat.amount)}</td>
+                              <td colSpan="2"></td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td className="label-cell category-subitem">• No card transactions</td>
+                            <td className="amount-cell income-value">-</td>
+                            <td colSpan="2"></td>
+                          </tr>
+                        )}
                         <tr>
-                          <td colSpan="2" className="empty-spacer-cell"></td>
+                          <td className="label-cell"><strong>Card Total</strong></td>
+                          <td className="amount-cell income-value"><strong>{formatCurrency(shift.card_income)}</strong></td>
                           <td colSpan="2" className="nested-table-cell">
                             {shift.material_expenses_list.length > 0 ? (
                               <div className="nested-table-container">
@@ -221,14 +262,13 @@ const ReportPage = () => {
                           </td>
                         </tr>
 
-
-                        {/* Material Subtotal */}
+                        {/* Income Subtotal */}
                         <tr className="subtotal-row">
-                          <td colSpan="2" className="empty-spacer-cell"></td>
+                          <td className="label-cell"><strong>Total Income</strong></td>
+                          <td className="amount-cell income-value"><strong>{formatCurrency(shift.total_income)}</strong></td>
                           <td className="label-cell subtotal-label">Material Subtotal</td>
                           <td className="amount-cell expense-value">{formatCurrency(shift.material_expense)}</td>
                         </tr>
-
 
                         {/* Grand Total Row */}
                         <tr className="grand-total-row">
@@ -237,7 +277,6 @@ const ReportPage = () => {
                           <td className="label-cell"><strong>TOTAL EXPENSES</strong></td>
                           <td className="amount-cell"><strong>{formatCurrency(shift.total_expense)}</strong></td>
                         </tr>
-
 
                         {/* Profit Row */}
                         <tr className="profit-summary-row">
@@ -307,6 +346,5 @@ const ReportPage = () => {
     </div>
   );
 };
-
 
 export default ReportPage;
