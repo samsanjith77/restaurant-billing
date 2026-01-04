@@ -1,6 +1,6 @@
 /* ========================================
    Report Page - Professional Table Layout
-   Complete CSS File
+   Complete CSS File (UPDATED: clear black table borders)
    ======================================== */
 
 * {
@@ -202,18 +202,28 @@
 }
 
 /* ========================================
-   Report Table
+   Report Table (UPDATED: black grid borders)
    ======================================== */
 
 .report-table-wrapper {
   padding: 0;
   overflow-x: auto;
+  background: #fff;
+  border: 2px solid #000; /* ✅ table outline */
+  border-radius: 0;
 }
 
 .report-main-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: collapse; /* ✅ single grid lines */
   table-layout: fixed;
+  border: 2px solid #000; /* ✅ outer border */
+}
+
+/* ✅ Apply black borders to ALL cells */
+.report-main-table th,
+.report-main-table td {
+  border: 1px solid #000;
 }
 
 /* Column Widths - Equal for both sides */
@@ -240,7 +250,7 @@
 /* Table Header */
 .main-header-row {
   background: #f8f9fa;
-  border-bottom: 3px solid #dee2e6;
+  border-bottom: 3px solid #000; /* ✅ clearer header separation */
 }
 
 .main-header-row th {
@@ -252,10 +262,10 @@
   text-align: left;
 }
 
+/* Keep your header colors, but borders stay black via th/td rule above */
 .income-header-cell {
   background: #d4edda;
   color: #155724;
-  border-right: 3px solid #c3e6cb;
 }
 
 .expense-header-cell {
@@ -270,7 +280,6 @@
 .income-header-cell + .amount-header-cell {
   background: #d4edda;
   color: #155724;
-  border-right: 3px solid #c3e6cb;
 }
 
 .expense-header-cell + .amount-header-cell {
@@ -280,7 +289,7 @@
 
 /* Table Body Rows */
 .report-main-table tbody tr {
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid #000; /* ✅ stronger row line */
   transition: background-color 0.2s ease;
 }
 
@@ -327,7 +336,6 @@
 .empty-spacer-cell {
   background: #f8f9fa;
   padding: 0;
-  border: none;
 }
 
 /* Nested Table Cell */
@@ -337,10 +345,11 @@
   vertical-align: top;
 }
 
+/* ✅ Black border for nested container */
 .nested-table-container {
   max-height: 300px;
   overflow-y: auto;
-  border: 1px solid #e9ecef;
+  border: 1px solid #000;
 }
 
 /* Custom Scrollbar */
@@ -367,8 +376,10 @@
   border-collapse: collapse;
 }
 
-.nested-expense-table tbody tr {
-  border-bottom: 1px solid #e9ecef;
+/* ✅ Black grid borders in nested table */
+.nested-expense-table,
+.nested-expense-table td {
+  border: 1px solid #000;
 }
 
 .nested-expense-table tbody tr:hover {
@@ -421,8 +432,8 @@
 .subtotal-row .label-cell,
 .subtotal-row .amount-cell {
   padding: 16px 20px;
-  border-top: 2px solid #dee2e6;
-  border-bottom: 2px solid #dee2e6;
+  border-top: 2px solid #000;   /* ✅ strong subtotal separators */
+  border-bottom: 2px solid #000;
 }
 
 /* Grand Total Row */
@@ -436,8 +447,8 @@
   padding: 18px 20px;
   font-size: 16px;
   color: white;
-  border-top: 3px solid #1a1d20;
-  border-bottom: 3px solid #1a1d20;
+  border-top: 3px solid #000;   /* ✅ strong section borders */
+  border-bottom: 3px solid #000;
 }
 
 /* Profit Summary Row */
@@ -447,7 +458,7 @@
 
 .profit-summary-row td {
   padding: 18px 20px;
-  border-bottom: 4px solid #0d6efd;
+  border-bottom: 4px solid #000; /* ✅ black bottom line */
 }
 
 .profit-info-cell {
@@ -636,7 +647,7 @@
   .summary-grid {
     grid-template-columns: repeat(3, 1fr);
   }
-  
+
   .summary-box.profit-box {
     grid-column: span 3;
   }
@@ -646,20 +657,20 @@
   .report-page-table {
     padding: 15px;
   }
-  
+
   .summary-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .summary-box.profit-box {
     grid-column: span 2;
   }
-  
+
   .shift-divider {
     margin: 30px 0;
     padding: 0 30px;
   }
-  
+
   .summary-section-divider {
     margin: 40px 0 25px 0;
   }
@@ -669,99 +680,99 @@
   .report-page-table {
     padding: 12px;
   }
-  
+
   .report-header-table {
     flex-direction: column;
     align-items: flex-start;
     gap: 15px;
     padding: 20px;
   }
-  
+
   .report-header-table h2 {
     font-size: 22px;
   }
-  
+
   .header-right {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .date-input-table {
     flex: 1;
   }
-  
+
   .shift-header-bar {
     flex-direction: column;
     gap: 15px;
     align-items: flex-start;
     padding: 18px 20px;
   }
-  
+
   .shift-info h3 {
     font-size: 20px;
   }
-  
+
   .shift-stats {
     width: 100%;
     justify-content: center;
   }
-  
+
   .report-table-wrapper {
     overflow-x: auto;
   }
-  
+
   .report-main-table {
     min-width: 700px;
   }
-  
+
   .main-header-row th {
     padding: 14px 12px;
     font-size: 13px;
   }
-  
+
   .label-cell,
   .amount-cell {
     padding: 12px;
     font-size: 14px;
   }
-  
+
   .nested-table-container {
     max-height: 250px;
   }
-  
+
   .summary-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .summary-box.profit-box {
     grid-column: span 1;
   }
-  
+
   .summary-box {
     padding: 20px;
   }
-  
+
   .summary-box-value {
     font-size: 24px;
   }
-  
+
   .shift-divider {
     margin: 25px 0;
     padding: 0 20px;
     gap: 15px;
   }
-  
+
   .divider-text {
     font-size: 14px;
     letter-spacing: 6px;
   }
-  
+
   .summary-section-divider {
     margin: 35px 0 20px 0;
     padding: 0 20px;
     gap: 15px;
   }
-  
+
   .summary-divider-text {
     font-size: 13px;
     letter-spacing: 2px;
@@ -773,106 +784,106 @@
   .report-header-table {
     padding: 18px;
   }
-  
+
   .report-header-table h2 {
     font-size: 18px;
   }
-  
+
   .header-right {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-  
+
   .header-right label {
     font-size: 13px;
   }
-  
+
   .date-input-table {
     width: 100%;
     font-size: 14px;
     padding: 8px 14px;
   }
-  
+
   .shift-info h3 {
     font-size: 18px;
   }
-  
+
   .shift-time {
     font-size: 13px;
   }
-  
+
   .stat-label {
     font-size: 12px;
   }
-  
+
   .stat-value {
     font-size: 16px;
   }
-  
+
   .report-main-table {
     min-width: 650px;
   }
-  
+
   .main-header-row th {
     padding: 12px 10px;
     font-size: 12px;
     letter-spacing: 0.5px;
   }
-  
+
   .label-cell,
   .amount-cell {
     padding: 10px;
     font-size: 13px;
   }
-  
+
   .nested-name {
     font-size: 13px;
   }
-  
+
   .nested-desc {
     font-size: 11px;
   }
-  
+
   .nested-amount {
     font-size: 14px;
   }
-  
+
   .shift-divider {
     margin: 20px 0;
     padding: 0 15px;
   }
-  
+
   .divider-text {
     font-size: 12px;
     letter-spacing: 4px;
   }
-  
+
   .summary-section-divider {
     margin: 30px 0 18px 0;
     padding: 0 15px;
   }
-  
+
   .summary-divider-text {
     font-size: 11px;
     letter-spacing: 1.5px;
     padding: 5px 12px;
   }
-  
+
   .summary-title {
     font-size: 18px;
     margin-bottom: 20px;
   }
-  
+
   .summary-box {
     padding: 18px;
   }
-  
+
   .summary-box-label {
     font-size: 12px;
     margin-bottom: 10px;
   }
-  
+
   .summary-box-value {
     font-size: 22px;
   }
@@ -887,11 +898,11 @@
     background: white;
     padding: 0;
   }
-  
+
   .date-input-table {
     display: none;
   }
-  
+
   .report-header-table,
   .shift-section-table,
   .daily-summary-section {
@@ -899,79 +910,79 @@
     border: 1px solid black;
     page-break-inside: avoid;
   }
-  
+
   .shift-header-bar {
     background: #f0f0f0 !important;
     color: black !important;
     border-bottom: 2px solid black;
   }
-  
+
   .shift-info h3,
   .shift-time,
   .stat-label,
   .stat-value {
     color: black !important;
   }
-  
+
   .shift-divider,
   .summary-section-divider {
     page-break-before: auto;
     margin: 20px 0;
   }
-  
+
   .divider-line,
   .summary-divider-line {
     background: #000 !important;
   }
-  
+
   .divider-text,
   .summary-divider-text {
     color: #000 !important;
     border-color: #000 !important;
   }
-  
+
   .nested-table-container {
     max-height: none !important;
     overflow: visible !important;
   }
-  
+
   .income-value,
   .expense-value {
     color: black !important;
   }
-  
+
   .profit-positive,
   .profit-negative {
     color: black !important;
   }
-  
+
   .income-highlight,
   .expense-highlight {
     color: black !important;
   }
-  
+
   .summary-box {
     border: 1px solid black !important;
     background: white !important;
   }
-  
+
   .summary-box.profit-box {
     background: #f0f0f0 !important;
   }
-  
+
   .summary-grid {
     grid-template-columns: repeat(5, 1fr);
   }
-  
+
   .grand-total-row {
     background: #f0f0f0 !important;
   }
-  
+
   .grand-total-row .label-cell,
   .grand-total-row .amount-cell {
     color: black !important;
   }
-  
+
   .profit-summary-row {
     background: #f8f8f8 !important;
   }
@@ -988,21 +999,19 @@
   }
 }
 
-/* Focus styles for keyboard navigation */
 .date-input-table:focus-visible,
 .btn-retry:focus-visible {
   outline: 3px solid #6366f1;
   outline-offset: 2px;
 }
 
-/* High contrast mode support */
 @media (prefers-contrast: high) {
   .report-header-table,
   .shift-section-table,
   .daily-summary-section {
     border: 2px solid currentColor;
   }
-  
+
   .income-value,
   .expense-value,
   .profit-positive,

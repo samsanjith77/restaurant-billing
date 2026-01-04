@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ApiService from '../services/api';
@@ -111,9 +110,9 @@ const RestaurantBilling = () => {
 
     if (existingItem) {
       setCart(
-        cart.map((item) =>
+        cart.map((item =>
           item.id === dish.id ? { ...item, quantity: item.quantity + 1 } : item
-        )
+        ))
       );
     } else {
       setCart([...cart, { ...dish, quantity: 1 }]);
@@ -183,11 +182,12 @@ const RestaurantBilling = () => {
     navigate(-1);
   };
 
-  // ✅ Direct API call (no confirmation)
+  // ✅ FIXED: Direct API call (no confirmation) - NOW WORKS WITH ONLY EXTRAS
   const handlePlaceOrder = async () => {
     if (isSubmitting) return;
 
-    if (cart.length === 0) {
+    // ✅ FIXED: Check BOTH cart AND addons
+    if (cart.length === 0 && selectedAddons.length === 0) {
       showNotification('Please add items to your cart', 'error');
       return;
     }
@@ -347,11 +347,6 @@ const RestaurantBilling = () => {
 
                             <div className="dish-info-row">
                               <h4 className="dish-name-row">{displayName}</h4>
-
-                              {/* ✅ Keep subtitle only when dish name displayed is not the same? (optional)
-                                  For your request: remove subtitle completely to reduce height.
-                              */}
-
                               <p className="dish-price-row">₹{parseFloat(dish.price).toFixed(2)}</p>
                             </div>
 
@@ -568,10 +563,11 @@ const RestaurantBilling = () => {
                 <span className="total-label">Total</span>
                 <span className="total-value">₹{calculateTotal().toFixed(2)}</span>
               </div>
+              {/* ✅ FIXED: Button now works with ONLY extras */}
               <button
                 className="place-order-btn"
                 onClick={handlePlaceOrder}
-                disabled={isSubmitting || cart.length === 0}
+                disabled={isSubmitting || (cart.length === 0 && selectedAddons.length === 0)}
                 type="button"
               >
                 {isSubmitting ? 'Placing Order...' : 'Place Order'}
