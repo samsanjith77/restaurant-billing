@@ -741,7 +741,74 @@ static async deleteExpense(expenseId) {
   }
 }
 
- 
+// Get dish sales data for a specific period
+static async getDishSalesInPeriod(params) {
+  try {
+    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DISH_SALES_IN_PERIOD}`;
+    const response = await this.authenticatedFetch(url, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(params)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to fetch dish sales data');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching dish sales:', error);
+    throw error;
+  }
+}
+
+// Get all selling dishes for a period (without specific dish_id)
+static async getTopSellingDishes(params) {
+  try {
+    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DISH_SALES_IN_PERIOD}`;
+    const response = await this.authenticatedFetch(url, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({
+        start: params.start,
+        end: params.end
+        // No dish_id means get all dishes
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to fetch top selling dishes');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching top selling dishes:', error);
+    throw error;
+  }
+}
+
+static async getDishSalesByShift(params) {
+  try {
+    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DISH_SALES_IN_PERIOD}`;
+    const response = await this.authenticatedFetch(url, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(params)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to fetch dish sales by shift');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching dish sales by shift:', error);
+    throw error;
+  }
+}
 // ==========================================
 // ANALYTICS API METHODS
 // ==========================================

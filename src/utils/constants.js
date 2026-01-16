@@ -3,7 +3,7 @@
 // API CONFIGURATION
 // ==========================================
 export const API_CONFIG = {
-  BASE_URL: 'http://localhost:8000', // Change to your backend URL
+  BASE_URL: 'http://localhost:8001', // Change to your backend URL
   ENDPOINTS: {
     // Auth endpoints
     LOGIN: '/accounts/login/',
@@ -20,7 +20,7 @@ export const API_CONFIG = {
     DISHES_FOR_ORDERING: '/bill/dishes/for-ordering/',
     REORDER_DISHES: '/bill/dishes/reorder/',
     INITIALIZE_ORDERS: '/bill/dishes/initialize-orders/',
-
+    DISH_SALES_IN_PERIOD: '/bill/api/dish-sales-in-period/',
     // Order endpoints
     ORDERS: '/bill/orders/',
     CREATE_ORDER: '/bill/orders/create/',
